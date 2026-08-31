@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/hero.svg" alt="A pixel-art marketer at a terminal: they ask an SEO agent to find keywords they can rank for, it calls DataForSEO and checks SERP ranks, reports 12 gaps, and queues three content briefs" width="720">
+</p>
+
 <h1 align="center">Marketing as Code</h1>
 
 <p align="center">
@@ -41,16 +45,20 @@ and voice, connect the agents you want, and run your marketing from here.
 ## What you get
 
 - **The hierarchy.** A working folder structure for a marketing team's second
-  brain: strategy, content, campaigns, data, memory, agents, playgrounds. Every
-  folder explains itself and comes with templates instead of blank pages.
-- **A default agent set** (bring your own keys). Starter agents for SEO
-  analysis, brand-mention tracking, web analytics reporting, data enrichment,
-  and meeting-transcript processing. Each one is a plain text file you can read
-  and edit.
+  brain: strategy, brand, content, projects, data, reports, memory, agents,
+  playgrounds. Every folder explains itself and comes with templates instead
+  of blank pages. The reasoning is written down in
+  [docs/architecture.md](docs/architecture.md).
+- **A default agent set** (bring your own keys). Starter agents and skills
+  for onboarding, content, project scaffolding, review, meeting-transcript
+  processing, and the quarterly marketing review — with SEO analysis,
+  analytics reporting, and brand-mention tracking landing next. Each one is
+  a plain text file you can read and edit, in a format Claude Code, Cursor,
+  and Codex all understand.
 - **A memory that compounds.** A decision log and a living knowledge base, fed
   automatically: a meeting transcript lands, an agent processes it, updates the
-  knowledge base, logs the decisions, and files the follow-ups as issues.
-  Meetings stop evaporating.
+  knowledge base, logs the decisions, and files the follow-ups into your task
+  tool. Meetings stop evaporating.
 - **A prototyping culture.** `playgrounds/` and a prototype-builder agent, so
   you come to meetings with prototypes, not decks: a landing page mock, a
   campaign concept page, an email sequence preview, built from one sentence and
@@ -86,14 +94,17 @@ parts for you.
 
 | Folder | What lives there |
 | --- | --- |
-| `strategy/` | Positioning, messaging, ICP and personas, brand voice: the context every agent loads before doing marketing work |
-| `content/` | Content backlog, briefs, drafts, and published pieces |
-| `campaigns/` | Campaign briefs as files, tasks as GitHub Issues |
-| `data/` | Keyword research, prospect lists, exports: the raw data your agents produce and consume |
+| `strategy/` | Positioning, messaging, ICP and personas, competitive battlecards: what every agent loads before doing marketing thinking |
+| `brand/` | Voice, visual identity, logos, design tokens: what every agent loads before making anything an outsider sees |
+| `content/` | Every piece of content, at every stage — the single source of truth projects link into |
+| `projects/` | How the work is organized: briefs and status, with campaigns as projects that contain projects |
+| `data/` | The machine-readable truth: keyword tables, analytics and CRM snapshots, target accounts — plus the ontology defining what your metrics mean |
+| `reports/` | What the data becomes: analyses, the quarterly marketing review, self-contained HTML dashboards |
 | `memory/` | The decision log and the living knowledge base, fed from meeting transcripts |
-| `agents/` | The agent workforce: each agent's instructions as a plain text file |
+| `agents/` | The workforce roster; the definitions live in `.agents/skills/`, readable by any coding agent |
+| `integrations/` | How the repo talks to your stack: task tool, CRM, analytics, SEO — and the conventions agents follow |
 | `playgrounds/` | Disposable prototypes: come to meetings with the thing itself, not a deck about it |
-| `docs/` | Guides, including the start-here path for people new to GitHub |
+| `docs/` | Guides: the review workflow, secrets, architecture, roadmap, and the start-here path for people new to GitHub |
 
 ## Project status
 

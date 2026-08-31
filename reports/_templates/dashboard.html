@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Dashboard title]</title>
+<!--
+  Marketing-as-Code dashboard template.
+  Contract: ONE self-contained file. No CDN, no external scripts, fonts, or
+  images — it must open offline from Finder or GitHub Desktop.
+
+  How an agent fills this in (see .agents/skills/make-dashboard/):
+    1. Set the <title>, header title/subtitle, and the CSS variables below
+       (from brand/tokens.json if filled).
+    2. Replace DATA with real numbers from data/ snapshots.
+    3. Compose the page in render() from the helpers:
+         bigNumber({label, value, delta, note})
+         barChart({title, labels, values, unit})
+         lineChart({title, labels, series: [{name, values}], unit})
+         table({title, columns, rows})
+    4. List every snapshot path in the footer sources line.
+-->
+<style>
+  :root {
+    --brand:      #2f6fed;  /* brand/tokens.json colors.primary   */
+    --accent:     #12b886;  /* colors.accent                      */
+    --bg:         #f7f7f5;  /* colors.background                  */
+    --text:       #1c1c1c;  /* colors.text                        */
+    --muted:      #6b6b6b;
+    --card:       #ffffff;
+    --line:       #e4e4e0;
+    --bad:        #d64545;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header { padding: 28px 32px 8px; }
+  header h1 { margin: 0 0 4px; font-size: 24px; }
+  header p { margin: 0; color: var(--muted); }
+  main {
+    padding: 16px 32px 8px; display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+  .tiles { display: grid; gap: 16px; grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .card h2 { margin: 0 0 10px; font-size: 14px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .big { font-size: 32px; font-weight: 700; }
+  .delta { font-size: 14px; font-weight: 600; }
+  .delta.up { color: var(--accent); }
+  .delta.down { color: var(--bad); }
+  .note { color: var(--muted); font-size: 13px; }
+  svg text { font: 12px system-ui, sans-serif; fill: var(--muted); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 6px 10px 6px 0;
+    border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  td.num, th.num { text-align: right; }
+  footer { padding: 8px 32px 28px; color: var(--muted); font-size: 13px; }
+  footer code { font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>[Dashboard title]</h1>
+  <p>[Subtitle: period covered · prepared YYYY-MM-DD · belongs to <em>report.md</em> in this folder]</p>
+</header>
+<main id="app"></main>
+<footer>
+  Data: <code>[data/crm/snapshots/....csv]</code> · <code>[data/analytics/snapshots/....csv]</code>.
+  Definitions per <code>data/ontology/</code>. Gaps are shown as gaps.
+</footer>
+
+<script>
+/* ---------------------------------------------------------------- DATA -- */
+/* Replace entirely. Keep numbers traceable to the snapshots in the footer. */
+const DATA = {
+  tiles: [
+    { label: "MQLs",     value: 128,  delta: "+18% vs Q2", note: "target 120" },
+    { label: "Signups",  value: 942,  delta: "-4% vs Q2",  note: "target 1000" },
+    { label: "Pipeline", value: "$310k", delta: "+11% vs Q2" },
+  ],
+  trafficBySource: {
+    labels: ["Organic", "Direct", "Referral", "Social", "Email"],
+    values: [4210, 2380, 1170, 860, 640],
+  },
+  signupsTrend: {
+    labels: ["Jul", "Aug", "Sep"],
+    series: [{ name: "signups", values: [290, 322, 330] }],
+  },
+  funnel: {
+    columns: ["Stage", "This Q", "Last Q", "Conv."],
+    rows: [
+      ["Visitors", "48,020", "44,100", "—"],
+      ["Signups", "942", "981", "2.0%"],
+      ["MQLs", "128", "108", "13.6%"],
+    ],
+    numeric: [1, 2, 3],
+  },
+};
+
+/* ------------------------------------------------------------- helpers -- */
+const app = document.getElementById("app");
+const el = (tag, cls, html) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (html !== undefined) n.innerHTML = html;
+  return n;
+};
+const esc = s => String(s).replace(/[&<>"]/g,
+  c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function bigNumber({ label, value, delta, note }) {
+  const dir = delta && /^[-−↓]/.test(String(delta).trim()) ? "down" : "up";
+  const card = el("div", "card");
+  card.append(el("h2", null, esc(label)));
+  card.append(el("div", "big", esc(value)));
+  if (delta) card.append(el("div", "delta " + dir, esc(delta)));
+  if (note) card.append(el("div", "note", esc(note)));
+  return card;
+}
+
+function svgEl(w, h) {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  s.setAttribute("width", "100%");
+  return s;
+}
+const sAdd = (svg, tag, attrs, text) => {
+  const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (text !== undefined) n.textContent = text;
+  svg.append(n);
+  return n;
+};
+const fmt = v => (typeof v === "number" && Math.abs(v) >= 1000)
+  ? v.toLocaleString("en-US") : String(v);
+
+function barChart({ title, labels, values, unit }) {
+  const W = 460, rowH = 28, pad = 4, labelW = 110;
+  const H = labels.length * rowH + pad * 2;
+  const max = Math.max(...values, 1);
+  const svg = svgEl(W, H);
+  labels.forEach((lab, i) => {
+    const y = pad + i * rowH;
+    const w = (values[i] / max) * (W - labelW - 70);
+    sAdd(svg, "text", { x: labelW - 8, y: y + 18, "text-anchor": "end" }, lab);
+    sAdd(svg, "rect", { x: labelW, y: y + 5, width: Math.max(w, 2), height: rowH - 10,
+      rx: 3, fill: "var(--brand)" });
+    sAdd(svg, "text", { x: labelW + Math.max(w, 2) + 6, y: y + 18 }, fmt(values[i]));
+  });
+  const card = el("div", "card");
+  card.append(el("h2", null, esc(title + (unit ? ` (${unit})` : ""))));
+  card.append(svg);
+  return card;
+}
+
+function lineChart({ title, labels, series, unit }) {
+  const W = 460, H = 200, padL = 46, padR = 12, padT = 12, padB = 26;
+  const all = series.flatMap(s => s.values);
+  const max = Math.max(...all, 1), min = Math.min(...all, 0);
+  const x = i => padL + (labels.length < 2 ? 0
+    : i * (W - padL - padR) / (labels.length - 1));
+  const y = v => padT + (1 - (v - min) / (max - min || 1)) * (H - padT - padB);
+  const svg = svgEl(W, H);
+  [min, (min + max) / 2, max].forEach(v => {
+    sAdd(svg, "line", { x1: padL, y1: y(v), x2: W - padR, y2: y(v),
+      stroke: "var(--line)" });
+    sAdd(svg, "text", { x: padL - 6, y: y(v) + 4, "text-anchor": "end" },
+      fmt(Math.round(v)));
+  });
+  labels.forEach((lab, i) =>
+    sAdd(svg, "text", { x: x(i), y: H - 8, "text-anchor": "middle" }, lab));
+  const colors = ["var(--brand)", "var(--accent)", "var(--bad)"];
+  series.forEach((s, si) => {
+    sAdd(svg, "polyline", {
+      points: s.values.map((v, i) => `${x(i)},${y(v)}`).join(" "),
+      fill: "none", stroke: colors[si % colors.length], "stroke-width": 2.5,
+      "stroke-linejoin": "round",
+    });
+    s.values.forEach((v, i) => sAdd(svg, "circle",
+      { cx: x(i), cy: y(v), r: 3, fill: colors[si % colors.length] }));
+  });
+  const legend = series.length > 1
+    ? " — " + series.map(s => s.name).join(" · ") : "";
+  const card = el("div", "card");
+  card.append(el("h2", null, esc(title + (unit ? ` (${unit})` : "") + legend)));
+  card.append(svg);
+  return card;
+}
+
+function table({ title, columns, rows, numeric = [] }) {
+  const card = el("div", "card");
+  card.append(el("h2", null, esc(title)));
+  const t = el("table");
+  t.append(el("tr", null, columns.map((c, i) =>
+    `<th${numeric.includes(i) ? ' class="num"' : ""}>${esc(c)}</th>`).join("")));
+  rows.forEach(r => t.append(el("tr", null, r.map((c, i) =>
+    `<td${numeric.includes(i) ? ' class="num"' : ""}>${esc(c)}</td>`).join(""))));
+  card.append(t);
+  return card;
+}
+
+/* -------------------------------------------------------------- render -- */
+function render() {
+  const tiles = el("div", "tiles");
+  DATA.tiles.forEach(t => tiles.append(bigNumber(t)));
+  app.append(tiles);
+  app.append(barChart({ title: "Traffic by source", ...DATA.trafficBySource,
+    unit: "sessions" }));
+  app.append(lineChart({ title: "Signups", ...DATA.signupsTrend }));
+  app.append(table({ title: "Funnel", ...DATA.funnel }));
+}
+render();
+</script>
+</body>
+</html>

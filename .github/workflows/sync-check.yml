@@ -1,0 +1,16 @@
+name: sync-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  skills-in-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check .claude/skills symlinks match .agents/skills
+        run: python3 scripts/sync_skills.py --check
+      - name: Repo health check
+        run: python3 scripts/doctor.py

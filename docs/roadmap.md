@@ -26,31 +26,31 @@ entirely offline. No API keys required for anything in this wave.
 
 ### Structure
 
-- [ ] Create `brand/`, `projects/` (retiring `campaigns/`), `reports/`,
+- [x] Create `brand/`, `projects/` (retiring `campaigns/`), `reports/`,
       `integrations/`, `scripts/`, `data/{ontology,seo,analytics,crm,accounts}`,
       `memory/{knowledge,transcripts/{inbox,processed}}`
-- [ ] Rewrite every folder README as a machine contract: what is
+- [x] Rewrite every folder README as a machine contract: what is
       authoritative here, naming conventions, what to do when something is
       missing
-- [ ] AGENTS.md v2 — the full contract: ontology-first rule, the
+- [x] AGENTS.md v2 — the full contract: ontology-first rule, the
       data-question routing table, the lifecycle-owner rule, the brand
       binary carve-out, review workflow
-- [ ] README v2 — updated folder table and quick start
-- [ ] `.github/PULL_REQUEST_TEMPLATE.md` — the human-review ritual
-- [ ] `.env.example`
+- [x] README v2 — updated folder table and quick start
+- [x] `.github/PULL_REQUEST_TEMPLATE.md` — the human-review ritual
+- [x] `.env.example`
 
 ### Templates
 
-- [ ] `strategy/` — positioning, messaging hierarchy, ICP & personas,
+- [x] `strategy/` — positioning, messaging hierarchy, ICP & personas,
       competitive notes + battlecard
-- [ ] `brand/` — voice.md, visual-identity.md, tokens.json, templates/
+- [x] `brand/` — voice.md, visual-identity.md, tokens.json, templates/
       placeholder
-- [ ] `content/_template/` — brief + draft with frontmatter
+- [x] `content/_template/` — brief + draft with frontmatter
       (`project`, `status`, `channel`, `owner`)
-- [ ] `projects/_template/` — brief.md, status.md; plus campaign.md template
-- [ ] `data/ontology/` — metrics.md, funnel.md, events.md, naming.md
+- [x] `projects/_template/` — brief.md, status.md; plus campaign.md template
+- [x] `data/ontology/` — metrics.md, funnel.md, events.md, naming.md
       (unfilled versions instruct agents to ask, not assume)
-- [ ] `memory/decision-log.md` — seeded with the entry format
+- [x] `memory/decision-log.md` — seeded with the entry format
 
 ### Agents & skills (no keys needed)
 
@@ -66,17 +66,17 @@ entirely offline. No API keys required for anything in this wave.
 
 ### Machinery
 
-- [ ] `scripts/sync_skills.py` + committed `.claude/skills/` per-skill
+- [x] `scripts/sync_skills.py` + committed `.claude/skills/` per-skill
       symlinks
-- [ ] `.github/workflows/sync-check.yml` — CI drift check for the symlinks
-- [ ] `.claude/settings.json` — safe permission defaults
-- [ ] `scripts/doctor.py` — env, symlink, and config health check
+- [x] `.github/workflows/sync-check.yml` — CI drift check for the symlinks
+- [x] `.claude/settings.json` — safe permission defaults
+- [x] `scripts/doctor.py` — env, symlink, and config health check
 
 ### Docs
 
-- [ ] `docs/workflow.md` — the PR review ritual, written for GitHub Desktop
+- [x] `docs/workflow.md` — the PR review ritual, written for GitHub Desktop
       users
-- [ ] `docs/secrets.md` — the three-tier secrets story
+- [x] `docs/secrets.md` — the three-tier secrets story
 - [ ] Finish `docs/new-to-github.md` and cross-link the new docs
 
 ---
@@ -90,9 +90,9 @@ ontology → answer.
 ### Integrations
 
 - [ ] `.mcp.json` + `.cursor/mcp.json` — servers listed, disabled by default
-- [ ] `integrations/README.md` — the registry (tool, mechanism, auth, status,
+- [x] `integrations/README.md` — the registry (tool, mechanism, auth, status,
       env vars)
-- [ ] `integrations/tasks.md` template — the task-tool adapter document
+- [x] `integrations/tasks.md` template — the task-tool adapter document
 - [ ] Setup docs: **Asana** (first task tool), **HubSpot**, **PostHog**,
       **GA4**, **DataForSEO**
 
@@ -108,6 +108,10 @@ ontology → answer.
 | `qmr` | Workflow | The quarterly marketing review: pull snapshots, compute deltas vs last quarter via the ontology, fill the template, flag gaps as questions |
 | `chief-of-staff` (upgrade) | Role | Files action items as real Asana tasks per `integrations/tasks.md` |
 
+Shipped early with wave 1 (offline-capable versions): the `qmr` skill (works
+the QMR data checklist with or without integrations), `make-dashboard`, and
+the full wave-1 agents & skills table above.
+
 ### Scripts
 
 - [ ] `scripts/pull_transcripts.py` — **Granola** → `memory/transcripts/inbox/`
@@ -117,10 +121,10 @@ ontology → answer.
 
 ### Report infrastructure
 
-- [ ] `reports/_templates/report.md`
-- [ ] `reports/_templates/dashboard.html` — single file, vendored chart
-      library, `const DATA` block
-- [ ] `reports/_templates/qmr/` — QMR report + dashboard scaffolds
+- [x] `reports/_templates/report.md`
+- [x] `reports/_templates/dashboard.html` — single file, dependency-free
+      inline chart helpers, `const DATA` block
+- [x] `reports/_templates/qmr/` — QMR report + dashboard scaffolds
 - [ ] Optional: `.github/workflows/transcripts-cron.yml` — runs the pipeline
       on a schedule, **opens a PR, never merges**
 
