@@ -1,0 +1,20 @@
+# Credentials: never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+service-account*.json
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Dependencies and caches (playground prototypes may pull these in)
+node_modules/
+__pycache__/
