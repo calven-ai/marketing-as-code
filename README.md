@@ -97,8 +97,10 @@ parts for you.
 
 ## Project status
 
-Early and under active construction. The structure is stable; templates,
-agents, and guides are landing now. Watch the repo to follow along.
+Early and under active construction. The target architecture is designed and
+documented in [docs/architecture.md](docs/architecture.md), and the full build
+plan lives in [docs/roadmap.md](docs/roadmap.md); templates, agents, and
+guides are landing in waves from there. Watch the repo to follow along.
 
 ## Who is behind this
 
