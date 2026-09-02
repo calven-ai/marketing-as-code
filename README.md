@@ -85,7 +85,7 @@ parts for you.
    AGENTS.md-aware tool works (see [AGENTS.md](AGENTS.md)).
 3. **Run the setup interview.** Ask the agent to set up the repo for your team.
    It interviews you, fills in the strategy and voice templates from your
-   answers, and switches on only the agents you have keys for.
+   answers, and connects only the integrations your team actually uses.
 4. **Start with one workflow.** Publish one piece of content, process one
    meeting transcript, or run one report. Let the repo prove itself before you
    move everything in.
@@ -104,6 +104,7 @@ parts for you.
 | `agents/` | The workforce roster; the definitions live in `.agents/skills/`, readable by any coding agent |
 | `integrations/` | How the repo talks to your stack: task tool, CRM, analytics, SEO — and the conventions agents follow |
 | `playgrounds/` | Disposable prototypes: come to meetings with the thing itself, not a deck about it |
+| `scripts/` | Deterministic helpers with no AI inside: the health check, the skill-link sync, and (soon) the data pulls |
 | `docs/` | Guides: the review workflow, secrets, architecture, roadmap, and the start-here path for people new to GitHub |
 
 ## Project status
@@ -115,7 +116,7 @@ guides are landing in waves from there. Watch the repo to follow along.
 
 ## Who is behind this
 
-Maintained by [Calven.ai](https://calven.ai). This repo is the runnable
+Maintained by [Calven](https://calven.ai). This repo is the runnable
 companion to the article
 [Marketing as Code: Not a Move to GitHub. A Move to Agents.](https://calven.ai/resources)
 and distills how Calven runs its own marketing (and most of the company) from

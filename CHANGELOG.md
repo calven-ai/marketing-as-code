@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Slack: app manifest and install guide in `integrations/slack/` (bot
+  token only, no server), registry row, env vars.
+- Review pass: `published:` date in content frontmatter (so "what shipped
+  this quarter" is computable), deliverables tables no longer mirror content
+  status, decision-log insertion point clarified, env-var names in the
+  integrations registry (agents cannot read `.env*`), accurate wording for
+  not-yet-existing files (`.mcp.json`, setup docs), `.gitignore` no longer
+  swallows Keynote `.key` files, doctor checks two more templates, PII note
+  for transcripts.
 - Wave 1: structure v2 (`brand/`, `projects/` replacing `campaigns/`,
   `data/` domains + ontology, `reports/`, `integrations/`, `scripts/`),
   folder READMEs as machine contracts, AGENTS.md v2 with the data-question

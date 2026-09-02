@@ -1,0 +1,71 @@
+# Slack app manifest for the team's marketing bot.
+#
+# Paste this file into https://api.slack.com/apps -> "Create New App" ->
+# "From a manifest" (README.md next to this file has the click path).
+# Rename "Marketing Bot" to whatever your team wants to see in Slack.
+#
+# Design constraints, on purpose:
+#   - Bot token scopes only. No user token, so the bot never acts as a
+#     person and never reads anything a person can see unless invited.
+#   - No Request URL, no Events API, no interactivity, no Socket Mode.
+#     Slack never calls us; the repo's scripts and GitHub Actions call
+#     Slack with the bot token. No server to host, no signing secret.
+#   - Reading is limited to channels the bot is invited to (the requests
+#     channel). Posting is allowed in public channels.
+#
+# Resulting secret: one Bot User OAuth Token (starts with xoxb-), stored as
+# the GitHub Actions repository secret SLACK_BOT_TOKEN and, for local runs,
+# in .env (never committed).
+
+_metadata:
+  major_version: 1
+  minor_version: 1
+
+display_information:
+  name: Marketing Bot
+  description: Posts marketing updates from the marketing repo and answers requests in-thread.
+  long_description: >-
+    Posts digests, merged-change announcements, and data alerts generated
+    from the marketing-as-code repository, always linking the file each
+    fact comes from. Reads the marketing requests channel so requests can
+    be answered in-thread from the repo or routed to an owner. Anything that
+    needs a human (pricing, product claims, customer quotes, written
+    competitor comparisons, launch disclosure) is handed to the named owner
+    instead of answered. Runs from scripts and GitHub Actions; it has no
+    server and never acts as a person.
+  background_color: "#1c1c1c"
+
+features:
+  bot_user:
+    display_name: Marketing Bot
+    always_online: false
+
+oauth_config:
+  scopes:
+    bot:
+      # Read the requests channel (public). The bot must be invited to it.
+      - channels:read
+      - channels:history
+      # Let the bot join a public channel by itself (so /invite is optional).
+      - channels:join
+      # Post replies (in-thread) and announcements.
+      - chat:write
+      # Post to public channels the bot has not joined.
+      - chat:write.public
+      # Acknowledge a request with an emoji (eyes = seen, check = answered,
+      # raised hand = needs a human).
+      - reactions:write
+      # Attach a file to a reply (a CSV snapshot, a Markdown one-pager).
+      - files:write
+      # Resolve a requester's display name for the task that gets filed
+      # ("asked by <name> in #marketing-requests"). No email access.
+      - users:read
+      # Only needed if the requests channel is PRIVATE. Harmless otherwise:
+      # the bot still sees only private channels it is invited to.
+      - groups:read
+      - groups:history
+
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

@@ -29,9 +29,11 @@ TEMPLATES = {  # file -> marker meaning "still unfilled"
     "strategy/messaging.md": "Template — unfilled",
     "strategy/icp-personas.md": "Template — unfilled",
     "brand/voice.md": "Template — unfilled",
+    "brand/visual-identity.md": "Template — unfilled",
     "data/ontology/metrics.md": "Template — unfilled",
     "data/ontology/funnel.md": "Template — unfilled",
     "data/ontology/events.md": "Template — unfilled",
+    "data/ontology/naming.md": "Template — unfilled",
     "integrations/tasks.md": "Fallback: in-repo checklists",
 }
 

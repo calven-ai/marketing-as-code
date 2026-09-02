@@ -1,7 +1,7 @@
 # scripts/
 
 Deterministic, non-AI code. Skills call these instead of reimplementing them.
-Python 3, standard library only unless a script says otherwise.
+Python 3.9 or newer, standard library only unless a script says otherwise.
 
 | Script | What it does |
 | --- | --- |

@@ -22,4 +22,4 @@ projects each keep their own `brief.md`.
 
 | Project | Owner | Status |
 | --- | --- | --- |
-| [`webinar/`](webinar/brief.md) | | |
+| `webinar/` (link its `brief.md`) | | |

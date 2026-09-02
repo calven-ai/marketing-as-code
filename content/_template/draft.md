@@ -1,8 +1,9 @@
 ---
 project: ""
-status: draft
+status: brief
 channel: blog
 owner: ""
+published: ""
 published_url: ""
 ---
 

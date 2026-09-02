@@ -18,11 +18,12 @@ number that proves it (defined per `data/ontology/metrics.md`).]
 ## Deliverables
 
 Content lives in `content/`; this list links to it (lifecycle-owner rule —
-never copy content into this folder).
+never copy content into this folder). A piece's status lives in its own
+frontmatter — read it there rather than mirroring it here, so nothing drifts.
 
-| Deliverable | Path | Status |
-| --- | --- | --- |
-| [e.g. launch post] | `content/2026-09-launch-post/` | brief |
+| Deliverable | Path |
+| --- | --- |
+| [e.g. launch post] | `content/2026-09-launch-post/` |
 
 ## Out of scope
 

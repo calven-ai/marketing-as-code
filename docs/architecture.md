@@ -4,8 +4,9 @@ This document is the reasoning behind the repository structure — the target
 layout, what each folder owns, and the design decisions that hold it together.
 The [roadmap](roadmap.md) lists what gets built and in what order.
 
-> **Status:** approved design. The tree below is the target; the current repo
-> is still the skeleton. Wave 1 of the [roadmap](roadmap.md) makes them match.
+> **Status:** approved design. Wave 1 of the [roadmap](roadmap.md) landed the
+> structure below; items marked wave 2/3 there (integrations, `.mcp.json`,
+> pull scripts, the analyst skills) are still to come.
 
 ## Design principles
 
@@ -122,6 +123,7 @@ project: projects/q4-launch/webinar   # which project produced it
 status: draft | in-review | published | evergreen
 channel: blog | email | linkedin | webinar | ...
 owner: name
+published: YYYY-MM-DD                 # set when status flips to published
 ```
 
 Email sequences, webinar assets, and case studies are content *types* here,
@@ -194,7 +196,7 @@ Four files that make raw data interpretable:
 - `events.md` — event taxonomy: names, properties, which system emits them
 - `naming.md` — UTM conventions, campaign naming
 
-Ground rule (lands in AGENTS.md): **any agent reading or writing `data/`
+Ground rule (AGENTS.md rule 2): **any agent reading or writing `data/`
 loads `data/ontology/` first.** An unfilled ontology file instructs agents to
 ask rather than assume. `/setup` interviews the team to fill these in.
 

@@ -31,8 +31,8 @@ snapshot in `data/` and means what `data/ontology/` says it means.
    targets, funnel conversion by stage, deltas vs the previous quarter's QMR
    (read `reports/qmr/<prev>/report.md` — its Data-used section names the
    comparable snapshots). All terms per `data/ontology/metrics.md` and
-   `funnel.md`. Content shipped: grep `content/` frontmatter for the
-   quarter's published pieces. Projects: read `projects/*/status.md` and
+   `funnel.md`. Content shipped: grep `content/` frontmatter for
+   `status: published` with a `published:` date inside the quarter. Projects: read `projects/*/status.md` and
    `_archive/` for what closed.
 
 4. **Fill `report.md`.** Numbers and evidence fully; narrative sections

@@ -1,6 +1,7 @@
 # Decision log
 
-Append-only, newest on top. Every entry follows this format:
+Append-only, newest on top: a new entry goes directly below the `---`
+separator, above the previous newest entry. Every entry follows this format:
 
 ```markdown
 ## YYYY-MM-DD: [decision in one imperative-free sentence]

@@ -10,8 +10,8 @@ description: Record a decision in memory/decision-log.md. Use whenever a discuss
 1. **Extract the decision** as one clean sentence of *what was decided* (not
    the discussion). If multiple decisions are tangled together, log them as
    separate entries.
-2. **Append to `memory/decision-log.md`**, newest on top, in the file's
-   exact format: date, decided-by, source (transcript path, PR, or link),
+2. **Add the entry to `memory/decision-log.md`** directly below the `---`
+   separator (newest on top), in the file's exact format: date, decided-by, source (transcript path, PR, or link),
    context (1–3 sentences: the problem and the options weighed), follow-ups.
 3. **File the follow-ups** per `integrations/tasks.md` and list them in the
    entry.

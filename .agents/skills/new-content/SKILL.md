@@ -19,7 +19,7 @@ description: Scaffold a new piece of content in content/. Use when asked to star
    and wire the draft frontmatter (`project`, `status: brief`, `channel`,
    `owner`).
 4. **Cross-link**: add the piece to the owning project's brief under
-   Deliverables (path + status).
+   Deliverables (name + path; status stays in the piece's frontmatter).
 5. **Stop at the brief** unless asked to draft. The brief is the reviewable
    unit — offer to draft once the human has glanced at it.
 

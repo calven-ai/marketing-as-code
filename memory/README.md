@@ -33,3 +33,9 @@ pipeline that feeds them.
   only — history is the point.
 - Transcripts may contain sensitive discussion; quote them in outputs only as
   much as the task needs.
+- Transcripts are the most sensitive files in this repo: names, customer
+  details, salaries, and candid opinions all end up in them. Keep them only
+  in a **private** repo, and if the team prefers, gitignore
+  `memory/transcripts/` entirely — the decisions, tasks, and knowledge
+  extracted from them are what needs to be versioned, not the raw audio
+  text. Log that choice in `decision-log.md`.

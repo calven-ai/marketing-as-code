@@ -1,8 +1,9 @@
 # reports/
 
 Human-first outputs: analyses, recurring reports, the QMR, and dashboards.
-Dated, and immutable once delivered — a new analysis is a new file, never an
-edit to an old one. (The machine-readable inputs live in
+Dated, and immutable once delivered (a QMR is edited while its status is
+"assembling"; once "final", a new analysis is a new file, never an edit to an
+old one). (The machine-readable inputs live in
 [`data/`](../data/).)
 
 ## Layout

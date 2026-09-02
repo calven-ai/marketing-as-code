@@ -17,8 +17,12 @@ studies are content *types* here — they don't get their own top-level folders.
   status: idea | brief | draft | in-review | published | evergreen
   channel: blog | email | linkedin | webinar | ad | case-study | other
   owner: name
+  published: ""                         # YYYY-MM-DD, set when status flips to published
   published_url: ""                     # once live
   ```
+
+  The folder name carries the month the piece was *started*; `published:`
+  is what "what shipped in Q3?" is answered from.
 
 - **Content lives only here.** Projects link to pieces by repo path in their
   brief's Deliverables section; the `project:` frontmatter field points back.
@@ -27,7 +31,7 @@ studies are content *types* here — they don't get their own top-level folders.
 ## For agents
 
 - "What did we ship last quarter?" → grep frontmatter for `status: published`
-  and the date range, don't ask.
+  with `published:` in the date range, don't ask.
 - Before drafting: load `strategy/` and `brand/`. Before marking
   `in-review`: run the `review` skill. Setting `status: published` is a
   human's call.

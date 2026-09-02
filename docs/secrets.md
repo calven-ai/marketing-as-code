@@ -42,6 +42,11 @@ workflow files.
 
 - A key that ever lands in a commit is **burned**: rotate it immediately —
   removing the commit is not enough, history is forever.
-- Agents never read `.env` (Claude Code is configured to refuse) and never
-  echo key values into files, logs, or chat.
+- Agents never read `.env` and never echo key values into files, logs, or
+  chat. Claude Code enforces part of this: `.claude/settings.json` denies
+  the Read tool (and `cat`/`head`/`tail`/`sed` in Bash) on every `.env*`
+  file — including `.env.example`, which is why the variable names are also
+  listed in `integrations/README.md`. The rule cannot stop a script that
+  opens the file itself, so scripts in this repo read keys only from the
+  environment and never print them.
 - Scope keys down where the provider allows (read-only, project-scoped).
