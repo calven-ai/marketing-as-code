@@ -102,8 +102,9 @@ The entry in `.mcp.json`:
 }
 ```
 
-Cursor and Codex take the same entry in their own MCP config
-(`.cursor/mcp.json` is wave 2 of the roadmap).
+`.cursor/mcp.json` carries the same entry in Cursor's syntax
+(`${env:CALVEN_MCP_KEY}`), and Codex users paste the TOML from
+[adding-an-integration.md](adding-an-integration.md#configuring-an-mcp-server-per-coding-agent).
 
 ## Once connected: how agents behave
 

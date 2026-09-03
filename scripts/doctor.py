@@ -3,7 +3,9 @@
 
 Run from the repo root:  python3 scripts/doctor.py
 
-Checks that the wiring agents depend on is intact, reports which templates
+Checks that the wiring agents depend on is intact (required files, skill
+links, the MCP configs for Claude Code and Cursor listing the same servers
+and holding placeholders instead of values), reports which templates
 are still unfilled (fine on day one; each unfilled template is a question an
 agent will have to ask), and lists context files whose `last_reviewed` date
 is missing or older than STALE_AFTER_DAYS (informational; the alternative to
@@ -11,6 +13,7 @@ reviewing them by hand is a context layer, see
 integrations/context-layer.md). Exit code 1 only on real breakage.
 """
 
+import json
 import re
 import subprocess
 import sys
@@ -55,6 +58,13 @@ CONTEXT_FILES = [  # carry `source` and `last_reviewed` frontmatter
 ]
 STALE_AFTER_DAYS = 90
 
+MCP_FILES = [".mcp.json", ".cursor/mcp.json"]  # must list the same servers
+# Anything that looks like a real credential inside an MCP config. The files
+# hold ${VAR} placeholders only: non-interactive Claude Code loads project
+# servers without a prompt, so a value here would run anywhere.
+SECRET_SHAPES = re.compile(
+    r"(sk-[A-Za-z0-9_-]{8,}|xox[abp]-[A-Za-z0-9-]{8,}|Bearer\s+(?!\$\{)[A-Za-z0-9._-]{12,})")
+
 
 def frontmatter(text):
     """Return the YAML frontmatter as a flat dict (simple key: value lines)."""
@@ -93,6 +103,35 @@ def context_freshness(unfilled):
     return served, stale, unreviewed
 
 
+def mcp_config_problems():
+    """The MCP files parse, list the same server names, and hold no values."""
+    problems, names = [], {}
+    for rel in MCP_FILES:
+        path = ROOT / rel
+        if not path.is_file():
+            problems.append(f"missing MCP config: {rel} (integrations/README.md)")
+            continue
+        text = path.read_text(encoding="utf-8")
+        try:
+            servers = json.loads(text).get("mcpServers", {})
+        except json.JSONDecodeError as err:
+            problems.append(f"{rel} is not valid JSON: {err}")
+            continue
+        names[rel] = set(servers)
+        for hit in SECRET_SHAPES.findall(text):
+            token = hit[0] if isinstance(hit, tuple) else hit
+            problems.append(f"{rel} looks like it holds a credential value "
+                            f"({token[:6]}...); use a ${{VAR}} placeholder")
+    if len(names) == len(MCP_FILES):
+        a, b = (names[rel] for rel in MCP_FILES)
+        if a != b:
+            problems.append("MCP server lists differ: "
+                            f"{MCP_FILES[0]} has {sorted(a)}, "
+                            f"{MCP_FILES[1]} has {sorted(b)}; "
+                            "edit both together (integrations/README.md)")
+    return problems
+
+
 def main():
     problems = []
 
@@ -106,6 +145,8 @@ def main():
     if sync.returncode != 0:
         problems.append("skill links out of sync:\n  "
                         + sync.stdout.strip().replace("\n", "\n  "))
+
+    problems.extend(mcp_config_problems())
 
     unfilled = [rel for rel, marker in TEMPLATES.items()
                 if (ROOT / rel).is_file()

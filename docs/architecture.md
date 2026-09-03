@@ -63,7 +63,7 @@ workforce does is a reviewable diff, not a deploy.
 marketing-as-code/
 ├── .agents/skills/<name>/       # canonical agent & skill definitions (open standard)
 ├── .claude/skills/<name>        # per-skill symlinks into .agents/skills/ (Claude Code shim)
-├── .mcp.json  .cursor/mcp.json  # integration servers, listed but disabled until /setup
+├── .mcp.json  .cursor/mcp.json  # the same MCP servers for Claude Code and Cursor, placeholders only
 ├── .github/                     # PR template, sync-check workflow, later automation crons
 │
 ├── strategy/                    # market truth: positioning, messaging, ICP/personas, competitive
