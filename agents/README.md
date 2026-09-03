@@ -28,7 +28,8 @@ correctly.
 
 | Skill | What it does | Needs |
 | --- | --- | --- |
-| [setup](../.agents/skills/setup/SKILL.md) | The onboarding interview: fills strategy, brand, and ontology; connects integrations | nothing |
+| [setup](../.agents/skills/setup/SKILL.md) | The onboarding interview: fills strategy, brand, and ontology; connects the wired integrations and lists the rest as follow-ups | nothing |
+| [add-integration](../.agents/skills/add-integration/SKILL.md) | Connects a tool the team uses: picks the tier (MCP server, CLI, script) per `integrations/adding-an-integration.md` and delivers the integration as one PR | nothing; the tool's own auth at first use |
 | [new-content](../.agents/skills/new-content/SKILL.md) | Scaffolds a content piece with wired frontmatter | nothing |
 | [new-project](../.agents/skills/new-project/SKILL.md) | Scaffolds a project or campaign folder | nothing |
 | [review](../.agents/skills/review/SKILL.md) | Pre-publish check of a draft against strategy, voice, and brand | nothing |

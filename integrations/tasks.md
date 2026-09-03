@@ -23,6 +23,10 @@ the real adapter. Example shape for Asana (official remote MCP):
 
 ## Current tool: Asana
 
+- Mechanism: Asana's official remote MCP server (OAuth, no key; it has
+  write tools, and its interactive tools show a confirmation before
+  creating anything). Added to `.mcp.json` and `.cursor/mcp.json` per
+  integrations/adding-an-integration.md.
 - Workspace: <workspace name / GID>
 - Default project for marketing tasks: <project name / GID>
 - How to file a task: create it in the default project with a clear

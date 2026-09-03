@@ -15,6 +15,10 @@ Guides for running your marketing from this repo.
   gets human-approved and shipped, no terminal required.
 - [secrets.md](secrets.md): API keys without the pain: OAuth first, local
   `.env`, team sharing via a secrets manager.
+- [../integrations/adding-an-integration.md](../integrations/adding-an-integration.md):
+  how your agent connects a tool this template does not ship: MCP server
+  first, vendor CLI second, a script last, and what a finished integration
+  contains.
 - [architecture.md](architecture.md): the target structure and the reasoning
   behind every design decision.
 - [roadmap.md](roadmap.md): everything this repo will contain (agents,

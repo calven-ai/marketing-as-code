@@ -55,12 +55,16 @@ already filled in without asking.
       Rewrite `integrations/tasks.md` per its embedded example: workspace,
       default project, filing conventions. If none, leave the in-repo
       fallback.
-   8. *Integrations*: which of the tools in `integrations/README.md` the
-      team uses. For OAuth MCPs, point them at the setup doc in
-      `integrations/` (or at the registry row while the doc doesn't exist
-      yet); for key-based ones, have them copy `.env.example` → `.env` and
-      fill only what they use; the variable names are in the registry's
-      Env vars column, since you cannot read `.env*` files yourself. Enable only what they asked for; never edit `.env` yourself.
+   8. *Integrations*: which tools the team uses, against the two tables in
+      `integrations/README.md`. For a tool that is **wired**, follow its
+      registry row: OAuth MCPs need nothing but the browser prompt on first
+      use; for key-based ones, have them copy `.env.example` → `.env` and
+      fill only what they use (the variable names are in the registry's
+      Env vars column, since you cannot read `.env*` files yourself). For
+      a tool that is **not wired**, do not build it during the interview:
+      list it in the closing summary as a follow-up, "add with
+      `add-integration`", one line per tool with the job it must do. Enable
+      only what they asked for; never edit `.env` yourself.
 
 3. **Close.** Summarize what's filled, what's skipped and who owes an
    answer. Log the setup in `memory/decision-log.md` (one entry: "Repo set

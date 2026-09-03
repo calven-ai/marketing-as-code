@@ -33,7 +33,7 @@ manager the team already has:
 
 ## Tier 3: CI keys
 
-Automation that runs on GitHub (the transcript cron, wave 2) gets keys from
+Automation that runs on GitHub (the transcript cron) gets keys from
 **GitHub Actions repository secrets** (repo → Settings → Secrets and
 variables → Actions). Same rules: one secret per key, no secrets in
 workflow files.
