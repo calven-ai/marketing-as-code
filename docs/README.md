@@ -18,6 +18,12 @@ Guides for running your marketing from this repo.
   recurring workflow and their trade-off, and what never runs unattended.
 - [secrets.md](secrets.md): API keys without the pain: OAuth first, local
   `.env`, team sharing via a secrets manager.
+- [github-settings.md](github-settings.md): the repository settings the
+  lifecycle assumes, the script that applies them, and which GitHub plan
+  enforces them.
+- [schema.json](schema.json): what "valid" means here, in one machine- and
+  human-readable file: frontmatter per folder, naming rules, CSV headers,
+  which files count as bookkeeping. `scripts/lint.py` enforces it.
 - [../integrations/adding-an-integration.md](../integrations/adding-an-integration.md):
   how your agent connects a tool this template does not ship: MCP server
   first, vendor CLI second, a script last, and what a finished integration

@@ -1,6 +1,9 @@
 ---
 name: seo-analyst
 description: Keyword and ranking analysis against data/seo/keywords.csv using the DataForSEO MCP. Use when asked about search volumes, keyword difficulty, current ranks, SERP competitors, keyword ideas, or "how are our rankings doing". Saves every pull as a dated snapshot and writes the analysis to reports/.
+metadata:
+  kind: role
+  needs: DataForSEO MCP
 ---
 
 # SEO analyst

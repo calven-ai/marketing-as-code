@@ -1,6 +1,9 @@
 ---
 name: campaign-discovery
 description: Run discovery for a campaign idea given in one sentence. Composes the competitive angle, keyword volumes and current ranks, AI answer-engine prompt coverage, and an inventory of existing content into one report in reports/adhoc/. Use when asked to "explore a campaign", "run discovery on", "what would it take to campaign on X", or before a new-project brief is written.
+metadata:
+  kind: workflow
+  needs: DataForSEO MCP for the data parts; works partially without
 ---
 
 # Campaign discovery

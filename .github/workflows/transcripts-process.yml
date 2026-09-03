@@ -16,11 +16,15 @@ name: transcripts-process
 # variables, so the skill can post its summary. OAuth MCP servers cannot run
 # headless; the skill's direct writes and scripts are all it uses here.
 #
-# Triggers: by hand, or when files land in the inbox on main (which is what
-# merging a "Transcripts: <date>" PR from transcripts-cron.yml does).
+# Triggers: by hand; when a person merges files into the inbox on main; and
+# daily at 06:30 UTC, an hour after transcripts-cron.yml, because a merge
+# performed by the check's own token does not trigger push workflows. The
+# job exits early when the inbox is empty, so the schedule costs nothing.
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "30 6 * * *"
   push:
     branches: [main]
     paths:

@@ -1,0 +1,438 @@
+{
+  "_doc": [
+    "What 'valid' means in this repository, in one place. scripts/lint.py enforces",
+    "it, scripts/doctor.py reports it, the doctor and audit skills read it, and a",
+    "person can read it too. Change a convention here and in the folder README",
+    "that explains it, in the same proposal. Keys starting with _ are comments."
+  ],
+  "stale_after_days": 90,
+  "repo": {
+    "_doc": "private: true silences the PII warning (data/README.md says private repos may hold names; log that decision). /setup sets it.",
+    "private": false
+  },
+  "required_files": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "README.md",
+    ".env.example",
+    ".mcp.json",
+    ".cursor/mcp.json",
+    ".claude/settings.json",
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    "integrations/README.md",
+    "integrations/tasks.md",
+    "memory/decision-log.md",
+    "data/ontology/metrics.md",
+    "reports/_templates/report.md",
+    "reports/_templates/dashboard.html",
+    "reports/_templates/qmr/data-checklist.md",
+    "content/_template/brief.md",
+    "content/_template/draft.md",
+    "projects/_template/brief.md",
+    "projects/_template/status.md"
+  ],
+  "required_dirs": [
+    "data/seo/snapshots",
+    "data/analytics/snapshots",
+    "data/crm/snapshots",
+    "data/accounts/snapshots",
+    "memory/knowledge",
+    "memory/transcripts/inbox",
+    "memory/transcripts/processed",
+    "projects/_archive",
+    "playgrounds/_archive",
+    "reports/adhoc",
+    "reports/qmr",
+    "reports/recurring/seo",
+    "reports/recurring/analytics",
+    "reports/recurring/mentions"
+  ],
+  "templates": {
+    "_doc": "file -> the marker that means 'still unfilled'. Informational; /setup fills them.",
+    "strategy/positioning.md": "Template: unfilled",
+    "strategy/messaging.md": "Template: unfilled",
+    "strategy/icp.md": "Template: unfilled",
+    "strategy/personas.md": "Template: unfilled",
+    "strategy/product-brief.md": "Template: unfilled",
+    "brand/voice.md": "Template: unfilled",
+    "brand/visual-identity.md": "Template: unfilled",
+    "data/ontology/metrics.md": "Template: unfilled",
+    "data/ontology/funnel.md": "Template: unfilled",
+    "data/ontology/events.md": "Template: unfilled",
+    "data/ontology/naming.md": "Template: unfilled",
+    "integrations/tasks.md": "Fallback: in-repo checklists"
+  },
+  "context_files": [
+    "strategy/positioning.md",
+    "strategy/messaging.md",
+    "strategy/icp.md",
+    "strategy/personas.md",
+    "strategy/product-brief.md",
+    "brand/voice.md",
+    "brand/visual-identity.md"
+  ],
+  "frontmatter": {
+    "_doc": "Per file glob: required keys, optional keys, enums, ISO-date keys, defaults --fix may add. Keys not in required+optional are warned as unknown.",
+    "content/*/draft.md": {
+      "required": [
+        "project",
+        "status",
+        "channel",
+        "owner",
+        "published",
+        "published_url"
+      ],
+      "optional": [],
+      "enums": {
+        "status": [
+          "idea",
+          "brief",
+          "draft",
+          "in-review",
+          "published",
+          "evergreen"
+        ],
+        "channel": [
+          "blog",
+          "email",
+          "linkedin",
+          "webinar",
+          "ad",
+          "case-study",
+          "other"
+        ]
+      },
+      "dates": [
+        "published"
+      ],
+      "defaults": {
+        "published": "",
+        "published_url": "",
+        "project": "",
+        "owner": ""
+      }
+    },
+    "strategy/*.md": {
+      "except": [
+        "strategy/README.md"
+      ],
+      "required": [
+        "document",
+        "source",
+        "last_reviewed",
+        "owner"
+      ],
+      "optional": [],
+      "enums": {
+        "source": [
+          "repo",
+          "context-layer"
+        ]
+      },
+      "dates": [
+        "last_reviewed"
+      ],
+      "defaults": {}
+    },
+    "brand/voice.md": {
+      "required": [
+        "source",
+        "last_reviewed",
+        "owner"
+      ],
+      "optional": [
+        "document"
+      ],
+      "enums": {
+        "source": [
+          "repo",
+          "context-layer"
+        ]
+      },
+      "dates": [
+        "last_reviewed"
+      ],
+      "defaults": {}
+    },
+    "brand/visual-identity.md": {
+      "required": [
+        "source",
+        "last_reviewed",
+        "owner"
+      ],
+      "optional": [
+        "document"
+      ],
+      "enums": {
+        "source": [
+          "repo",
+          "context-layer"
+        ]
+      },
+      "dates": [
+        "last_reviewed"
+      ],
+      "defaults": {}
+    },
+    "memory/transcripts/*/*.md": {
+      "required": [
+        "title",
+        "date",
+        "source"
+      ],
+      "optional": [
+        "attendees",
+        "*_id"
+      ],
+      "enums": {},
+      "dates": [
+        "date"
+      ],
+      "defaults": {}
+    },
+    ".agents/skills/*/SKILL.md": {
+      "required": [
+        "name",
+        "description"
+      ],
+      "optional": [
+        "metadata",
+        "license",
+        "compatibility",
+        "allowed-tools",
+        "disallowed-tools",
+        "disable-model-invocation",
+        "model",
+        "context"
+      ],
+      "enums": {},
+      "dates": [],
+      "defaults": {}
+    }
+  },
+  "naming": {
+    "_doc": "Regexes over the file or folder name only. Each mirrors the sentence in the folder README that explains it.",
+    "content_folder": "^\\d{4}-\\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+    "snapshot": "^(\\d{4}-\\d{2}-\\d{2})-([a-z0-9]+)-([a-z0-9]+(?:-[a-z0-9]+)*)\\.csv$",
+    "transcript": "^(\\d{4}-\\d{2}-\\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*\\.(?:md|txt|vtt)$",
+    "report_recurring": "^\\d{4}-\\d{2}-\\d{2}(?:-[a-z0-9-]+)?\\.(?:md|html)$",
+    "report_adhoc": "^\\d{4}-\\d{2}-\\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+    "report_qmr": "^\\d{4}-q[1-4]$",
+    "decision_heading": "^## (\\d{4}-\\d{2}-\\d{2}): \\S.*$",
+    "status_heading": "^## (\\d{4}-\\d{2}-\\d{2})$",
+    "skill_name": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+  },
+  "decision_log": {
+    "bullets": [
+      "Decided by",
+      "Source",
+      "Context",
+      "Follow-ups"
+    ]
+  },
+  "project_status": {
+    "states": [
+      "on track",
+      "at risk",
+      "blocked",
+      "done"
+    ],
+    "forbidden_files": [
+      "draft.md",
+      "*.csv",
+      "*.html",
+      "*.xlsx",
+      "*.pptx",
+      "*.key"
+    ]
+  },
+  "csv": {
+    "_doc": "Canonical tables: the header row must be exactly this. Snapshots only need a header and uniform columns.",
+    "canonical": {
+      "data/seo/keywords.csv": [
+        "keyword",
+        "intent",
+        "target_url",
+        "difficulty",
+        "volume",
+        "current_rank",
+        "last_checked",
+        "notes"
+      ],
+      "data/seo/prompts.csv": [
+        "prompt",
+        "persona",
+        "stage",
+        "category",
+        "notes"
+      ],
+      "data/accounts/target-accounts.csv": [
+        "company",
+        "domain",
+        "tier",
+        "owner",
+        "status",
+        "notes"
+      ]
+    }
+  },
+  "binaries": {
+    "_doc": "Plain text first (AGENTS.md rule 4). brand/ is the one sanctioned binary zone; playgrounds/ is tolerated with a warning.",
+    "allowed_dirs": [
+      "brand/"
+    ],
+    "tolerated_dirs": [
+      "playgrounds/"
+    ],
+    "extensions": [
+      "png",
+      "jpg",
+      "jpeg",
+      "gif",
+      "webp",
+      "ico",
+      "pdf",
+      "psd",
+      "ai",
+      "sketch",
+      "fig",
+      "key",
+      "pptx",
+      "docx",
+      "xlsx",
+      "zip",
+      "gz",
+      "tar",
+      "mp4",
+      "mov",
+      "mp3",
+      "wav",
+      "woff",
+      "woff2",
+      "ttf",
+      "otf",
+      "bin",
+      "exe",
+      "dmg"
+    ],
+    "max_file_kb": 5120
+  },
+  "secrets": {
+    "_doc": "Shapes of real credentials. Prose may mention a prefix; a match needs the long tail.",
+    "patterns": [
+      "sk-ant-[A-Za-z0-9_-]{16,}",
+      "sk-[A-Za-z0-9_-]{20,}",
+      "sk_(?:live|test)_[A-Za-z0-9]{16,}",
+      "xox[abprs]-[A-Za-z0-9-]{16,}",
+      "ghp_[A-Za-z0-9]{30,}",
+      "github_pat_[A-Za-z0-9_]{40,}",
+      "gho_[A-Za-z0-9]{30,}",
+      "AKIA[0-9A-Z]{16}",
+      "AIza[0-9A-Za-z_-]{30,}",
+      "-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----",
+      "(?i)(?:api[_-]?key|secret|token|password)\\s*[:=]\\s*[\"']?(?!\\$\\{)(?!<)(?![A-Z_]{4,}[\"']?\\s*$)[A-Za-z0-9_\\-]{24,}"
+    ]
+  },
+  "pii": {
+    "dirs": [
+      "data/",
+      "memory/"
+    ],
+    "email": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+    "allow_domains": [
+      "example.com",
+      "example.org",
+      "users.noreply.github.com"
+    ]
+  },
+  "mcp": {
+    "files": [
+      ".mcp.json",
+      ".cursor/mcp.json"
+    ],
+    "placeholder": "\\$\\{(?:env:)?([A-Z][A-Z0-9_]*)\\}",
+    "env_registry": "integrations/README.md"
+  },
+  "bookkeeping": {
+    "_doc": "A proposal that touches only these paths is bookkeeping: agents maintain them, CI approves the proposal itself once the checks are green (docs/workflow.md).",
+    "globs": [
+      "projects/*/status.md",
+      "projects/*/*/status.md",
+      "memory/decision-log.md",
+      "data/*/snapshots/*",
+      "memory/transcripts/inbox/*",
+      "memory/transcripts/processed/*",
+      "reports/recurring/*/*"
+    ]
+  },
+  "generated": {
+    "_doc": "README blocks regenerated by lint --fix from the files they index. Edit the source (a SKILL.md description and metadata, a script docstring), never the block.",
+    "agents/README.md": [
+      "skills-roles",
+      "skills-workflows"
+    ],
+    "scripts/README.md": [
+      "scripts"
+    ]
+  },
+  "docs_index": {
+    "docs/README.md": "docs/*.md"
+  },
+  "paths": {
+    "_doc": "Backticked repo paths in these files must exist. Errors for the folders scripts depend on, warnings elsewhere.",
+    "check_in": [
+      ".agents/skills/*/SKILL.md",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "docs/*.md",
+      "*/README.md"
+    ],
+    "error_prefixes": [
+      "scripts/",
+      "reports/_templates/",
+      ".agents/skills/",
+      ".github/workflows/"
+    ],
+    "top_dirs": [
+      "strategy",
+      "brand",
+      "content",
+      "projects",
+      "data",
+      "memory",
+      "reports",
+      "scripts",
+      "integrations",
+      "docs",
+      "agents",
+      "playgrounds",
+      ".agents",
+      ".cursor",
+      ".github"
+    ],
+    "skip": [
+      "docs/roadmap.md",
+      "CHANGELOG.md"
+    ],
+    "future_words": [
+      "rejected",
+      "(wave",
+      "wave 2",
+      "wave 3",
+      "planned",
+      "later",
+      "not yet",
+      "yours to add"
+    ],
+    "root_files": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "README.md",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "SECURITY.md",
+      "CODE_OF_CONDUCT.md",
+      "LICENSE"
+    ]
+  }
+}

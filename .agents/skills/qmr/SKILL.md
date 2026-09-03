@@ -1,6 +1,9 @@
 ---
 name: qmr
 description: Assemble the Quarterly Marketing Review. Use when asked to prepare, start, or update the QMR, quarterly review, or quarterly report. Drives the data checklist, gathers snapshots (via integrations or human exports), computes deltas vs last quarter, and fills the report and dashboard.
+metadata:
+  kind: workflow
+  needs: integrations help, not required
 ---
 
 # QMR: the quarterly marketing review

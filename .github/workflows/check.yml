@@ -1,0 +1,172 @@
+name: check
+
+# The deterministic floor under every proposal (docs/workflow.md).
+#
+# Job "doctor": runs the lint's own tests, applies the safe fixes and pushes
+# them to the proposal as a "Tidy" commit, then runs scripts/doctor.py and
+# annotates the diff. It also labels the proposal bookkeeping or
+# needs-review and keeps one sticky comment up to date in plain words.
+#
+# Job "review-gate": a bookkeeping proposal (agent-maintained files only,
+# per docs/schema.json) merges itself once "doctor" is green; a needs-review
+# proposal passes only when someone other than the author has approved.
+#
+# Both are the required checks scripts/github_setup.sh registers. No key,
+# no AI, no third-party actions: GitHub's own checkout and the gh CLI.
+# Pushes to main run the same checks in --strict mode and, if they fail,
+# open an issue (or post to Slack when SLACK_BOT_TOKEN is set).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    outputs:
+      pr: ${{ steps.pr.outputs.number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the proposal's branch when it lives in this repository (so Tidy commits can be pushed); a fork gets the merge ref
+          ref: ${{ (github.event.pull_request && github.event.pull_request.head.repo.full_name == github.repository) && github.event.pull_request.head.ref || github.ref }}
+          fetch-depth: 0
+
+      - name: Which proposal is this?
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n="${{ github.event.pull_request.number }}"
+          if [ -z "$n" ] && [ "${{ github.ref_name }}" != "main" ]; then
+            n="$(gh pr list --head "${{ github.ref_name }}" --state open --json number -q '.[0].number' || true)"
+          fi
+          echo "number=$n" >> "$GITHUB_OUTPUT"
+          echo "proposal: ${n:-none (main)}"
+
+      - name: Test the lint itself
+        run: python3 -m unittest scripts/test_lint.py
+
+      - name: Apply the safe fixes and push them to the proposal
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/lint.py --fix --quiet || true
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "Tidy: apply the safe fixes from scripts/lint.py"
+            if git push; then
+              echo "pushed a Tidy commit; re-running the checks on it"
+              gh workflow run check.yml --ref "$(git rev-parse --abbrev-ref HEAD)" || true
+            else
+              echo "could not push (a fork?); the fixes are listed below instead"
+            fi
+          fi
+
+      - name: Run the health check
+        id: doctor
+        run: |
+          set +e
+          if [ "${{ github.ref_name }}" = "main" ] && [ -z "${{ steps.pr.outputs.number }}" ]; then
+            python3 scripts/doctor.py --strict --format github | tee doctor.txt
+          else
+            python3 scripts/doctor.py --format github | tee doctor.txt
+          fi
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          python3 scripts/lint.py --json > findings.json || true
+
+      - name: Label the proposal and refresh the sticky comment
+        if: always() && steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.pr.outputs.number }}
+        run: |
+          kind="$(python3 scripts/lint.py --classify origin/${{ github.event.pull_request.base.ref || 'main' }} | head -1)"
+          python3 - "$kind" <<'EOF'
+          import json, os, subprocess, sys
+          kind = sys.argv[1]
+          data = json.load(open("findings.json"))
+          f = data["findings"]
+          errors = [x for x in f if x["level"] == "error"]
+          warnings = [x for x in f if x["level"] == "warning"]
+          lines = ["<!-- doctor -->", "### Health check"]
+          if kind == "bookkeeping":
+              lines.append("This proposal only touches files the agents maintain (bookkeeping). "
+                           "Once the checks are green it is approved automatically.")
+          else:
+              lines.append("This proposal needs a person to read the diff and approve it before it lands.")
+          if not errors and not warnings:
+              lines.append("\n**All checks passed.**")
+          if errors:
+              lines.append(f"\n**{len(errors)} problem(s) block this proposal:**")
+              lines += [f"- `{x['path']}`" + (f" line {x['line']}" if x['line'] else "") + f": {x['message']}" for x in errors]
+              lines.append("\nFix them, or ask your agent: \"run /doctor on this proposal\".")
+          if warnings:
+              lines.append(f"\n<details><summary>{len(warnings)} warning(s), not blocking</summary>\n")
+              lines += [f"- `{x['path']}`: {x['message']}" for x in warnings]
+              lines.append("\n</details>")
+          lines.append("\n<sub>scripts/doctor.py, the same check you can run locally. docs/workflow.md explains proposals.</sub>")
+          open("comment.md", "w").write("\n".join(lines) + "\n")
+          EOF
+          pr="$PR"
+          existing="$(gh api "repos/${{ github.repository }}/issues/$pr/comments" --paginate -q '.[] | select(.body | startswith("<!-- doctor -->")) | .id' | head -1)"
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$existing" -F body=@comment.md > /dev/null
+          else
+            gh pr comment "$pr" --body-file comment.md > /dev/null
+          fi
+
+      - name: Tell the team when main itself is red
+        if: failure() && github.ref_name == 'main' && steps.pr.outputs.number == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_TEAM_CHANNEL_ID: ${{ vars.SLACK_TEAM_CHANNEL_ID }}
+        run: |
+          title="Repo health: the approved copy has problems"
+          body="$(printf 'scripts/doctor.py fails on main.\n\n```\n%s\n```\n\nRun `python3 scripts/doctor.py --fix` or ask your agent for /doctor, then propose the fix (docs/workflow.md).' "$(cat doctor.txt)")"
+          if [ -n "$SLACK_BOT_TOKEN" ] && [ -n "$SLACK_TEAM_CHANNEL_ID" ]; then
+            printf '%s\n%s' "$title" "$body" | python3 scripts/slack_post.py --channel team || true
+          fi
+          existing="$(gh issue list --search "\"$title\" in:title" --state open --json number -q '.[0].number')"
+          if [ -z "$existing" ]; then
+            gh issue create --title "$title" --body "$body" --label needs-review || gh issue create --title "$title" --body "$body"
+          else
+            gh issue comment "$existing" --body "$body"
+          fi
+
+      - name: Fail the job if the check failed
+        if: steps.doctor.outputs.status != '0'
+        run: exit 1
+
+  review-gate:
+    needs: doctor
+    if: needs.doctor.outputs.pr != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the proposal's branch when it lives in this repository (so Tidy commits can be pushed); a fork gets the merge ref
+          ref: ${{ (github.event.pull_request && github.event.pull_request.head.repo.full_name == github.repository) && github.event.pull_request.head.ref || github.ref }}
+          fetch-depth: 0
+      - name: Bookkeeping merges itself; everything else waits for a person
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/review_gate.py --pr "${{ needs.doctor.outputs.pr }}" --base "origin/${{ github.event.pull_request.base.ref || 'main' }}"

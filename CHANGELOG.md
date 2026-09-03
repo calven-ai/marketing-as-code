@@ -6,6 +6,25 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Keeping a cloned repo healthy, part 1: `docs/schema.json` says what valid
+  means (frontmatter per folder, naming, CSV headers, secrets shapes, which
+  files are bookkeeping); `scripts/lint.py` enforces it with `--fix` for
+  the safe repairs and `scripts/test_lint.py` proves each check;
+  `scripts/doctor.py` reports it (`--brief`, `--strict`, `--github`).
+  `.github/workflows/check.yml` replaces `sync-check.yml`: it tests the
+  lint, pushes the safe fixes to the proposal as a "Tidy" commit, annotates
+  the diff, keeps one plain-language comment current, labels the proposal
+  `bookkeeping` or `needs-review`, and, through `scripts/review_gate.py`,
+  merges green bookkeeping proposals itself while needs-review ones wait
+  for an approval from someone other than the author. `housekeeping.yml`
+  tidies the approved copy weekly and closes stale proposals.
+  `scripts/github_setup.sh`, `.github/CODEOWNERS` and
+  `docs/github-settings.md` cover the settings that cannot live in a file
+  and say plainly that a private repo needs GitHub Team or Pro for the
+  rules to be enforced. Roster tables in `agents/README.md` and
+  `scripts/README.md` are generated from skill `metadata` and script
+  docstrings. `transcripts-process.yml` gains a daily schedule because a
+  merge made by the check does not trigger push workflows.
 - Blueprint, not a product: the README says what works as-is and what a
   team is expected to make its own; AGENTS.md rule 10 ("Make it yours")
   tells agents to build the integration or skill the team asks for.

@@ -1,6 +1,9 @@
 ---
 name: add-integration
 description: Connect a tool the team uses to this repo. Use when asked "we use X, connect it", "automate pulling Y", "can the agent read Z", or when a skill needs a tool that is not wired. Walks the MCP, CLI, script ladder in integrations/adding-an-integration.md and delivers the integration as one reviewable PR.
+metadata:
+  kind: workflow
+  needs: nothing; the tool's own auth at first use
 ---
 
 # Add an integration

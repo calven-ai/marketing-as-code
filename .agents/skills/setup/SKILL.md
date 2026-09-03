@@ -1,6 +1,9 @@
 ---
 name: setup
 description: Onboard a team into this repo. Use when asked to "set up the repo", "run the setup interview", or when the strategy/brand/ontology templates are clearly unfilled and the user wants to start working. Interviews the team, fills the templates from their answers, connects integrations, and writes the task-tool adapter.
+metadata:
+  kind: workflow
+  needs: nothing
 ---
 
 # Setup: the onboarding interview

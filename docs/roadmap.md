@@ -80,7 +80,7 @@ entirely offline. No API keys required for anything in this wave.
 
 - [x] `scripts/sync_skills.py` + committed `.claude/skills/` per-skill
       symlinks
-- [x] `.github/workflows/sync-check.yml`: CI drift check for the symlinks
+- [x] `.github/workflows/check.yml`: the deterministic checks on every proposal (replaced `sync-check.yml`)
 - [x] `.claude/settings.json`: safe permission defaults
 - [x] `scripts/doctor.py`: env, symlink, and config health check
 
@@ -148,6 +148,28 @@ the full wave-1 agents & skills table above. Shipped since: `seo-analyst`,
 updates, action items per owner, risks and red flags, Slack notify via
 `scripts/slack_post.py`); filing into a real task tool starts the day the
 team wires one per `integrations/tasks.md`.
+
+### Keeping it healthy
+
+- [x] `docs/schema.json`: what valid means, in one file
+- [x] `scripts/lint.py` + `scripts/test_lint.py`: the deterministic checks
+      (frontmatter, naming, placement, CSV headers, links, secrets, generated
+      roster tables) with `--fix`; `scripts/doctor.py` reports them
+- [x] `.github/workflows/check.yml`: tests, safe fixes pushed as a Tidy
+      commit, annotations, a sticky comment, labels; bookkeeping proposals
+      merge themselves, the rest wait for a person (`scripts/review_gate.py`)
+- [x] `.github/workflows/housekeeping.yml`: weekly tidy proposal, stale
+      proposals closed
+- [x] `scripts/github_setup.sh`, `.github/CODEOWNERS`,
+      `docs/github-settings.md`: the settings that cannot live in a file
+- [ ] `scripts/sync.py`, `scripts/propose.py`, `.githooks/pre-push` and the
+      `sync`, `propose`, `doctor` skills: the five-word lifecycle for people
+      who do not know Git; `docs/troubleshooting.md`; `docs/new-to-github.md`
+      finished
+- [ ] The AI layer: `audit`, `cascade`, `integration-check` skills;
+      `context-review.yml`, `weekly-audit.yml`, `integration-check.yml`,
+      `claude.yml`; Claude Code hooks that run the lint after every edit;
+      `scripts/integration_check.py`
 
 ### Scripts
 

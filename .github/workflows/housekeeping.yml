@@ -1,0 +1,68 @@
+name: housekeeping
+
+# Weekly tidy-up, no AI, no key. Two jobs:
+#
+# "tidy" runs scripts/lint.py --fix on the approved copy and, if anything
+# changed (a roster table, a missing .gitkeep, a file that needed renaming),
+# opens one bookkeeping proposal "Housekeeping: <date>" that check.yml then
+# approves automatically. It never merges by itself.
+#
+# "stale" marks proposals nobody touched for 14 days and closes them a week
+# later, deleting the branch. A closed proposal is not lost: sync, then ask
+# your agent to propose it again from today's approved copy.
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # Mondays, 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply the safe fixes and open a proposal if anything changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/lint.py --fix --quiet || true
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing to tidy."
+            exit 0
+          fi
+          date="$(date -u +%Y-%m-%d)"
+          branch="housekeeping/$date"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "Housekeeping: $date"
+          git push -u origin "$branch"
+          gh pr create --title "Housekeeping: $date" --base "${{ github.ref_name }}" --head "$branch" --body "$(cat <<'EOF'
+          The weekly tidy-up: the safe fixes from `python3 scripts/lint.py --fix` applied to the approved copy (regenerated roster tables, missing `.gitkeep` files, line endings, file names).
+
+          Nothing here changes what the team knows; it keeps the wiring straight. If the checks are green this proposal approves itself. If you would rather look first, read the diff; it is short.
+          EOF
+          )"
+
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-issue-stale: -1
+          days-before-pr-stale: 14
+          days-before-pr-close: 7
+          stale-pr-label: stale
+          delete-branch: true
+          stale-pr-message: >
+            This proposal has had no activity for two weeks. In a week it closes and its branch is deleted.
+            Nothing is lost: sync, then ask your agent to propose the change again from today's approved copy
+            (docs/workflow.md). Comment here to keep it open.
+          close-pr-message: >
+            Closed for inactivity. To bring it back: sync, then ask your agent to propose it again.

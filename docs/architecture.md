@@ -67,7 +67,7 @@ marketing-as-code/
 ├── .agents/skills/<name>/       # canonical agent & skill definitions (open standard)
 ├── .claude/skills/<name>        # per-skill symlinks into .agents/skills/ (Claude Code shim)
 ├── .mcp.json  .cursor/mcp.json  # the same MCP servers for Claude Code and Cursor, placeholders only
-├── .github/                     # PR template, sync-check workflow, later automation crons
+├── .github/                     # PR template, CODEOWNERS, check and housekeeping workflows, crons
 │
 ├── strategy/                    # market truth: positioning, messaging, ICP/personas, competitive
 ├── brand/                       # voice + visual identity + reusable design assets
@@ -407,7 +407,7 @@ in its own repository. Three reasons:
 3. **Practice.** This mirrors how the pattern already runs in production:
    the OG-image tooling originated in a separate website repo.
 
-The repos still connect: `docs/website.md` documents the pattern, and a
+The repos still connect: `docs/website.md` (planned) will document the pattern, and a
 GitHub Action here opens a PR against the website repo whenever a content
 piece merges with `status: published`. The website repo stays dumb; it just
 receives content. A companion `marketing-as-code-website` Astro template repo

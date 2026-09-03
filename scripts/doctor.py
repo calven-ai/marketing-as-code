@@ -1,194 +1,138 @@
 #!/usr/bin/env python3
-"""Health check for a marketing-as-code checkout.
+"""Health check for a marketing-as-code checkout: runs every check in
+scripts/lint.py against docs/schema.json, then reports unfilled templates,
+context files past their review date, and whether an .env exists. --fix
+applies the safe fixes first; --strict fails on warnings too (CI on main);
+--brief prints three lines for the session-start hook; --github checks the
+repository settings through gh. Exit 1 only on real breakage.
 
 Run from the repo root:  python3 scripts/doctor.py
 
-Checks that the wiring agents depend on is intact (required files, skill
-links, the MCP configs for Claude Code and Cursor listing the same servers
-and holding placeholders instead of values), reports which templates
-are still unfilled (fine on day one; each unfilled template is a question an
-agent will have to ask), and lists context files whose `last_reviewed` date
-is missing or older than STALE_AFTER_DAYS (informational; the alternative to
-reviewing them by hand is a context layer, see
-integrations/context-layer.md). Exit code 1 only on real breakage.
+When it is red, fix what it names or ask your agent for /doctor. The
+findings are the same ones CI posts on every proposal (check.yml), so a
+green doctor here means a green check there.
 """
 
+import argparse
 import json
-import re
 import subprocess
 import sys
-from datetime import date
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import lint  # noqa: E402
 
-REQUIRED = [
-    "AGENTS.md",
-    ".env.example",
-    "integrations/tasks.md",
-    "memory/decision-log.md",
-    "data/ontology/metrics.md",
-    "reports/_templates/dashboard.html",
-    "reports/_templates/qmr/data-checklist.md",
-]
-
-TEMPLATES = {  # file -> marker meaning "still unfilled"
-    "strategy/positioning.md": "Template: unfilled",
-    "strategy/messaging.md": "Template: unfilled",
-    "strategy/icp.md": "Template: unfilled",
-    "strategy/personas.md": "Template: unfilled",
-    "strategy/product-brief.md": "Template: unfilled",
-    "brand/voice.md": "Template: unfilled",
-    "brand/visual-identity.md": "Template: unfilled",
-    "data/ontology/metrics.md": "Template: unfilled",
-    "data/ontology/funnel.md": "Template: unfilled",
-    "data/ontology/events.md": "Template: unfilled",
-    "data/ontology/naming.md": "Template: unfilled",
-    "integrations/tasks.md": "Fallback: in-repo checklists",
-}
-
-CONTEXT_FILES = [  # carry `source` and `last_reviewed` frontmatter
-    "strategy/positioning.md",
-    "strategy/messaging.md",
-    "strategy/icp.md",
-    "strategy/personas.md",
-    "strategy/product-brief.md",
-    "brand/voice.md",
-    "brand/visual-identity.md",
-]
-STALE_AFTER_DAYS = 90
-
-MCP_FILES = [".mcp.json", ".cursor/mcp.json"]  # must list the same servers
-# Anything that looks like a real credential inside an MCP config. The files
-# hold ${VAR} placeholders only: non-interactive Claude Code loads project
-# servers without a prompt, so a value here would run anywhere.
-SECRET_SHAPES = re.compile(
-    r"(sk-[A-Za-z0-9_-]{8,}|xox[abp]-[A-Za-z0-9-]{8,}|Bearer\s+(?!\$\{)[A-Za-z0-9._-]{12,})")
+ROOT = lint.ROOT
 
 
-def frontmatter(text):
-    """Return the YAML frontmatter as a flat dict (simple key: value lines)."""
-    m = re.match(r"---\n(.*?)\n---\n", text, re.S)
-    if not m:
-        return {}
-    out = {}
-    for line in m.group(1).splitlines():
-        if ":" in line:
-            key, _, value = line.partition(":")
-            out[key.strip()] = value.split("#", 1)[0].strip()
+def github_settings():
+    """Warnings about repo settings scripts/github_setup.sh would apply. Needs gh."""
+    out = []
+    try:
+        view = subprocess.run(["gh", "repo", "view", "--json",
+                               "squashMergeAllowed,mergeCommitAllowed,rebaseMergeAllowed,deleteBranchOnMerge,"
+                               "autoMergeAllowed,isPrivate,nameWithOwner"],
+                              capture_output=True, text=True, check=True, cwd=str(ROOT))
+        repo = json.loads(view.stdout)
+    except (subprocess.CalledProcessError, FileNotFoundError, json.JSONDecodeError):
+        return ["gh is not available or not logged in; skipped the GitHub settings check"]
+    if not repo.get("squashMergeAllowed") or repo.get("mergeCommitAllowed") or repo.get("rebaseMergeAllowed"):
+        out.append("merge method is not squash-only (proposals should land as one commit)")
+    if not repo.get("deleteBranchOnMerge"):
+        out.append("branches are not deleted on merge (old proposals will pile up)")
+    if not repo.get("autoMergeAllowed"):
+        out.append("auto-merge is off (bookkeeping proposals wait for the checks, then merge themselves)")
+    try:
+        rules = subprocess.run(["gh", "api", f"repos/{repo['nameWithOwner']}/rulesets"],
+                               capture_output=True, text=True, check=True, cwd=str(ROOT))
+        names = [r.get("name") for r in json.loads(rules.stdout)]
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        names = []
+    if "main" not in names:
+        out.append("no ruleset named 'main' (nothing stops a push to the approved copy)")
+    if out:
+        out.append("run: scripts/github_setup.sh (docs/github-settings.md explains each setting and the plan it needs)")
     return out
 
 
-def context_freshness(unfilled):
-    """Classify context files: served, stale, unreviewed. Never a problem."""
-    served, stale, unreviewed = [], [], []
-    today = date.today()
-    for rel in CONTEXT_FILES:
-        path = ROOT / rel
-        if not path.is_file() or rel in unfilled:
-            continue  # missing is REQUIRED's job; unfilled is reported above
-        fm = frontmatter(path.read_text(encoding="utf-8"))
-        if fm.get("source") == "context-layer":
-            served.append(rel)
-            continue
-        raw = fm.get("last_reviewed", "")
-        try:
-            reviewed = date.fromisoformat(raw)
-        except ValueError:
-            unreviewed.append(rel)
-            continue
-        age = (today - reviewed).days
-        if age > STALE_AFTER_DAYS:
-            stale.append((rel, age))
-    return served, stale, unreviewed
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="Health check for this checkout.")
+    ap.add_argument("--fix", action="store_true", help="apply the safe fixes first")
+    ap.add_argument("--strict", action="store_true", help="warnings fail too")
+    ap.add_argument("--format", choices=["text", "github"], default="text")
+    ap.add_argument("--brief", action="store_true", help="three lines: problems, stale, unfilled")
+    ap.add_argument("--github", action="store_true", help="also check the GitHub repository settings")
+    args = ap.parse_args(argv)
 
+    ctx = lint.Ctx()
+    findings = lint.run_checks(ctx)
+    fixed = []
+    if args.fix:
+        fixed = lint.apply_fixes(ctx, findings)
+        findings = lint.run_checks(ctx)
 
-def mcp_config_problems():
-    """The MCP files parse, list the same server names, and hold no values."""
-    problems, names = [], {}
-    for rel in MCP_FILES:
-        path = ROOT / rel
-        if not path.is_file():
-            problems.append(f"missing MCP config: {rel} (integrations/README.md)")
-            continue
-        text = path.read_text(encoding="utf-8")
-        try:
-            servers = json.loads(text).get("mcpServers", {})
-        except json.JSONDecodeError as err:
-            problems.append(f"{rel} is not valid JSON: {err}")
-            continue
-        names[rel] = set(servers)
-        for hit in SECRET_SHAPES.findall(text):
-            token = hit[0] if isinstance(hit, tuple) else hit
-            problems.append(f"{rel} looks like it holds a credential value "
-                            f"({token[:6]}...); use a ${{VAR}} placeholder")
-    if len(names) == len(MCP_FILES):
-        a, b = (names[rel] for rel in MCP_FILES)
-        if a != b:
-            problems.append("MCP server lists differ: "
-                            f"{MCP_FILES[0]} has {sorted(a)}, "
-                            f"{MCP_FILES[1]} has {sorted(b)}; "
-                            "edit both together (integrations/README.md)")
-    return problems
+    errors = [f for f in findings if f.level == lint.ERROR]
+    warnings = [f for f in findings if f.level == lint.WARNING]
+    unfilled = [f.path for f in findings if f.check == "template"]
+    stale = [f.path for f in warnings if f.check == "context-stale"]
+    served = [rel for rel in ctx.schema["context_files"]
+              if ctx.exists(rel) and (ctx.fm(rel) or {}).get("source") == "context-layer"]
 
+    if args.brief:
+        print(f"doctor: {len(errors)} problems, {len(warnings)} warnings"
+              + ("; run python3 scripts/doctor.py" if errors or warnings else ""))
+        print(f"stale context: {', '.join(stale) if stale else 'none'}")
+        print(f"unfilled templates: {len(unfilled)}" + (" (run /setup)" if unfilled else ""))
+        return 1 if errors else 0
 
-def main():
-    problems = []
-
-    for rel in REQUIRED:
-        if not (ROOT / rel).is_file():
-            problems.append(f"missing required file: {rel}")
-
-    sync = subprocess.run(
-        [sys.executable, str(ROOT / "scripts" / "sync_skills.py"), "--check"],
-        capture_output=True, text=True)
-    if sync.returncode != 0:
-        problems.append("skill links out of sync:\n  "
-                        + sync.stdout.strip().replace("\n", "\n  "))
-
-    problems.extend(mcp_config_problems())
-
-    unfilled = [rel for rel, marker in TEMPLATES.items()
-                if (ROOT / rel).is_file()
-                and marker in (ROOT / rel).read_text(encoding="utf-8")]
+    if fixed:
+        print(f"fixed {len(fixed)}:")
+        for f in fixed:
+            print(f"  {f.path}: {f.message}")
+        print()
 
     if (ROOT / ".env").is_file():
         print("info: .env present (gitignored; keep it that way)")
     else:
-        print("info: no .env; fine unless you use key-based integrations "
-              "(copy .env.example)")
+        print("info: no .env; fine unless you use key-based integrations (copy .env.example)")
 
     if unfilled:
         print(f"\nunfilled templates ({len(unfilled)}), run /setup to fill them:")
         for rel in unfilled:
             print(f"  - {rel}")
-
-    served, stale, unreviewed = context_freshness(unfilled)
     if served:
         print(f"\ncontext served by a context layer ({len(served)}), files are fallbacks:")
         for rel in served:
             print(f"  - {rel}")
-    if stale:
-        print(f"\nstale context ({len(stale)}), not reviewed in "
-              f"{STALE_AFTER_DAYS}+ days:")
-        for rel, age in stale:
-            print(f"  - {rel} ({age} days)")
-    if unreviewed:
-        print(f"\nunreviewed context ({len(unreviewed)}), filled but no "
-              "last_reviewed date:")
-        for rel in unreviewed:
-            print(f"  - {rel}")
-    if stale or unreviewed:
-        print("  review them with the team and set last_reviewed, or connect a "
-              "context layer: integrations/context-layer.md")
 
-    if problems:
-        print(f"\nPROBLEMS ({len(problems)}):")
-        for p in problems:
-            print(f"  ✗ {p}")
-        sys.exit(1)
-    print("\nok: wiring intact")
+    visible = [f for f in findings if f.level != lint.INFO]
+    if args.format == "github":
+        if visible:
+            print(lint.format_github(visible))
+    else:
+        if warnings:
+            print(f"\nWARNINGS ({len(warnings)}):")
+            print(lint.format_text(warnings))
+        if errors:
+            print(f"\nPROBLEMS ({len(errors)}):")
+            print(lint.format_text(errors))
+            fixable = sum(1 for f in errors if f.fixable)
+            if fixable:
+                print(f"\n{fixable} of these are auto-fixable: python3 scripts/doctor.py --fix")
+            print("or ask your agent for /doctor")
+
+    if args.github:
+        notes = github_settings()
+        if notes:
+            print("\nGitHub settings:")
+            for n in notes:
+                print(f"  - {n}")
+
+    if errors or (args.strict and warnings):
+        return 1
+    print("\nok: wiring intact" + (f", {len(warnings)} warnings" if warnings else ""))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

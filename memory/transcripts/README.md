@@ -6,8 +6,9 @@ The transcript pipeline (details in [`../README.md`](../README.md)):
   `scripts/pull_transcripts.py` fetch them from Granola. Name:
   `YYYY-MM-DD-<meeting>.md` (`.txt`/`.vtt` fine too). The daily
   `transcripts-cron` GitHub Action runs the same script and opens a pull
-  request titled "Transcripts: <date>" when something new landed; merge it,
-  then process.
+  request titled "Transcripts: <date>" when something new landed. The inbox
+  is agent-maintained, so that proposal is bookkeeping and merges itself
+  once the checks pass; then process.
 - **`processed/`**: the `chief-of-staff` skill moves transcripts here after
   extracting decisions, project status, action items, facts, and red flags.
   Nothing is deleted.

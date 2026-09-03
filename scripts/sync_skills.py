@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Keep .claude/skills/ pointing at the canonical .agents/skills/ definitions.
+"""Keep .claude/skills/ symlinks pointing at the canonical .agents/skills/
+definitions; --check reports drift without fixing it (used by CI).
 
 Canonical skill definitions live in .agents/skills/<name>/ (the Agent Skills
 open standard, auto-discovered by Cursor, Codex, and others). Claude Code

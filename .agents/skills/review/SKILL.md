@@ -1,6 +1,9 @@
 ---
 name: review
 description: Pre-publish review of a content draft against strategy, messaging, and brand voice. Use when asked to review, check, or QA a draft, or before any piece moves to in-review status. Reports findings; does not rewrite without being asked.
+metadata:
+  kind: workflow
+  needs: nothing
 ---
 
 # Content review

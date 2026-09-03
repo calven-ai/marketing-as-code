@@ -1,6 +1,9 @@
 ---
 name: brand-monitor
 description: Track how AI answer engines and LLMs mention us and our competitors, using the DataForSEO MCP's AI optimization and LLM mentions tools against the prompt set in data/seo/prompts.csv. Use when asked "are we cited by ChatGPT", "who gets recommended for X", "run the AEO check", or for the recurring mentions report.
+metadata:
+  kind: role
+  needs: DataForSEO MCP
 ---
 
 # Brand monitor

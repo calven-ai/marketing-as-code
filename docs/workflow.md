@@ -23,13 +23,27 @@ entirely? Start with [new-to-github.md](new-to-github.md).)
 - Anything sent to the outside world: emails, social posts, website changes
 - Strategy, brand, and ontology changes: these cascade everywhere
 - Automated pipelines: anything running in GitHub Actions, script or agent,
-  opens PRs and never merges ([operating-model.md](operating-model.md))
+  opens proposals; only the check merges, and only bookkeeping ones
+  ([operating-model.md](operating-model.md))
 
-## What may skip it
+## Two kinds of proposals, one path
 
-Low-stakes internal bookkeeping an agent does in place: project `status.md`
-updates, decision-log appends dictated in conversation, data snapshots,
-moving a processed transcript. When in doubt, it's a PR.
+Every change travels the same way: a branch and a pull request, which this
+repo calls a proposal. The check (`.github/workflows/check.yml`) then sorts
+it into one of two kinds:
+
+- **Bookkeeping.** It touches only files the agents maintain: project
+  `status.md` entries, decision-log appends, data snapshots, transcripts
+  moving through the inbox, recurring reports (the list is `bookkeeping` in
+  `docs/schema.json`). Once the checks are green it approves itself and
+  lands. Nobody has to merge a snapshot.
+- **Needs review.** Everything else: content, strategy, brand, ontology,
+  skills, scripts, docs. A person who is not the author reads the diff and
+  approves; the `review-gate` check says whose approval it is waiting for.
+
+When in doubt the check decides, not the author, and it always errs toward
+review. On GitHub Team or Pro the two checks are enforced; on Free they
+advise ([github-settings.md](github-settings.md)).
 
 ## Review rhythm
 

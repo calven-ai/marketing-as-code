@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Post a message to Slack with the team's own bot (integrations/slack/).
+"""Post a message as the team's Slack bot (integrations/slack/). --channel
+team|requests|leadership|<id>, text from --text or stdin, --thread <ts> to
+reply in a thread, --dry-run to print the payload. Needs SLACK_BOT_TOKEN plus
+the channel ID variables.
 
 Standard library only: one chat.postMessage call over urllib. Skills and
 GitHub Actions call this instead of talking to Slack themselves.

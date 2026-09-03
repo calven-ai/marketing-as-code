@@ -11,7 +11,7 @@ see (a draft, an email, a prototype, an image) loads this folder first.
 | --- | --- |
 | [voice.md](voice.md) | Voice and tone: how we write, with do/don't examples |
 | [visual-identity.md](visual-identity.md) | Colors, typography, imagery rules, logo usage |
-| [tokens.json](tokens.json) | The machine-readable subset (colors, fonts) that scripts consume: `scripts/og_image.py` and the prototype builder read this |
+| [tokens.json](tokens.json) | The machine-readable subset (colors, fonts) that scripts and the prototype builder read (an OG-image script is on the roadmap) |
 | `logos/` | Logo files (SVG preferred) |
 | `templates/` | Reusable design templates: OG-image background, social templates |
 

@@ -14,9 +14,10 @@ service-account*.json
 .DS_Store
 Thumbs.db
 
-# Editors
+# Editors and per-machine agent settings
 .vscode/
 .idea/
+.claude/settings.local.json
 
 # Dependencies and caches (playground prototypes may pull these in)
 node_modules/

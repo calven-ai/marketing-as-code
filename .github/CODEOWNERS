@@ -1,0 +1,18 @@
+# Who is asked to review a proposal that touches these paths.
+# The review gate (scripts/review_gate.py) names these people in its "waiting
+# for approval from ..." line; GitHub requests them as reviewers on plans
+# where CODEOWNERS is enforced. Replace the placeholder with GitHub handles
+# (/setup does this); one line per area is plenty.
+
+# Context that cascades everywhere
+strategy/            @owner-placeholder
+brand/               @owner-placeholder
+data/ontology/       @owner-placeholder
+
+# The agents, their instructions, and the machinery
+AGENTS.md            @owner-placeholder
+CLAUDE.md            @owner-placeholder
+.agents/             @owner-placeholder
+scripts/             @owner-placeholder
+.github/             @owner-placeholder
+docs/schema.json     @owner-placeholder

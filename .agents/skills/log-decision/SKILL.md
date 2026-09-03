@@ -1,6 +1,9 @@
 ---
 name: log-decision
 description: Record a decision in memory/decision-log.md. Use whenever a discussion, meeting, or thread resolves something ("log this decision", "we decided X"), or when other work surfaces a decision that was clearly made but never logged.
+metadata:
+  kind: workflow
+  needs: nothing
 ---
 
 # Log a decision

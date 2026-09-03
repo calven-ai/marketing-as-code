@@ -1,6 +1,9 @@
 ---
 name: make-dashboard
 description: Turn data into a self-contained HTML dashboard saved beside its report. Use when asked for a dashboard, chart, or visual view of marketing data, or when a report's answer is multidimensional enough that prose can't carry it.
+metadata:
+  kind: workflow
+  needs: nothing
 ---
 
 # Make a dashboard

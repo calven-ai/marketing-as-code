@@ -1,6 +1,9 @@
 ---
 name: researcher
 description: ABM account research with Apify actors through the official Apify MCP: people at or formerly at target accounts, company signals, social activity, saved as dated snapshots in data/accounts/. Use when asked to "research these accounts", "build an alumni list", "who at Acme should we talk to", or to enrich data/accounts/target-accounts.csv.
+metadata:
+  kind: role
+  needs: Apify MCP
 ---
 
 # Researcher

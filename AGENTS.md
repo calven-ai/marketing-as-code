@@ -25,8 +25,13 @@ decides.
    and how events are named. If an ontology file is still a template, ask the
    team for the definition; never assume one.
 3. **Humans decide.** Agents propose: drafts, reports, prototypes, backlog
-   items, and edits as reviewable diffs. Publishing, sending, deleting, and
-   anything that cascades across documents needs explicit human approval.
+   items, and edits as reviewable diffs, always on a branch, never on
+   `main`. Publishing, sending, deleting, and anything that cascades across
+   documents needs explicit human approval. The one exception is
+   bookkeeping (status entries, decision-log appends, snapshots,
+   transcripts moving through the inbox, recurring reports): a proposal
+   that touches only those merges itself once the checks pass
+   ([docs/workflow.md](docs/workflow.md)).
 4. **Plain text first.** Markdown for knowledge, CSV for data. No binary
    files where text will do. The one sanctioned binary zone is `brand/`
    (logos, image templates).

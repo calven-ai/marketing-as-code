@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-"""Pull search volume and difficulty for data/seo/keywords.csv from DataForSEO
-and save the result as a dated snapshot. Standard library only.
+"""Pull search volume and keyword difficulty for every row of
+data/seo/keywords.csv from DataForSEO and save
+data/seo/snapshots/YYYY-MM-DD-dataforseo-volume.csv. --update also refreshes
+volume, difficulty and last_checked in the canonical table; --dry-run lists
+what would be pulled. Needs DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD
+(environment or .env). Standard library only.
 
     python3 scripts/seo_snapshot.py                 # snapshot only
     python3 scripts/seo_snapshot.py --update        # also refresh keywords.csv

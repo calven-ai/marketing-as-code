@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Pull new Granola meeting transcripts into memory/transcripts/inbox/.
+"""Pull new Granola meeting transcripts into memory/transcripts/inbox/, one
+Markdown file per meeting in the inbox contract (memory/transcripts/README.md);
+skips anything already in inbox/ or processed/. Options: --since YYYY-MM-DD,
+--limit N, --dry-run. Needs GRANOLA_API_KEY (environment or .env). Also run
+daily by .github/workflows/transcripts-cron.yml, which opens a PR with what
+landed.
 
 Granola is the shipped example of a transcript connector. A connector for
 another provider (Zoom, Fireflies, anything with an API) is a copy of this

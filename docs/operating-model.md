@@ -35,8 +35,9 @@ can run with nobody watching. Two flavours:
   deterministic script and opens a pull request with the result; it never
   merges. Keys come from repository secrets
   ([secrets.md](secrets.md), tier 3). `transcripts-cron.yml` (Granola into
-  the inbox, daily) and `sync-check.yml` (the health check on every PR)
-  are the two examples.
+  the inbox, daily), `check.yml` (the health check on every proposal, which
+  also approves bookkeeping proposals) and `housekeeping.yml` (the weekly
+  tidy-up) are the shipped examples.
 - **An agent in Actions** (opt-in). A workflow runs a Claude Code agent on
   a schedule or on a trigger, with a skill as its prompt, and the agent
   opens a pull request. It never merges, publishes, or sends. It needs an
@@ -107,7 +108,9 @@ Whatever the mode, these need a person, every time (AGENTS.md rule 3,
 | Account research | `/researcher` (Apify MCP, OAuth) | Not headless |
 | Campaign discovery, content, review, prototypes, projects | Always a person | Never |
 | Slack digests and alerts | `python3 scripts/slack_post.py` from a skill | Scheduled workflows calling the same script, yours to add; the message table is in `integrations/slack/README.md` |
-| Health check | `python3 scripts/doctor.py` | `sync-check.yml` on every PR (shipped) |
+| Health check | `python3 scripts/doctor.py` | `check.yml` on every proposal and on `main`: tests the lint, pushes the safe fixes, annotates, labels, and merges bookkeeping proposals (shipped) |
+| Tidy the approved copy | `python3 scripts/doctor.py --fix` | `housekeeping.yml`, Mondays: the safe fixes as one bookkeeping proposal; stale proposals closed after three weeks (shipped) |
+| Repository settings | `sh scripts/github_setup.sh`, then `python3 scripts/doctor.py --github` | Never; settings are applied once by an admin ([github-settings.md](github-settings.md)) |
 
 When you add an integration or a workflow, add its row here and say both
 modes where the workflow is described; the checklist in

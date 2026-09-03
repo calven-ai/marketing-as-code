@@ -1,10 +1,11 @@
 name: transcripts-cron
 
 # Pulls new meeting transcripts into memory/transcripts/inbox/ every day and
-# opens a pull request with them. It never merges: a human reviews the PR
-# and merges it. Processing the inbox is then either a person running the
-# chief-of-staff skill (the default) or transcripts-process.yml running it
-# unattended once the merge lands; docs/operating-model.md has the choice.
+# opens a pull request with them. The inbox is an agent-maintained folder,
+# so check.yml treats that PR as bookkeeping and merges it once the checks
+# are green (docs/workflow.md). Processing the inbox is then either a person
+# running the chief-of-staff skill (the default) or transcripts-process.yml
+# running it unattended; docs/operating-model.md has the choice.
 #
 # Granola is the shipped provider. Needs one repository secret:
 # GRANOLA_API_KEY (Settings -> Secrets and variables -> Actions). Nothing
@@ -69,7 +70,7 @@ jobs:
           gh pr create --title "Transcripts: $date" --base "${{ github.ref_name }}" --head "$branch" --body "$(cat <<'EOF'
           New meeting transcripts pulled into `memory/transcripts/inbox/`.
 
-          Reviewer: merge this PR, then process the inbox. Either run `/chief-of-staff` (or ask your agent to "process the transcript inbox"), or, if the team has opted into `transcripts-process.yml`, the merge triggers it and a "Transcripts processed" PR follows. Processing extracts facts, decisions, project status, action items per owner, and red flags, moves the files to `processed/`, and posts the summary to Slack.
+          This is bookkeeping: the check approves it automatically once it is green, so nobody needs to merge it. Then process the inbox: run `/chief-of-staff` (or ask your agent to "process the transcript inbox"), or, if the team has opted into `transcripts-process.yml`, its daily run picks the files up and a "Transcripts processed" PR follows for a person to review. Processing extracts facts, decisions, project status, action items per owner, and red flags, moves the files to `processed/`, and posts the summary to Slack.
 
           Transcripts are sensitive. Keep this repository private.
           EOF

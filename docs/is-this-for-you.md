@@ -24,11 +24,19 @@ useful places to stop, and most teams should start there.
 | Keep API keys out of chat and in a secrets manager ([secrets.md](secrets.md)) | one owner | at setup, then rarely |
 | Fill in the strategy and brand templates, put a name and a review date on each, and keep the dates honest (`strategy/`, `brand/`) | the owner of each document | quarterly |
 | Pay for a coding-agent seat per active user and pay-as-you-go data instead of subscription suites | whoever owns the budget | monthly |
+| Pay for GitHub Team (or Pro) so the repository's rules are enforced, not just suggested ([github-settings.md](github-settings.md)) | whoever owns the budget | monthly, per seat |
 | Decide, per recurring workflow, whether a person runs it or GitHub Actions does, and pay for an API key if the latter ([operating-model.md](operating-model.md)) | the owner | once per workflow |
 | Change where the team looks for the truth, and stop maintaining the old place | everyone | once, and it is the hard part |
 
 The technical rows are the smaller half. Most of this page is about the
 larger half.
+
+One row deserves a sentence. A private repository on GitHub Free cannot
+enforce its rules: the checks run and comment, but nothing stops a red
+proposal from being merged or a push from landing on the approved copy.
+GitHub Team (or Pro for a personal account) turns "humans decide" into a
+rule the platform enforces. It is priced per seat and is the cheapest line
+in this setup; plan for it from the start.
 
 ## Who this is for
 
