@@ -11,7 +11,7 @@ see (a draft, an email, a prototype, an image) loads this folder first.
 | --- | --- |
 | [voice.md](voice.md) | Voice and tone: how we write, with do/don't examples |
 | [visual-identity.md](visual-identity.md) | Colors, typography, imagery rules, logo usage |
-| [tokens.json](tokens.json) | The machine-readable subset (colors, fonts) that scripts consume — `scripts/og_image.py` and the prototype builder read this |
+| [tokens.json](tokens.json) | The machine-readable subset (colors, fonts) that scripts consume: `scripts/og_image.py` and the prototype builder read this |
 | `logos/` | Logo files (SVG preferred) |
 | `templates/` | Reusable design templates: OG-image background, social templates |
 
@@ -23,3 +23,8 @@ see (a draft, an email, a prototype, an image) loads this folder first.
   changes, update both in the same commit.
 - Voice questions are settled by `voice.md`, not by taste. If it doesn't
   cover a case, propose an addition rather than improvising silently.
+- `voice.md` and `visual-identity.md` carry `last_reviewed` in their
+  frontmatter; `scripts/doctor.py` flags them after 90 days. Voice is not
+  served by a context layer (see
+  [integrations/context-layer.md](../integrations/context-layer.md)); it
+  stays here and the team owns it.

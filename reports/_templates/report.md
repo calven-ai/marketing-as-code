@@ -16,7 +16,7 @@ only this section, they have what they asked for.]
 ## Caveats and gaps
 
 [What the data can't say: missing snapshots, definition ambiguities,
-sample-size warnings. A gap is a gap — never an estimate dressed as fact.]
+sample-size warnings. A gap is a gap, never an estimate dressed as fact.]
 
 ## Data used
 

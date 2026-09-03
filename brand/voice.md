@@ -1,11 +1,17 @@
+---
+source: repo
+last_reviewed:
+owner:
+---
+
 # Voice and tone
 
-> **Template — unfilled.** Agents: if the placeholders are still here, ask
+> **Template: unfilled.** Agents: if the placeholders are still here, ask
 > the team (or run `/setup`) before writing anything an outsider will see.
 
 ## The voice in three adjectives
 
-[e.g. "plainspoken, confident, warm" — and one sentence on what each means
+[e.g. "plainspoken, confident, warm", plus one sentence on what each means
 in practice for this team.]
 
 ## How we write
@@ -27,7 +33,7 @@ in practice for this team.]
 
 ## Do / don't examples
 
-The most useful section — real sentences, not rules.
+The most useful section: real sentences, not rules.
 
 | Don't write | Write instead | Why |
 | --- | --- | --- |

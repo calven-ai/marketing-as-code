@@ -17,11 +17,13 @@ of lasting value and route it to where it lives.
    customer quotes, numbers, plans that affect existing docs. Propose
    updates to `memory/knowledge/` (new topic file or edit) and to any
    affected `strategy/`, `brand/`, or `projects/` docs. **Always as a
-   reviewable diff / PR — never a silent write.**
-3. **Extract decisions** — things that were *resolved*, not merely
+   reviewable diff / PR, never a silent write.** A strategy file marked
+   `source: context-layer` gets no diff; list the change in the summary as
+   "to update in the context layer" instead.
+3. **Extract decisions**: things that were *resolved*, not merely
    discussed. Append each to `memory/decision-log.md` in its exact format
    (date, decided-by, source = the transcript's `processed/` path, context,
-   follow-ups). When resolution is ambiguous, list it under "unclear —
+   follow-ups). When resolution is ambiguous, list it under "unclear:
    confirm?" in your summary instead of logging it.
 4. **Extract project status updates**: for every project in `projects/`
    the meeting touched, what moved, what is stuck, and the state the
@@ -82,8 +84,8 @@ Transcript `memory/transcripts/inbox/2026-09-03-weekly-marketing-sync.md`:
 
 ## Rules
 
-- Attribute only what the transcript supports; transcription errors exist —
-  when a name or number looks garbled, flag it.
+- Attribute only what the transcript supports; transcription errors exist,
+  so when a name or number looks garbled, flag it.
 - Quote sparingly in outputs; transcripts can contain sensitive discussion,
   and the Slack messages never include transcript text, only the extracted
   items and paths.

@@ -58,8 +58,8 @@ entries).
 
 ## Next quarter
 
-[Targets and the 3–5 bets, once the team decides — the QMR meeting's
-output, logged to `memory/decision-log.md`.]
+[Targets and the 3 to 5 bets, once the team decides. This is the QMR
+meeting's output, logged to `memory/decision-log.md`.]
 
 ## Data used
 

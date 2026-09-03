@@ -1,7 +1,7 @@
 # Roadmap: everything this repo will contain
 
-The complete build list — structure, templates, agents & skills, scripts,
-integrations, docs — phased into three waves. The reasoning behind the
+The complete build list (structure, templates, agents & skills, scripts,
+integrations, docs), phased into three waves. The reasoning behind the
 structure and every design decision lives in [architecture.md](architecture.md).
 
 Conventions used below:
@@ -19,7 +19,7 @@ demo company on a separate branch later.
 
 ---
 
-## Wave 1 — the promise is true with zero integrations
+## Wave 1: the promise is true with zero integrations
 
 Goal: clone the template, run `/setup`, and complete a real content workflow
 entirely offline. No API keys required for anything in this wave.
@@ -32,25 +32,26 @@ entirely offline. No API keys required for anything in this wave.
 - [x] Rewrite every folder README as a machine contract: what is
       authoritative here, naming conventions, what to do when something is
       missing
-- [x] AGENTS.md v2 — the full contract: ontology-first rule, the
+- [x] AGENTS.md v2: the full contract: ontology-first rule, the
       data-question routing table, the lifecycle-owner rule, the brand
       binary carve-out, review workflow
-- [x] README v2 — updated folder table and quick start
-- [x] `.github/PULL_REQUEST_TEMPLATE.md` — the human-review ritual
+- [x] README v2: updated folder table and quick start
+- [x] `.github/PULL_REQUEST_TEMPLATE.md`: the human-review ritual
 - [x] `.env.example`
 
 ### Templates
 
-- [x] `strategy/` — positioning, messaging hierarchy, ICP & personas,
-      competitive notes + battlecard
-- [x] `brand/` — voice.md, visual-identity.md, tokens.json, templates/
+- [x] `strategy/`: positioning, messaging, ICP, personas, product brief
+      (headings mirror the documents a marketing context layer serves over
+      MCP), competitive notes + battlecard
+- [x] `brand/`: voice.md, visual-identity.md, tokens.json, templates/
       placeholder
-- [x] `content/_template/` — brief + draft with frontmatter
+- [x] `content/_template/`: brief + draft with frontmatter
       (`project`, `status`, `channel`, `owner`)
-- [x] `projects/_template/` — brief.md, status.md; plus campaign.md template
-- [x] `data/ontology/` — metrics.md, funnel.md, events.md, naming.md
+- [x] `projects/_template/`: brief.md, status.md; plus campaign.md template
+- [x] `data/ontology/`: metrics.md, funnel.md, events.md, naming.md
       (unfilled versions instruct agents to ask, not assume)
-- [x] `memory/decision-log.md` — seeded with the entry format
+- [x] `memory/decision-log.md`: seeded with the entry format
 
 ### Agents & skills (no keys needed)
 
@@ -68,20 +69,20 @@ entirely offline. No API keys required for anything in this wave.
 
 - [x] `scripts/sync_skills.py` + committed `.claude/skills/` per-skill
       symlinks
-- [x] `.github/workflows/sync-check.yml` — CI drift check for the symlinks
-- [x] `.claude/settings.json` — safe permission defaults
-- [x] `scripts/doctor.py` — env, symlink, and config health check
+- [x] `.github/workflows/sync-check.yml`: CI drift check for the symlinks
+- [x] `.claude/settings.json`: safe permission defaults
+- [x] `scripts/doctor.py`: env, symlink, and config health check
 
 ### Docs
 
-- [x] `docs/workflow.md` — the PR review ritual, written for GitHub Desktop
+- [x] `docs/workflow.md`: the PR review ritual, written for GitHub Desktop
       users
-- [x] `docs/secrets.md` — the three-tier secrets story
+- [x] `docs/secrets.md`: the three-tier secrets story
 - [ ] Finish `docs/new-to-github.md` and cross-link the new docs
 
 ---
 
-## Wave 2 — integrations and the analyst loop
+## Wave 2: integrations and the analyst loop
 
 Goal: the killer UX works. A marketer asks "how many people attended event X
 and then signed up?" and the repo routes it: snapshot → source system →
@@ -89,12 +90,17 @@ ontology → answer.
 
 ### Integrations
 
-- [x] `.mcp.json` — DataForSEO and Apify listed (keys via env placeholders;
-      Claude Code asks before enabling)
-- [ ] `.cursor/mcp.json` — the same list for Cursor
-- [x] `integrations/README.md` — the registry (tool, mechanism, auth, status,
+- [x] `.mcp.json`: DataForSEO, Apify and Calven listed (keys via env
+      placeholders; Claude Code asks before enabling)
+- [x] `integrations/context-layer.md`: why hand-maintained context goes
+      stale, the marketing context layer over MCP as the alternative,
+      Calven as the documented example
+- [x] `last_reviewed` frontmatter on every context file + the staleness
+      list in `scripts/doctor.py`
+- [ ] `.cursor/mcp.json`: the same list for Cursor
+- [x] `integrations/README.md`: the registry (tool, mechanism, auth, status,
       env vars)
-- [x] `integrations/tasks.md` template — the task-tool adapter document
+- [x] `integrations/tasks.md` template: the task-tool adapter document
 - [ ] Setup docs: **Asana** (first task tool), **HubSpot**, **PostHog**,
       **GA4**, **DataForSEO**
 
@@ -121,25 +127,25 @@ setup doc.
 
 ### Scripts
 
-- [x] `scripts/pull_transcripts.py` — **Granola** → `memory/transcripts/inbox/`
-- [x] `scripts/slack_post.py` — post as the team's Slack bot (team, requests,
+- [x] `scripts/pull_transcripts.py`: **Granola** → `memory/transcripts/inbox/`
+- [x] `scripts/slack_post.py`: post as the team's Slack bot (team, requests,
       leadership channels)
-- [ ] `scripts/og_image.py` — port from the Calven website repo; reads
+- [ ] `scripts/og_image.py`: port from the Calven website repo; reads
       `brand/tokens.json` + `brand/templates/`
 - [ ] Snapshot naming helper (shared by pull scripts)
 
 ### Report infrastructure
 
 - [x] `reports/_templates/report.md`
-- [x] `reports/_templates/dashboard.html` — single file, dependency-free
+- [x] `reports/_templates/dashboard.html`: single file, dependency-free
       inline chart helpers, `const DATA` block
-- [x] `reports/_templates/qmr/` — QMR report + dashboard scaffolds
-- [x] `.github/workflows/transcripts-cron.yml` — pulls transcripts daily,
+- [x] `reports/_templates/qmr/`: QMR report + dashboard scaffolds
+- [x] `.github/workflows/transcripts-cron.yml`: pulls transcripts daily,
       **opens a PR, never merges**
 
 ---
 
-## Wave 3 — breadth, story, ecosystem
+## Wave 3: breadth, story, ecosystem
 
 ### Agents & skills
 
@@ -152,12 +158,14 @@ setup doc.
 
 - [ ] monday.com as the second task adapter
 - [ ] Zoom transcripts in `pull_transcripts.py`
-- [ ] Data enrichment (vendor TBD — Apify actors vs Clay/Breeze; open
+- [ ] Data enrichment (vendor TBD: Apify actors vs Clay/Breeze; open
       question)
+- [ ] Optional context pull script: mirror a connected context layer into
+      `strategy/` as dated files, for teams that need offline copies
 
 ### Website
 
-- [ ] `docs/website.md` — the sibling-repo pattern
+- [ ] `docs/website.md`: the sibling-repo pattern
 - [ ] Content→website sync Action: on merge of `status: published`, open a PR
       against the website repo
 - [ ] Companion `marketing-as-code-website` Astro template repo
@@ -178,3 +186,6 @@ setup doc.
   HubSpot Breeze)?
 - **Granola MCP**: official status of Granola's MCP endpoint to be verified
   at build time; the pull script is the reliable fallback either way.
+- **Context-layer stubs**: once a team connects a context layer, the mirrored
+  strategy files become two-line fallbacks flagged `source: context-layer`.
+  Keep them (routing table stays intact) or delete them? Stubs for now.

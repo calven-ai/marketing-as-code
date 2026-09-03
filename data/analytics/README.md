@@ -1,7 +1,7 @@
 # data/analytics/
 
 Website and product analytics pulls (GA4, PostHog, or whatever the team
-tracks with — see `integrations/README.md`).
+tracks with). See `integrations/README.md`.
 
 ## Snapshots
 
@@ -15,7 +15,7 @@ Keep columns stable per `<what>` so snapshots diff cleanly across months.
 
 ## For agents
 
-- Interpret event and conversion names through `data/ontology/events.md` —
-  never assume what `signed_up` means.
+- Interpret event and conversion names through `data/ontology/events.md`.
+  Never assume what `signed_up` means.
 - Analyses go to `reports/recurring/analytics/` (or `reports/adhoc/` for
   one-off questions), not here.

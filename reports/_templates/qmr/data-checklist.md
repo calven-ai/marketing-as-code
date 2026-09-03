@@ -10,19 +10,19 @@ pull, saved in the listed folder.
 
 ## CRM (`data/crm/snapshots/`)
 
-- [ ] **Pipeline by stage** — deals with stage, amount, created/closed dates
+- [ ] **Pipeline by stage**: deals with stage, amount, created/closed dates
       for the quarter. Via HubSpot MCP, or export: CRM → Deals → filter
       created/closed in quarter → export CSV.
       Expected: `<date>-hubspot-pipeline.csv`
-- [ ] **New contacts / signups** — contacts created in the quarter with
+- [ ] **New contacts / signups**: contacts created in the quarter with
       source and lifecycle stage.
       Expected: `<date>-hubspot-new-contacts.csv`
-- [ ] **MQLs/SQLs for the quarter** — per the definitions in
+- [ ] **MQLs/SQLs for the quarter**: per the definitions in
       `data/ontology/metrics.md` (if computable from the two exports above,
       skip this row).
-- [ ] **Email performance** — sends, opens, clicks, unsubscribes per
+- [ ] **Email performance**: sends, opens, clicks, unsubscribes per
       campaign. Expected: `<date>-hubspot-email-performance.csv`
-- [ ] **Event attendees** — one file per event held this quarter (webinars,
+- [ ] **Event attendees**: one file per event held this quarter (webinars,
       conferences). Expected: `<date>-<source>-<event>-attendees.csv`
 
 ## Analytics (`data/analytics/snapshots/`)
@@ -30,21 +30,21 @@ pull, saved in the listed folder.
 - [ ] **Traffic by source/channel** for the quarter, weekly or monthly
       granularity. Via PostHog/GA4 MCP, or export from the analytics UI.
       Expected: `<date>-<posthog|ga4>-traffic-by-source.csv`
-- [ ] **Conversions / key events** — the events named in
+- [ ] **Conversions / key events**: the events named in
       `data/ontology/events.md`, counts for the quarter.
       Expected: `<date>-<source>-conversions.csv`
-- [ ] **Top content** — pageviews for `content/` pieces published this and
+- [ ] **Top content**: pageviews for `content/` pieces published this and
       last quarter. Expected: `<date>-<source>-top-content.csv`
 
 ## SEO (`data/seo/snapshots/`)
 
-- [ ] **Ranking snapshot** — current rank for every keyword in
+- [ ] **Ranking snapshot**: current rank for every keyword in
       `data/seo/keywords.csv`. Via DataForSEO MCP.
       Expected: `<date>-dataforseo-rankings.csv`
-- [ ] The comparable snapshot from last quarter's QMR exists (for deltas) —
-      if not, note "baseline quarter" in the report.
+- [ ] The comparable snapshot from last quarter's QMR exists (for deltas). If
+      not, note "baseline quarter" in the report.
 
-## From the repo itself (no export needed — the skill computes these)
+## From the repo itself (no export needed: the skill computes these)
 
 - [ ] Content shipped: `content/` frontmatter, `status: published` in
       quarter

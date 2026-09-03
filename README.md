@@ -53,7 +53,7 @@ and voice, connect the agents you want, and run your marketing from here.
   for onboarding, content, project scaffolding, review, meeting-transcript
   processing, the quarterly marketing review, keyword and ranking analysis,
   AI answer-engine mention tracking, account research, and campaign
-  discovery — with analytics reporting landing next. Each one is
+  discovery, with analytics reporting landing next. Each one is
   a plain text file you can read and edit, in a format Claude Code, Cursor,
   and Codex all understand.
 - **A memory that compounds.** A decision log and a living knowledge base, fed
@@ -99,7 +99,10 @@ Everything in this repo is one of four kinds of files:
   briefs and status, the decision log and knowledge base, published content,
   and the guides on how the team works here (`strategy/`, `brand/`,
   `content/`, `projects/`, `memory/`, `docs/`, plus `AGENTS.md` and
-  `CLAUDE.md` at the root).
+  `CLAUDE.md` at the root). Context goes stale by default, so every strategy
+  file is dated and the health check flags old ones; the same files are
+  shaped to be served live by a marketing context layer over MCP instead
+  (see [integrations/context-layer.md](integrations/context-layer.md)).
 - **Agents**, the workforce, as instructions in English: every agent or skill
   is a Markdown file a person can read and change, plus the registry of what
   agents are allowed to reach (`agents/` for the roster, `.agents/skills/`
@@ -123,15 +126,15 @@ they define what the agents may reach.
 | --- | --- | --- |
 | Context | `strategy/` | Positioning, messaging, ICP and personas, competitive battlecards: what every agent loads before doing marketing thinking |
 | Context | `brand/` | Voice, visual identity, logos, design tokens: what every agent loads before making anything an outsider sees |
-| Context | `content/` | Every piece of content, at every stage — the single source of truth projects link into |
+| Context | `content/` | Every piece of content, at every stage: the single source of truth projects link into |
 | Context | `projects/` | How the work is organized: briefs and status, with campaigns as projects that contain projects |
 | Context | `memory/` | The decision log and the living knowledge base, fed from meeting transcripts |
 | Context | `docs/` | Guides: the review workflow, secrets, architecture, roadmap, and the start-here path for people new to GitHub |
 | Agents | `agents/` | The workforce roster; the definitions live in `.agents/skills/`, readable by any coding agent |
-| Agents | `integrations/` | How the repo talks to your stack: task tool, CRM, analytics, SEO — and the conventions agents follow |
+| Agents | `integrations/` | How the repo talks to your stack: task tool, CRM, analytics, SEO, plus the conventions agents follow |
 | Code | `playgrounds/` | Disposable prototypes: come to meetings with the thing itself, not a deck about it |
 | Code | `scripts/` | Deterministic helpers with no AI inside: the transcript pull, the keyword snapshot, Slack posting, the health check, the skill-link sync |
-| Data | `data/` | The machine-readable truth: keyword tables, analytics and CRM snapshots, target accounts — plus the ontology defining what your metrics mean |
+| Data | `data/` | The machine-readable truth: keyword tables, analytics and CRM snapshots, target accounts, plus the ontology defining what your metrics mean |
 | Data | `reports/` | What the data becomes: analyses, the quarterly marketing review, self-contained HTML dashboards |
 
 ## Project status
@@ -147,7 +150,9 @@ Maintained by [Calven](https://calven.ai). This repo is the runnable
 companion to the article
 [Marketing as Code: Not a Move to GitHub. A Move to Agents.](https://calven.ai/resources)
 and distills how Calven runs its own marketing (and most of the company) from
-repositories with AI agents.
+repositories with AI agents. Calven also makes the marketing context layer
+that [integrations/context-layer.md](integrations/context-layer.md)
+describes. The repo works without it.
 
 ## License
 

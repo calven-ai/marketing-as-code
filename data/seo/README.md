@@ -2,7 +2,7 @@
 
 ## Canonical
 
-- **`keywords.csv`** — the single source of truth for every keyword this team
+- **`keywords.csv`**: the single source of truth for every keyword this team
   tracks. Columns:
 
   ```csv
@@ -15,7 +15,7 @@
   yours. `scripts/seo_snapshot.py` refreshes volume and difficulty for every
   row and saves the pull as a snapshot.
 
-- **`prompts.csv`** — the canonical prompt set for AI answer-engine (AEO)
+- **`prompts.csv`**: the canonical prompt set for AI answer-engine (AEO)
   tracking: the questions a buyer types into ChatGPT or Perplexity for
   which we want to be cited. Columns:
 
@@ -30,16 +30,16 @@
 
 `snapshots/YYYY-MM-DD-<source>-<what>.csv`, immutable. Typical:
 
-- `2026-08-31-dataforseo-rankings.csv` — rank check for every keyword in the
+- `2026-08-31-dataforseo-rankings.csv`: rank check for every keyword in the
   canonical table
-- `2026-08-31-dataforseo-keyword-ideas.csv` — research output, pending triage
+- `2026-08-31-dataforseo-keyword-ideas.csv`: research output, pending triage
   into `keywords.csv`
-- `2026-08-31-dataforseo-llm-mentions.csv` — one row per brand cited per
+- `2026-08-31-dataforseo-llm-mentions.csv`: one row per brand cited per
   prompt per model (`brand-monitor` skill)
 
 ## For agents
 
 - Weekly delta = diff the two most recent ranking snapshots (`weekly-seo`
   skill); write the analysis to `reports/recurring/seo/`, not here.
-- Pulls go through DataForSEO — see `integrations/README.md`. Keyword and
+- Pulls go through DataForSEO (see `integrations/README.md`). Keyword and
   rank pulls: `seo-analyst`; AI answer-engine mentions: `brand-monitor`.

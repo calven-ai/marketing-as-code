@@ -1,7 +1,7 @@
 # strategy/competitive/
 
 One file per competitor, named after them (`acme.md`), using
-[_battlecard-template.md](_battlecard-template.md). Keep cards honest — a
+[_battlecard-template.md](_battlecard-template.md). Keep cards honest: a
 battlecard that pretends the competitor has no strengths trains the team to
 lose credibility in live deals.
 

@@ -1,6 +1,6 @@
 # Event taxonomy
 
-> **Template — unfilled.** Agents: never guess what an event name means or
+> **Template: unfilled.** Agents: never guess what an event name means or
 > which system emits it.
 
 One row per tracked event that matters to marketing.

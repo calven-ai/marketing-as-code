@@ -19,10 +19,10 @@ smallest artifact that makes the idea judgeable.
      opens in any browser. An email sequence is one page showing each email
      in sequence; an ad board is one page of variants side by side.
    - A `README.md`: the one-sentence idea, what feedback is sought, and
-     "disposable — decision goes to memory/decision-log.md".
-3. **Fake honestly.** Placeholder metrics, imagery, and quotes are fine —
-   label them as fake in-context (e.g. "[illustrative]"). Never fabricate a
-   real customer's endorsement.
+     "disposable: decision goes to memory/decision-log.md".
+3. **Fake honestly.** Placeholder metrics, imagery, and quotes are fine if
+   you label them as fake in-context (e.g. "[illustrative]"). Never
+   fabricate a real customer's endorsement.
 4. **After the meeting** (when told the outcome): log the decision via
    `log-decision`, then move the prototype folder to
    `playgrounds/_archive/`.

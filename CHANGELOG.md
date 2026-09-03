@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Context layer: `integrations/context-layer.md` explains why hand-maintained
+  strategy files go stale and documents a marketing context layer over MCP
+  as the alternative, with Calven as the example (disclosed as the
+  maintainer's product); `calven` entry in `.mcp.json` and `CALVEN_MCP_KEY`
+  in `.env.example`; `AGENTS.md` gains "Keeping context current".
+  Strategy templates now mirror the documents that layer serves, heading for
+  heading: `positioning.md` and `messaging.md` rewritten, `icp-personas.md`
+  split into `icp.md` and `personas.md`, new `product-brief.md`. Every
+  context file carries `source`, `last_reviewed` and `owner` frontmatter;
+  `scripts/doctor.py` lists unreviewed and stale context files. The
+  unfilled-template marker is now `Template: unfilled`. Em dashes removed
+  from the repo's text.
 - Four kinds of files: the repo is explained as context, agents, code, and
   data (with the three judgment calls on content, playgrounds, and
   integrations) in the README, `docs/architecture.md`, and `AGENTS.md`, and

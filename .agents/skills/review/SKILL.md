@@ -11,19 +11,22 @@ into the words.
 
 ## Checks, in order of severity
 
-1. **Strategy fit** — does the piece advance a pillar from
+1. **Strategy fit**: does the piece advance a pillar from
    `strategy/messaging.md`, speak to a persona from
-   `strategy/icp-personas.md`, and stay inside the positioning? A
-   well-written piece for the wrong audience fails review.
-2. **Argument** — does it deliver the brief's stated argument? Flag drift
+   `strategy/personas.md` inside the fit defined by `strategy/icp.md`, and
+   stay inside the positioning? A well-written piece for the wrong audience
+   fails review. If a strategy file says `source: context-layer`, check
+   against the document served over MCP, not the file; if its
+   `last_reviewed` is older than 90 days, say so in the review.
+2. **Argument**: does it deliver the brief's stated argument? Flag drift
    between `brief.md` and the draft.
-3. **Claims** — every number and factual claim traceable (to `data/`
+3. **Claims**: every number and factual claim traceable (to `data/`
    snapshots, cited sources, or the brief's raw material). Untraceable
    claims are findings, not style notes.
-4. **Voice** — against `brand/voice.md`: the do/don't examples, the banned
-   list, tone-by-context. Quote the offending sentence and show the on-voice
+4. **Voice**: against `brand/voice.md`, its do/don't examples, banned list,
+   and tone-by-context. Quote the offending sentence and show the on-voice
    rewrite.
-5. **Mechanics** — frontmatter complete and correct (`project`, `channel`,
+5. **Mechanics**: frontmatter complete and correct (`project`, `channel`,
    `owner`), links resolve, naming conventions per `data/ontology/naming.md`
    if UTMs appear.
 
@@ -32,4 +35,4 @@ into the words.
 Findings ordered by severity, each with location, problem, and suggested
 fix. End with a verdict: *ready for human review* / *needs work first*.
 Never flip `status:` yourself past `in-review`, and don't rewrite the draft
-unless asked — review and revision are separate requests.
+unless asked; review and revision are separate requests.

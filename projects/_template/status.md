@@ -1,6 +1,6 @@
 # Status: [project name]
 
-Newest entry on top. One short entry per meaningful change — this file is
+Newest entry on top. One short entry per meaningful change: this file is
 what "how is it going?" reads.
 
 ## Tasks

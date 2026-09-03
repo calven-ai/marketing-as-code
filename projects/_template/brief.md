@@ -13,13 +13,13 @@ number that proves it (defined per `data/ontology/metrics.md`).]
 
 ## Audience
 
-[Which ICP segment / persona, per `strategy/icp-personas.md`.]
+[Which ICP segment per `strategy/icp.md`, which persona per `strategy/personas.md`.]
 
 ## Deliverables
 
-Content lives in `content/`; this list links to it (lifecycle-owner rule —
+Content lives in `content/`; this list links to it (lifecycle-owner rule:
 never copy content into this folder). A piece's status lives in its own
-frontmatter — read it there rather than mirroring it here, so nothing drifts.
+frontmatter. Read it there rather than mirroring it here, so nothing drifts.
 
 | Deliverable | Path |
 | --- | --- |

@@ -1,6 +1,6 @@
 # Brief: [working title]
 
-- **Project:** [projects/<name> — or "none"]
+- **Project:** [projects/<name>, or "none"]
 - **Owner:** [name]
 - **Channel:** [blog / email / linkedin / webinar / ad / case-study / other]
 - **Target date:** [date or "none"]
@@ -13,7 +13,7 @@ think or do afterwards.]
 
 ## The argument
 
-[The core claim and the 2–4 supporting points, in one short paragraph or a
+[The core claim and the 2 to 4 supporting points, in one short paragraph or a
 list. If you can't state the argument, the piece isn't ready to draft.]
 
 ## Keywords / distribution

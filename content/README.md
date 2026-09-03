@@ -4,13 +4,13 @@
 
 The single source of truth for every piece of content, at every stage: idea,
 brief, draft, published, evergreen. Email sequences, webinar assets, and case
-studies are content *types* here — they don't get their own top-level folders.
+studies are content *types* here. They don't get their own top-level folders.
 
 ## Conventions (load-bearing)
 
 - **One folder per piece**, kebab-case, e.g. `2026-09-why-plain-text-wins/`.
   Brief first (`brief.md`), draft second (`draft.md`), human review before
-  anything ships. Copy [`_template/`](_template/) to start — or use the
+  anything ships. Copy [`_template/`](_template/) to start, or use the
   `new-content` skill.
 - **Frontmatter on every draft** is what makes the corpus queryable:
 

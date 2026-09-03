@@ -13,7 +13,7 @@ snapshot in `data/` and means what `data/ontology/` says it means.
 
 1. **Open the quarter's folder.** `reports/qmr/<year>-q<n>/` (ask which
    quarter if ambiguous). Copy in the pack from `reports/_templates/qmr/`:
-   `report.md` and `data-checklist.md`. If the folder exists, resume — the
+   `report.md` and `data-checklist.md`. If the folder exists, resume; the
    checklist tracks what's still missing.
 
 2. **Work the data checklist.** `data-checklist.md` lists every snapshot the
@@ -25,11 +25,11 @@ snapshot in `data/` and means what `data/ontology/` says it means.
    - No integration → give the human the exact export instruction from the
      checklist ("In HubSpot: … export as CSV, drop it at
      `data/crm/snapshots/<name>.csv`") and leave the item open. **Batch all
-     the export asks into one list** — nobody wants seven interruptions.
+     the export asks into one list**; nobody wants seven interruptions.
 
 3. **Compute.** With the snapshots in hand: quarter's headline metrics vs
    targets, funnel conversion by stage, deltas vs the previous quarter's QMR
-   (read `reports/qmr/<prev>/report.md` — its Data-used section names the
+   (read `reports/qmr/<prev>/report.md`; its Data-used section names the
    comparable snapshots). All terms per `data/ontology/metrics.md` and
    `funnel.md`. Content shipped: grep `content/` frontmatter for
    `status: published` with a `published:` date inside the quarter. Projects: read `projects/*/status.md` and
@@ -52,9 +52,9 @@ snapshot in `data/` and means what `data/ontology/` says it means.
 ## Rules
 
 - **A gap is a gap.** An uncomputable metric appears in the report as
-  "missing: needs <snapshot>" — never an estimate silently presented as
+  "missing: needs <snapshot>", never an estimate silently presented as
   fact.
-- First QMR ever? No previous quarter to diff — say so, and establish this
+- First QMR ever? No previous quarter to diff. Say so, and establish this
   one as the baseline.
 - If `data/ontology/metrics.md` is unfilled for a headline metric, that's a
   blocking question for the team, not a definition you pick.

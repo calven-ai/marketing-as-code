@@ -1,7 +1,13 @@
+---
+source: repo
+last_reviewed:
+owner:
+---
+
 # Visual identity
 
-> **Template — unfilled.** Keep this file and [tokens.json](tokens.json) in
-> agreement — update both in the same commit.
+> **Template: unfilled.** Keep this file and [tokens.json](tokens.json) in
+> agreement: update both in the same commit.
 
 ## Colors
 
@@ -26,8 +32,8 @@
 
 ## Imagery
 
-[Photography vs illustration, style rules, what on-brand images look like —
-this steers the prototype builder and any generated visuals.]
+[Photography vs illustration, style rules, what on-brand images look like.
+This steers the prototype builder and any generated visuals.]
 
 ## Templates
 

@@ -17,6 +17,7 @@ one connects. One setup doc per tool lands here as integrations come online
 | Google Analytics 4 | web analytics | Google's official MCP | service account | `GOOGLE_APPLICATION_CREDENTIALS` | setup doc coming |
 | DataForSEO | keywords, SERP, audits, backlinks, LLM mentions (`seo-analyst`, `brand-monitor`, `campaign-discovery`) | official MCP, listed in `.mcp.json` | login/password | `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD` | in `.mcp.json`; setup doc coming |
 | Apify | actors for ABM research (`researcher`) | official remote MCP, listed in `.mcp.json` | OAuth | none | in `.mcp.json`; setup doc coming |
+| Calven | marketing context layer: positioning, messaging, ICP, product brief, personas, competitors and battlecards, customer voice, served live to every agent (made by this repo's maintainer) | official remote MCP (Streamable HTTP), listed in `.mcp.json` | MCP key | `CALVEN_MCP_KEY` | in `.mcp.json`; setup doc [context-layer.md](context-layer.md) |
 | Granola | meeting transcripts | `scripts/pull_transcripts.py` (by hand, or daily via `.github/workflows/transcripts-cron.yml`, which opens a PR) | API key | `GRANOLA_API_KEY` | script ready |
 | Zoom | meeting transcripts | script | OAuth app | tbd | wave 3 |
 | Slack | the team's front door: digests, announcements, alerts out; requests in; red flags to leadership | the team's own Slack app ([slack/](slack/)), bot token, no server; `scripts/slack_post.py` | bot token | `SLACK_BOT_TOKEN`, `SLACK_REQUESTS_CHANNEL_ID`, `SLACK_TEAM_CHANNEL_ID`, `SLACK_LEADERSHIP_CHANNEL_ID` | manifest and post script ready; inbound intake wave 2 |
@@ -26,7 +27,7 @@ any `.env*` file (see [docs/secrets.md](../docs/secrets.md)), so keep the
 two in sync.
 
 MCP servers are listed in `.mcp.json` (Claude Code; `.cursor/mcp.json` for
-Cursor is wave 2). Two are in there today:
+Cursor is wave 2). Three are in there today:
 
 - **`dataforseo`**: the official `dataforseo-mcp-server` npm package, run
   with `npx`, credentials taken from `DATAFORSEO_LOGIN` and
@@ -37,20 +38,23 @@ Cursor is wave 2). Two are in there today:
   if you prefer not to run `npx`.
 - **`apify`**: the official remote server at `https://mcp.apify.com`,
   OAuth in the browser on first use, no key.
+- **`calven`**: the remote server at `https://app.calven.ai/api/mcp`,
+  bearer key from `CALVEN_MCP_KEY`. This is the context-layer example from
+  [context-layer.md](context-layer.md); the repo works without it.
 
-Both entries follow the vendors' public docs as of September 2026; if a
+All three entries follow the vendors' public docs as of September 2026; if a
 vendor changes its server, edit `.mcp.json` and this list together. Claude
 Code asks before enabling project-scoped servers, so nothing runs until
-you approve it. OAuth tools need no keys at all — each person authorizes
+you approve it. OAuth tools need no keys at all; each person authorizes
 in the browser. For the rest, keys go in `.env` (copied from
-`.env.example`, never committed) — see [docs/secrets.md](../docs/secrets.md).
+`.env.example`, never committed); see [docs/secrets.md](../docs/secrets.md).
 
-## [tasks.md](tasks.md) — the task-tool adapter
+## [tasks.md](tasks.md): the task-tool adapter
 
 The one file that tells every agent where tasks go and how to file them.
 `/setup` fills it in for your team's tool; until then it documents the
-zero-setup fallback. **Any skill that creates tasks reads `tasks.md` first**
-— that's the whole abstraction.
+zero-setup fallback. **Any skill that creates tasks reads `tasks.md` first.**
+That's the whole abstraction.
 
 ## For agents
 

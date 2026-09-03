@@ -16,7 +16,7 @@ pipeline that feeds them.
 
 ## The pipeline
 
-1. A transcript lands in `transcripts/inbox/` — via
+1. A transcript lands in `transcripts/inbox/`, via
    `scripts/pull_transcripts.py` (Granola; run it by hand, or let the daily
    `transcripts-cron` GitHub Action run it and open a PR with the new files)
    or a simple drag-and-drop. Any text format works; name it
@@ -39,12 +39,12 @@ pipeline that feeds them.
 - "What did we decide about X?" → search `decision-log.md` first, then
   `knowledge/`.
 - Every decision-log entry follows the format at the top of the file. Append
-  only — history is the point.
+  only: history is the point.
 - Transcripts may contain sensitive discussion; quote them in outputs only as
   much as the task needs.
 - Transcripts are the most sensitive files in this repo: names, customer
   details, salaries, and candid opinions all end up in them. Keep them only
   in a **private** repo, and if the team prefers, gitignore
-  `memory/transcripts/` entirely — the decisions, tasks, and knowledge
+  `memory/transcripts/` entirely. The decisions, tasks, and knowledge
   extracted from them are what needs to be versioned, not the raw audio
   text. Log that choice in `decision-log.md`.

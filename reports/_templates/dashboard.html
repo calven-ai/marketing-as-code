@@ -7,7 +7,7 @@
 <!--
   Marketing-as-Code dashboard template.
   Contract: ONE self-contained file. No CDN, no external scripts, fonts, or
-  images — it must open offline from Finder or GitHub Desktop.
+  images. It must open offline from Finder or GitHub Desktop.
 
   How an agent fills this in (see .agents/skills/make-dashboard/):
     1. Set the <title>, header title/subtitle, and the CSS variables below
@@ -97,7 +97,7 @@ const DATA = {
   funnel: {
     columns: ["Stage", "This Q", "Last Q", "Conv."],
     rows: [
-      ["Visitors", "48,020", "44,100", "—"],
+      ["Visitors", "48,020", "44,100", ""],
       ["Signups", "942", "981", "2.0%"],
       ["MQLs", "128", "108", "13.6%"],
     ],
@@ -188,7 +188,7 @@ function lineChart({ title, labels, series, unit }) {
       { cx: x(i), cy: y(v), r: 3, fill: colors[si % colors.length] }));
   });
   const legend = series.length > 1
-    ? " — " + series.map(s => s.name).join(" · ") : "";
+    ? ": " + series.map(s => s.name).join(" · ") : "";
   const card = el("div", "card");
   card.append(el("h2", null, esc(title + (unit ? ` (${unit})` : "") + legend)));
   card.append(svg);

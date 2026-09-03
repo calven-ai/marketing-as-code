@@ -17,8 +17,8 @@ description: Scaffold a project or campaign folder in projects/. Use when the te
    - New campaign → `projects/<slug>/` with `campaign.md`, then scaffold its
      child projects the same way.
 3. **Fill the brief with the human**, not with placeholders: goal with a
-   number (defined per `data/ontology/metrics.md` — if the metric is
-   undefined, flag it), audience per `strategy/icp-personas.md`,
+   number (defined per `data/ontology/metrics.md`; if the metric is
+   undefined, flag it), audience per `strategy/icp.md` and `strategy/personas.md`,
    deliverables as `content/` paths (scaffold them via `new-content` if
    asked).
 4. **Tasks**: read `integrations/tasks.md` and set the project up in the
@@ -27,6 +27,6 @@ description: Scaffold a project or campaign folder in projects/. Use when the te
 
 ## Rules
 
-- The slug is the campaign name everywhere (`data/ontology/naming.md`) —
+- The slug is the campaign name everywhere (`data/ontology/naming.md`):
   same slug in the task tool, UTMs, and this folder.
 - Never put content or data files in the project folder (AGENTS.md rule 5).

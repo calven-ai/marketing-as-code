@@ -1,6 +1,6 @@
 # Funnel and lifecycle stages
 
-> **Template — unfilled.** Agents: ask rather than assume stage semantics.
+> **Template: unfilled.** Agents: ask rather than assume stage semantics.
 
 ## Stages, in order
 

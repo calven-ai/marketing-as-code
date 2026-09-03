@@ -1,7 +1,7 @@
 # tasks.md: where tasks go and how to file them
 
 Every agent that creates a task reads this file first and follows it exactly.
-This file is the single adapter between this repo and the team's task tool —
+This file is the single adapter between this repo and the team's task tool:
 change the tool by changing this file, and every skill follows.
 
 > `/setup` rewrites this file for your team. Until then, the zero-setup

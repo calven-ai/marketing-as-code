@@ -3,7 +3,10 @@
     "dataforseo": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "dataforseo-mcp-server"],
+      "args": [
+        "-y",
+        "dataforseo-mcp-server"
+      ],
       "env": {
         "DATAFORSEO_LOGIN": "${DATAFORSEO_LOGIN}",
         "DATAFORSEO_PASSWORD": "${DATAFORSEO_PASSWORD}"
@@ -12,6 +15,13 @@
     "apify": {
       "type": "http",
       "url": "https://mcp.apify.com"
+    },
+    "calven": {
+      "type": "http",
+      "url": "https://app.calven.ai/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${CALVEN_MCP_KEY}"
+      }
     }
   }
 }

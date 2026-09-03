@@ -18,7 +18,7 @@ provide.
 ## Procedure
 
 1. **Frame the idea.** Restate the campaign in one line, name the persona
-   from `strategy/icp-personas.md` and the messaging pillar from
+   from `strategy/personas.md` and the messaging pillar from
    `strategy/messaging.md` it leans on. If neither fits, that is the first
    open question.
 2. **Competitive angle.** Read `strategy/competitive/` (the battlecards)

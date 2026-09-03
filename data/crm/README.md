@@ -1,17 +1,17 @@
 # data/crm/
 
 Pipeline, signup, and email-performance pulls from the CRM (HubSpot or
-equivalent — see `integrations/README.md`).
+equivalent). See `integrations/README.md`.
 
 ## Snapshots
 
 `snapshots/YYYY-MM-DD-<source>-<what>.csv`, immutable. Typical:
 
-- `2026-08-31-hubspot-pipeline.csv` — deals by stage (stages defined in
+- `2026-08-31-hubspot-pipeline.csv`: deals by stage (stages defined in
   `data/ontology/funnel.md`)
 - `2026-08-31-hubspot-new-contacts.csv`
 - `2026-08-31-hubspot-email-performance.csv`
-- `2026-09-15-hubspot-event-x-attendees.csv` — event attendee exports land
+- `2026-09-15-hubspot-event-x-attendees.csv`: event attendee exports land
   here too
 
 ## Rules

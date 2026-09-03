@@ -1,6 +1,6 @@
 # Naming conventions
 
-> **Template — unfilled.** These conventions make campaigns traceable across
+> **Template: unfilled.** These conventions make campaigns traceable across
 > systems; agents apply them exactly and flag violations they encounter.
 
 ## UTM parameters
@@ -15,7 +15,7 @@
 ## Campaign names across systems
 
 [The one slug per campaign, and how it appears in the task tool, the CRM,
-ad platforms, and `projects/<slug>/` — same slug everywhere.]
+ad platforms, and `projects/<slug>/`: same slug everywhere.]
 
 ## File naming in this repo
 

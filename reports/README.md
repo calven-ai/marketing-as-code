@@ -23,12 +23,12 @@ old one). (The machine-readable inputs live in
 
 - Every report starts from [`_templates/report.md`](_templates/report.md):
   answer first, evidence second, and a **Data used** section listing the
-  exact `data/` snapshot paths behind every number — a report must be
+  exact `data/` snapshot paths behind every number. A report must be
   auditable back to its inputs.
 - Recurring reports are named by date: `recurring/seo/2026-09-01.md`.
 - **Dashboards are single self-contained HTML files** built from
   [`_templates/dashboard.html`](_templates/dashboard.html), saved beside the
-  report they support. No build step, no CDN, no external anything — they
+  report they support. No build step, no CDN, no external anything: they
   open in any browser, from Finder, GitHub Desktop, or a download.
 - Numbers in a report mean what `data/ontology/` says they mean. A gap in
   the data is reported as a gap, never an invented number.

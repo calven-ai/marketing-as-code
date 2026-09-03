@@ -5,11 +5,11 @@
 Every agent and skill in this repo, what it does, and what it needs. This
 page is the index for humans; the definitions any coding agent actually loads
 live in [`.agents/skills/`](../.agents/skills/) (the Agent Skills open
-standard — Cursor, Codex, and friends discover them there automatically;
+standard: Cursor, Codex, and friends discover them there automatically;
 Claude Code reads the same files via `.claude/skills/` symlinks).
 
 Invoke any of these by slash command (`/setup`) in tools that support it, or
-just ask in plain English — the descriptions are written so your agent routes
+just ask in plain English; the descriptions are written so your agent routes
 correctly.
 
 ## Roles (recurring specialists)
