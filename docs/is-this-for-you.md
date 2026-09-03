@@ -24,6 +24,7 @@ useful places to stop, and most teams should start there.
 | Keep API keys out of chat and in a secrets manager ([secrets.md](secrets.md)) | one owner | at setup, then rarely |
 | Fill in the strategy and brand templates, put a name and a review date on each, and keep the dates honest (`strategy/`, `brand/`) | the owner of each document | quarterly |
 | Pay for a coding-agent seat per active user and pay-as-you-go data instead of subscription suites | whoever owns the budget | monthly |
+| Decide, per recurring workflow, whether a person runs it or GitHub Actions does, and pay for an API key if the latter ([operating-model.md](operating-model.md)) | the owner | once per workflow |
 | Change where the team looks for the truth, and stop maintaining the old place | everyone | once, and it is the hard part |
 
 The technical rows are the smaller half. Most of this page is about the

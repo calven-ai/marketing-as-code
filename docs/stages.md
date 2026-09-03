@@ -125,7 +125,8 @@ the second person can see what changed.
 ### What it is not
 
 No cron, no scheduled runs, no repo-wide migration, no rewriting the
-strategy documents. If the agent needs positioning, paste it in from the
+strategy documents. (Scheduled runs are a stage-3 option, chosen per
+workflow: [operating-model.md](operating-model.md).) If the agent needs positioning, paste it in from the
 stage-1 instructions. Resist building the second agent until the first one
 has run for a month.
 
@@ -192,7 +193,9 @@ description of the destination, not a promise about week one.
 The README's [quick start](../README.md#quick-start), plus the three things
 the change-management section insists on: one pilot workflow with a
 pass/fail sentence, one sponsor who reads the first diffs, and a rollback
-written before you start.
+written before you start. Run the pilot by hand first; automating it in
+GitHub Actions is a later, per-workflow choice
+([operating-model.md](operating-model.md)).
 
 ## Buy, build, or wait: the four pillars
 

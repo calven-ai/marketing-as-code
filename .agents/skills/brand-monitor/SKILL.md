@@ -16,6 +16,11 @@ read yourself), specifically its AI optimization tools: LLM mentions
 search, top domains and top pages, and the LLM response / ChatGPT scraper
 tools. Without it, say so and stop; there is no manual export for this.
 
+Run it by hand on the cadence the team picks (monthly is plenty; answer
+engines vary run to run), or as an agent in GitHub Actions on a schedule
+if the team has opted into that mode (`docs/operating-model.md`); the
+DataForSEO server is key-based, so it works headless.
+
 ## The prompt set
 
 `data/seo/prompts.csv` is canonical. Columns:

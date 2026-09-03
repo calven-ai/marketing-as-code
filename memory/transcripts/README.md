@@ -12,5 +12,13 @@ The transcript pipeline (details in [`../README.md`](../README.md)):
   extracting decisions, project status, action items, facts, and red flags.
   Nothing is deleted.
 
-To process what's waiting: ask your agent to "process the transcript inbox"
-(or `/chief-of-staff`).
+To process what's waiting, two ways, your choice per
+[docs/operating-model.md](../../docs/operating-model.md):
+
+- **A person, after the meeting** (the default): ask your agent to
+  "process the transcript inbox" (or `/chief-of-staff`). Costs nothing
+  beyond the coding-agent subscription; the person watches the run.
+- **Unattended**: `.github/workflows/transcripts-process.yml` runs the same
+  skill as an agent in GitHub Actions whenever transcripts land on `main`,
+  and opens a "Transcripts processed" PR. Opt-in: it does nothing until the
+  `ANTHROPIC_API_KEY` repository secret exists, and it bills per run.

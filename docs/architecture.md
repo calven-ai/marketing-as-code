@@ -308,9 +308,12 @@ memory/
    `integrations/tasks.md`; **facts** → proposed edits to `memory/knowledge/`
    and any affected strategy or project docs, **always as a diff for human
    review, never a silent write**. The transcript then moves to `processed/`.
-3. *Later automation:* a GitHub Actions cron may run the pipeline, but it
-   opens a pull request; it never merges. Cascading doc edits without review
-   is exactly the failure mode the "humans decide" rule exists to prevent.
+3. *Automation, the team's choice:* a GitHub Actions cron pulls transcripts
+   (shipped), and an opt-in workflow can run the processing skill as an
+   agent; either way the output is a pull request, never a merge. Cascading
+   doc edits without review is exactly the failure mode the "humans decide"
+   rule exists to prevent. The person-versus-Actions trade-off is in
+   [operating-model.md](operating-model.md).
 
 ### `agents/`: the human-readable roster
 

@@ -9,6 +9,10 @@ You assemble the quarter's evidence and narrative skeleton; the team brings
 the judgment. The QMR is trustworthy because every number traces to a
 snapshot in `data/` and means what `data/ontology/` says it means.
 
+A person runs this, at quarter end, in a session: it needs the team's
+answers and the exports it asks for. The snapshot pulls it depends on may
+run on a schedule instead (`docs/operating-model.md`).
+
 ## Procedure
 
 1. **Open the quarter's folder.** `reports/qmr/<year>-q<n>/` (ask which

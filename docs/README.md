@@ -13,6 +13,9 @@ Guides for running your marketing from this repo.
   used GitHub. Written for marketers, no terminal required.
 - [workflow.md](workflow.md): the review ritual: how agent-proposed work
   gets human-approved and shipped, no terminal required.
+- [operating-model.md](operating-model.md): where things run (a person at a
+  coding agent, GitHub Actions, never a server), the two ways to run any
+  recurring workflow and their trade-off, and what never runs unattended.
 - [secrets.md](secrets.md): API keys without the pain: OAuth first, local
   `.env`, team sharing via a secrets manager.
 - [../integrations/adding-an-integration.md](../integrations/adding-an-integration.md):

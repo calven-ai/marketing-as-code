@@ -14,6 +14,11 @@ Needs: the DataForSEO MCP server (`dataforseo` in `.mcp.json`, credentials
 read yourself). Without it, say exactly which CSV export the human should
 drop into `data/seo/snapshots/` and stop.
 
+Two run modes, the team's choice (`docs/operating-model.md`): the routine
+refresh is a script (`scripts/seo_snapshot.py`) a person runs on Monday or
+a cron step runs for them; everything else is a question asked in a
+session and answered through the MCP, which cannot run unattended.
+
 ## Procedure
 
 1. **Load `data/ontology/`** (naming, what "rank" and "target URL" mean

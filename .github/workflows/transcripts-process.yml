@@ -1,0 +1,87 @@
+name: transcripts-process
+
+# Opt-in. Processes memory/transcripts/inbox/ with the chief-of-staff skill
+# running as a Claude Code agent inside GitHub Actions, and opens a pull
+# request with what it extracted. It never merges.
+#
+# The default way to do this is a person running /chief-of-staff after the
+# meeting, on their own coding-agent subscription, at no extra cost. This
+# workflow is the automated alternative: same-day processing with nobody
+# watching, paid per token through an API key. The trade-off is laid out in
+# docs/operating-model.md; pick per workflow and log the choice.
+#
+# Needs one repository secret: ANTHROPIC_API_KEY (Settings -> Secrets and
+# variables -> Actions). Without it the job exits 0 and does nothing.
+# Optional: SLACK_BOT_TOKEN as a secret and the SLACK_*_CHANNEL_ID values as
+# variables, so the skill can post its summary. OAuth MCP servers cannot run
+# headless; the skill's direct writes and scripts are all it uses here.
+#
+# Triggers: by hand, or when files land in the inbox on main (which is what
+# merging a "Transcripts: <date>" PR from transcripts-cron.yml does).
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "memory/transcripts/inbox/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Is the API key set?
+        id: gate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "ANTHROPIC_API_KEY secret is not set; nothing to do."
+            echo "A person runs /chief-of-staff instead (docs/operating-model.md)."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+
+      - name: Is anything waiting in the inbox?
+        id: inbox
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          count="$(find memory/transcripts/inbox -type f ! -name '.gitkeep' | wc -l | tr -d ' ')"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          if [ "$count" = "0" ]; then echo "Inbox is empty; nothing to do."; fi
+
+      - name: Process the inbox with the chief-of-staff skill
+        if: steps.gate.outputs.run == 'true' && steps.inbox.outputs.count != '0'
+        uses: anthropics/claude-code-action@v1
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_TEAM_CHANNEL_ID: ${{ vars.SLACK_TEAM_CHANNEL_ID }}
+          SLACK_LEADERSHIP_CHANNEL_ID: ${{ vars.SLACK_LEADERSHIP_CHANNEL_ID }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          base_branch: ${{ github.ref_name }}
+          branch_prefix: "transcripts-processed/"
+          claude_args: "--allowedTools Read,Write,Edit,Glob,Grep,Bash(python3:*),Bash(git:*),Bash(gh:*)"
+          prompt: |
+            Run the chief-of-staff skill (.agents/skills/chief-of-staff/SKILL.md)
+            on every file in memory/transcripts/inbox/. Follow AGENTS.md.
+
+            Work on a new branch. Apply the writes the skill allows directly
+            (decision-log appends, routine status entries, moving each
+            transcript to memory/transcripts/processed/) and put every other
+            proposed edit (knowledge, strategy, brand, project briefs) on the
+            same branch as ordinary file changes, so the reviewer sees them as
+            a diff. Commit, push the branch, and open ONE pull request with
+            `gh pr create` titled "Transcripts processed: <today's date>" whose
+            description is the skill's full summary, per transcript. Never
+            merge. If scripts/slack_post.py reports a missing variable, do not
+            fail: include the messages that were not sent in the PR description.

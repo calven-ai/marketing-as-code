@@ -22,7 +22,8 @@ entirely? Start with [new-to-github.md](new-to-github.md).)
 - Published content (`status: published` is set in a PR, never directly)
 - Anything sent to the outside world: emails, social posts, website changes
 - Strategy, brand, and ontology changes: these cascade everywhere
-- Automated pipelines: the transcript cron (wave 2) opens PRs, never merges
+- Automated pipelines: anything running in GitHub Actions, script or agent,
+  opens PRs and never merges ([operating-model.md](operating-model.md))
 
 ## What may skip it
 

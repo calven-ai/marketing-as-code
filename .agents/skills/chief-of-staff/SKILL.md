@@ -9,6 +9,14 @@ Meetings stop evaporating here. For each transcript in
 `memory/transcripts/inbox/` (or the specific one named), extract everything
 of lasting value and route it to where it lives.
 
+This skill runs the same way whether a person invokes it after the meeting
+(the default, on their own subscription) or `transcripts-process.yml` runs
+it unattended in GitHub Actions (opt-in, API key, opens a PR). Which one
+the team uses is its call; `docs/operating-model.md` has the trade-off.
+When running unattended, every proposed edit goes on the branch as a file
+change and the summary goes in the PR description, because the PR is the
+only checkpoint.
+
 ## Per transcript
 
 1. **Read it fully.** Note the meeting date, attendees, and purpose (from

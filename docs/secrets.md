@@ -36,7 +36,10 @@ manager the team already has:
 Automation that runs on GitHub (the transcript cron) gets keys from
 **GitHub Actions repository secrets** (repo → Settings → Secrets and
 variables → Actions). Same rules: one secret per key, no secrets in
-workflow files.
+workflow files. If the team opts into running an agent in Actions
+([operating-model.md](operating-model.md)), `ANTHROPIC_API_KEY` is one
+more repository secret, billed per token; the shipped workflows do nothing
+until it exists.
 
 ## House rules
 
