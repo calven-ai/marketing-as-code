@@ -17,6 +17,7 @@
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
   <a href="docs/is-this-for-you.md">Is this for you?</a> ·
+  <a href="#a-blueprint-not-a-product">Make it yours</a> ·
   <a href="#how-this-repo-is-organized">Structure</a> ·
   <a href="docs/new-to-github.md">New to GitHub?</a> ·
   <a href="#project-status">Status</a>
@@ -40,8 +41,8 @@ messaging, briefs, decisions, and knowledge as plain text, versioned, in one
 place, where AI agents can read all of it and write into it. The repo is the
 floor you build on. The agents are the point.
 
-This repository is that floor, pre-built. Clone it, fill in your own strategy
-and voice, connect the agents you want, and run your marketing from here.
+This repository is that floor, pre-built. Start from it, make it yours, and
+run your marketing from here.
 
 ## What you get
 
@@ -50,13 +51,15 @@ and voice, connect the agents you want, and run your marketing from here.
   playgrounds. Every folder explains itself and comes with templates instead
   of blank pages. The reasoning is written down in
   [docs/architecture.md](docs/architecture.md).
-- **A default agent set** (bring your own keys). Starter agents and skills
+- **A default agent set** (bring your own stack). Starter agents and skills
   for onboarding, content, project scaffolding, review, meeting-transcript
   processing, the quarterly marketing review, keyword and ranking analysis,
   AI answer-engine mention tracking, account research, and campaign
   discovery, with analytics reporting landing next. Each one is
   a plain text file you can read and edit, in a format Claude Code, Cursor,
-  and Codex all understand.
+  and Codex all understand. Five integrations ship wired as worked examples;
+  [the guide](integrations/adding-an-integration.md) shows your agent how to
+  add the rest of your stack.
 - **A memory that compounds.** A decision log and a living knowledge base, fed
   automatically: a meeting transcript lands, an agent processes it, updates the
   knowledge base, logs the decisions, and files the follow-ups into your task
@@ -81,6 +84,33 @@ management each one needs. [docs/stages.md](docs/stages.md) is the path for
 everyone who is not there yet: use the AI tools you already pay for, then
 hand one activity to one agent, then this repo.
 
+## A blueprint, not a product
+
+This repo is a starting point, not a finished system. Expect to change it.
+
+What works as it is, with no keys and nothing connected: the setup
+interview, content briefs and drafts, project folders, the pre-publish
+review, the decision log, processing a meeting transcript you drag into the
+inbox, and a quarterly review built from exported CSVs. That part is done,
+and it is the part to try first.
+
+What you are expected to make yours: the **integrations** (your CRM, your
+task tool, your meeting recorder, your analytics), the **structure** where
+it does not match how your team works, and the **agents**, which are
+Markdown files you edit and extend. Five integrations ship wired, as worked
+examples of the three ways to connect a tool. The rest of your stack is a
+job for your coding agent, not for this repo's maintainers: tell it what you
+use ("We use Zoom for meetings. Automate reading the transcripts into the
+inbox.") and it builds the connector by the rules in
+[integrations/adding-an-integration.md](integrations/adding-an-integration.md):
+the vendor's official MCP server first, its CLI second, a small script
+last. The `/add-integration` skill walks it through.
+
+Nothing here needs a server. Work runs where a person is typing to a coding
+agent, or on a schedule in GitHub Actions; each recurring workflow can be
+run either way, and [docs/operating-model.md](docs/operating-model.md)
+lays out the trade-off so your team can choose.
+
 ## Never used GitHub?
 
 You are the audience this repo was built for. You do not need to be a
@@ -95,8 +125,11 @@ parts for you.
 1. **Get the repo.** Click "Use this template" (or fork/clone it) so you have
    your own private copy.
 2. **Open it with a coding agent.** [Claude Code](https://claude.com/claude-code)
-   is what this repo is tuned for (see [CLAUDE.md](CLAUDE.md)), and any
-   AGENTS.md-aware tool works (see [AGENTS.md](AGENTS.md)).
+   is what this repo is tuned for (see [CLAUDE.md](CLAUDE.md)), in the
+   terminal or in the Claude desktop app, and any AGENTS.md-aware tool such
+   as Cursor or Codex works too (see [AGENTS.md](AGENTS.md)). Where things
+   run, and what may run unattended, is in
+   [docs/operating-model.md](docs/operating-model.md).
 3. **Run the setup interview.** Ask the agent to set up the repo for your team.
    It interviews you, fills in the strategy and voice templates from your
    answers, and connects only the integrations your team actually uses.
@@ -104,6 +137,9 @@ parts for you.
    meeting transcript, or run one report. Let the repo prove itself before you
    move everything in. [docs/stages.md](docs/stages.md) explains why one
    workflow, and what to do if even that is too much.
+5. **Add your first integration.** Tell the agent which tool your team uses
+   for that workflow and let it wire the connection per
+   [integrations/adding-an-integration.md](integrations/adding-an-integration.md).
 
 ## Four kinds of files
 
@@ -153,10 +189,12 @@ they define what the agents may reach.
 
 ## Project status
 
-Early and under active construction. The target architecture is designed and
-documented in [docs/architecture.md](docs/architecture.md), and the full build
-plan lives in [docs/roadmap.md](docs/roadmap.md); templates, agents, and
-guides are landing in waves from there. Watch the repo to follow along.
+The structure, the templates, the offline workflows, and the guides are in
+place; the integrations are worked examples plus a guide for adding yours.
+The reasoning is in [docs/architecture.md](docs/architecture.md) and what is
+still planned in [docs/roadmap.md](docs/roadmap.md). Take it, change it,
+and send back what others could reuse (see
+[CONTRIBUTING.md](CONTRIBUTING.md)).
 
 ## Who is behind this
 

@@ -47,6 +47,14 @@ decides.
 9. **Prototypes are disposable.** Everything in `playgrounds/` is throwaway
    by design, never production, and gets archived once the decision is
    logged.
+10. **Make it yours.** This repo is a blueprint, and the team is expected to
+    change it. When they ask for a tool that is not wired, build the
+    integration by the rules in
+    [`integrations/adding-an-integration.md`](integrations/adding-an-integration.md)
+    (the `add-integration` skill walks through them). When they ask for a
+    workflow no skill covers, add one in `.agents/skills/` and run
+    `scripts/sync_skills.py`. Propose structure changes as pull requests.
+    Never connect a tool nobody asked for.
 
 ## Four kinds of files
 
@@ -83,6 +91,8 @@ because they define what the agents may reach.
 | Which integrations exist and how to use them | `integrations/README.md` |
 | Keeping strategy current, stale or contradictory context | `integrations/context-layer.md` |
 | Whether this approach fits a team, or how to start smaller | `docs/is-this-for-you.md`, then `docs/stages.md` |
+| Adding an integration, a script, or a skill | `integrations/adding-an-integration.md`, then `agents/README.md` |
+| Where things run, what may run unattended, a person vs GitHub Actions | `docs/operating-model.md` |
 | What an agent/skill does | `agents/README.md` (roster) → `.agents/skills/` (definitions) |
 
 ## Answering questions from data

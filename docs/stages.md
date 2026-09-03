@@ -158,7 +158,9 @@ human merging everything that ships. The [memory pipeline](../memory/README.md)
 turns meeting transcripts into decisions, tasks, and knowledge. The
 [integrations registry](../integrations/README.md) says what the agents may
 reach, and `scripts/doctor.py` tells you which context files have gone
-stale.
+stale. It is a blueprint: the structure and the offline workflows are done,
+the integrations are worked examples, and you are expected to change it
+([README](../README.md#a-blueprint-not-a-product)).
 
 ### What it is not
 
@@ -173,7 +175,10 @@ already tracks them ([integrations/tasks.md](../integrations/tasks.md)).
 
 An owner and a second person. Leadership that reads pull requests. A
 private GitHub repository. A coding-agent seat for each person who will
-work in it. Keys in a secrets manager. The effort by team size is in
+work in it. Keys in a secrets manager. A willingness to let the coding
+agent build the connectors for your stack
+([integrations/adding-an-integration.md](../integrations/adding-an-integration.md)).
+The effort by team size is in
 [is-this-for-you.md](is-this-for-you.md#by-team-size); it ranges from a few
 days for one person to a quarter for a group.
 
@@ -200,7 +205,7 @@ like, with this repo's answer in the last column.
 | Context | Keep positioning and voice in the drive or the wiki, with a review date at the top | A marketing context layer that serves positioning, personas, and competitors to every agent over MCP | Markdown in `strategy/` and `brand/`, with `last_reviewed` on every file and `scripts/doctor.py` flagging the old ones |
 | Agents | Saved prompts and shared projects in the assistant you have | An all-in-one AI marketing suite with its agents built in | Skills in `.agents/skills/`, plain Markdown you edit, readable by every coding agent |
 | Code | None | The automations inside the tools you already own | Small deterministic scripts the agent writes ([scripts/README.md](../scripts/README.md)) |
-| Data | Exports by hand into a spreadsheet | SEO and enrichment suites with the data inside | Data rails over MCP or API plus dated CSV snapshots ([data/README.md](../data/README.md)) |
+| Data | Exports by hand into a spreadsheet | SEO and enrichment suites with the data inside | Data rails over MCP, CLI, or API ([the ladder](../integrations/adding-an-integration.md)) plus dated CSV snapshots ([data/README.md](../data/README.md)) |
 
 For agents, code, and data, stage 2 is the argument: buying the rail and
 building the thin layer on top beats buying the suite, because the layer is
