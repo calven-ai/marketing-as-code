@@ -1,0 +1,69 @@
+name: transcripts-cron
+
+# Pulls new Granola transcripts into memory/transcripts/inbox/ every day and
+# opens a pull request with them. It never merges: a human reviews the PR,
+# merges it, and runs the chief-of-staff skill on the inbox.
+#
+# Needs one repository secret: GRANOLA_API_KEY (Settings -> Secrets and
+# variables -> Actions). Nothing else. Uses only GitHub's own actions and
+# the gh CLI already present on the runner.
+
+on:
+  schedule:
+    - cron: "30 5 * * *"   # daily, 05:30 UTC
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Only pull meetings from this date (YYYY-MM-DD)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull new transcripts
+        env:
+          GRANOLA_API_KEY: ${{ secrets.GRANOLA_API_KEY }}
+        run: |
+          if [ -z "$GRANOLA_API_KEY" ]; then
+            echo "GRANOLA_API_KEY secret is not set; nothing to do."
+            exit 0
+          fi
+          since="${{ github.event.inputs.since }}"
+          if [ -n "$since" ]; then
+            python3 scripts/pull_transcripts.py --since "$since"
+          else
+            python3 scripts/pull_transcripts.py
+          fi
+
+      - name: Open a pull request if new transcripts landed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(git status --porcelain memory/transcripts/inbox)" ]; then
+            echo "No new transcripts."
+            exit 0
+          fi
+          date="$(date -u +%Y-%m-%d)"
+          branch="transcripts/$date"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add memory/transcripts/inbox
+          git commit -m "Transcripts: $date"
+          git push -u origin "$branch"
+          gh pr create --title "Transcripts: $date" --base "${{ github.ref_name }}" --head "$branch" --body "$(cat <<'EOF'
+          New meeting transcripts pulled from Granola into `memory/transcripts/inbox/`.
+
+          Reviewer: merge this PR, then run `/chief-of-staff` (or ask your agent to "process the transcript inbox"). It extracts facts, decisions, project status, action items per owner, and red flags, moves the files to `processed/`, and posts the summary to Slack.
+
+          Transcripts are sensitive. Keep this repository private.
+          EOF
+          )"
