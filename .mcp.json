@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "dataforseo": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "dataforseo-mcp-server"],
+      "env": {
+        "DATAFORSEO_LOGIN": "${DATAFORSEO_LOGIN}",
+        "DATAFORSEO_PASSWORD": "${DATAFORSEO_PASSWORD}"
+      }
+    },
+    "apify": {
+      "type": "http",
+      "url": "https://mcp.apify.com"
+    }
+  }
+}

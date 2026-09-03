@@ -14,7 +14,7 @@ old one). (The machine-readable inputs live in
 | `qmr/<year>-q<n>/` | The quarterly marketing review: report + dashboard + its data checklist |
 | `recurring/seo/` | Weekly/monthly keyword & ranking deltas |
 | `recurring/analytics/` | Web/product analytics reports |
-| `recurring/mentions/` | Brand & LLM-mention tracking (wave 3) |
+| `recurring/mentions/` | Brand & AI answer-engine mention tracking (`brand-monitor` skill) |
 | `adhoc/YYYY-MM-DD-<question>/` | One-off analyses, named after the question they answer |
 
 ## Conventions (load-bearing)
