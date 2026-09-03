@@ -6,6 +6,27 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Blueprint, not a product: the README says what works as-is and what a
+  team is expected to make its own; AGENTS.md rule 10 ("Make it yours")
+  tells agents to build the integration or skill the team asks for.
+  `integrations/adding-an-integration.md` is the guide: MCP server first,
+  vendor CLI second, a script last, the runtime rule (sessions use MCP,
+  unattended runs use CLIs and scripts), known routes for common tools,
+  per-agent MCP config (Claude Code, Cursor, Codex) with the env-var
+  syntax differences, the script contract, the deliverables checklist,
+  and Zoom and Asana worked examples; the `add-integration` skill is its
+  procedure. The registry splits "wired" from "known routes" and drops
+  every "setup doc coming". `docs/operating-model.md` says where things
+  run (a person at a coding agent, GitHub Actions, never a server) and
+  lays out the person-versus-Actions trade-off per recurring workflow;
+  `.github/workflows/transcripts-process.yml` is the opt-in
+  agent-in-Actions example (needs `ANTHROPIC_API_KEY`, opens a PR). The
+  transcript inbox is a documented contract any connector targets;
+  `scripts/_common.py` shares `read_env_file`, `setting` and
+  `snapshot_path` across scripts. `.cursor/mcp.json` ships, and
+  `scripts/doctor.py` checks both MCP configs agree and hold placeholders
+  only. Roadmap, architecture, roster and `.env.example` updated to the
+  stance; phantom roster rows removed.
 - Fit and path: `docs/is-this-for-you.md` (who this is for and not for, a
   self-assessment, profiles for teams of about 1, 5, 20 and 100 plus
   agencies, change management and stop signals) and `docs/stages.md`

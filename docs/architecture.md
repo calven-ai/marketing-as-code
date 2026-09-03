@@ -4,10 +4,13 @@ This document is the reasoning behind the repository structure: the target
 layout, what each folder owns, and the design decisions that hold it together.
 The [roadmap](roadmap.md) lists what gets built and in what order.
 
-> **Status:** approved design. Wave 1 of the [roadmap](roadmap.md) landed the
-> structure below and wave 2 is under way (`.mcp.json`, the transcript and
-> keyword pull scripts, the analyst skills, the context-layer integration);
-> the remaining setup docs and wave 3 are still to come.
+> **Status:** approved design, built. Waves 1 and 2 of the
+> [roadmap](roadmap.md) landed the structure below, the offline workflows,
+> the MCP configs, the pull scripts, the analyst skills, the context-layer
+> integration, the integration guide, and the operating model. What remains
+> is wave 3 (website pattern, demo company, packaging). Connectors beyond
+> the worked examples are the team's to add
+> ([integrations/adding-an-integration.md](../integrations/adding-an-integration.md)).
 
 ## Design principles
 
@@ -79,7 +82,7 @@ marketing-as-code/
 ├── reports/                     # human-first outputs, incl. self-contained HTML dashboards
 ├── memory/                      # decision log, knowledge base, transcript pipeline
 ├── agents/                      # the human-readable workforce roster (index)
-├── integrations/                # registry, per-tool setup docs, the task-tool adapter
+├── integrations/                # registry, the integration guide, the task-tool adapter
 ├── scripts/                     # deterministic non-AI code (OG images, pulls, sync, doctor)
 ├── playgrounds/                 # disposable prototypes
 └── docs/                        # guides, this document, the roadmap
@@ -324,8 +327,14 @@ it does, which integrations it needs, a link to its definition in
 
 ### `integrations/`: the registry and the task adapter
 
-- `README.md` is the registry: tool, mechanism, auth, status, env vars.
-- One setup doc per tool.
+- `README.md` is the registry: what is wired (tool, mechanism, auth, env
+  vars) and the known routes for common tools that are not.
+- `adding-an-integration.md` is the guide a coding agent follows to add a
+  tool, and the `add-integration` skill is its procedure. Per-tool setup
+  docs were rejected in favour of it: the maintainers cannot keep a
+  connector catalogue current, and a team's coding agent can build the one
+  connector it needs in an afternoon from a good guide and a worked
+  example.
 - **`tasks.md`: the task-tool adapter.** GitHub Issues won't fly with a
   marketing team, so the repo integrates with the team's real task tool
   (Asana first; monday.com next). The adapter is a *document*: which tool,
@@ -335,41 +344,49 @@ it does, which integrations it needs, a link to its definition in
   abstraction, and it works identically in every coding agent. Until `/setup`
   writes it, the file documents GitHub Issues as the zero-setup fallback.
 
-The wishlist and mechanism for each integration (all official vendor MCP
-servers unless noted; verify endpoints at build time):
-
-| Tool | For | Mechanism | Auth |
-| --- | --- | --- | --- |
-| Asana | tasks | official remote MCP | OAuth |
-| monday.com | tasks (2nd adapter) | official MCP | OAuth |
-| HubSpot | CRM, pipeline, email/signup data | official remote MCP | OAuth |
-| PostHog | product & web analytics | official MCP + `posthog-cli` | API key |
-| Google Analytics 4 | web analytics | Google's official MCP | service account |
-| DataForSEO | keywords, SERP, site audit, backlinks, LLM/AEO mentions | official MCP | login/password |
-| Apify | LinkedIn/social scraping for ABM | official remote MCP | OAuth |
-| Calven | marketing context layer: positioning, messaging, ICP, personas, competitors served live (the maintainer's product; see `integrations/context-layer.md`) | official remote MCP | MCP key |
-| Granola | meeting transcripts | API via `scripts/pull_transcripts.py` (MCP if official) | API key |
-| Zoom | transcripts (later) | script via API | OAuth app |
-
-MCP-first, because for OAuth-based remote servers there is *no key to manage
-or leak*; each person authorizes in the browser. The servers ship pre-listed
-in `.mcp.json` / `.cursor/mcp.json` but disabled; `/setup` enables the ones
-the team actually uses.
+**The ladder.** A tool is connected at the highest tier that does the
+job: the vendor's official MCP server (remote with OAuth preferred: no key
+exists, so none can leak; each person authorizes in the browser), then the
+vendor's CLI, then a small script in `scripts/` under the script contract.
+Move down only for a reason: no server, a write the server lacks, an
+unattended run, a bulk pull. The runtime rule decides as much as
+availability does: an MCP call happens inside an interactive session, so
+anything scheduled in GitHub Actions runs a CLI or a script. That is why
+DataForSEO appears twice (the MCP for questions, `seo_snapshot.py` for the
+weekly refresh) and why the Granola script stays although Granola has an
+MCP. The full reasoning, the known routes per tool, and the per-agent
+config differences (Claude Code `${VAR}`, Cursor `${env:VAR}`, Codex TOML)
+are in [integrations/adding-an-integration.md](../integrations/adding-an-integration.md).
+The shipped servers are listed in `.mcp.json` and `.cursor/mcp.json` with
+placeholders only; Claude Code asks before starting a project server in a
+session, and non-interactive runs load them without asking, which is the
+reason for the placeholder rule.
 
 *Rejected:* a code-level task adapter (a CLI wrapping Asana/monday APIs):
 real engineering and permanent maintenance for a problem MCP already solves.
+Also rejected: a connector catalogue maintained here (see above).
 
 ### `scripts/`: deterministic, non-AI code
 
-Python, stdlib plus minimal dependencies. Skills call these instead of
-reimplementing:
+Python, standard library only. Skills call these instead of
+reimplementing, and a new connector copies the closest one (the script
+contract is in the integration guide):
 
-- `og_image.py`: composes an article title over a brand background using
-  `brand/tokens.json` and `brand/templates/`; no AI involved.
-- `pull_transcripts.py`: Granola → `memory/transcripts/inbox/`.
+- `_common.py`: the shared helpers (`read_env_file`, `setting`,
+  `snapshot_path`), so every script resolves keys and names snapshots the
+  same way.
+- `pull_transcripts.py`: Granola → `memory/transcripts/inbox/`, the shipped
+  transcript connector; any other provider writes the same files (the
+  inbox contract in `memory/transcripts/README.md`).
+- `seo_snapshot.py`: the scheduled DataForSEO refresh into
+  `data/seo/snapshots/`.
+- `slack_post.py`: post as the team's bot.
 - `sync_skills.py`: regenerates the `.claude/skills/` symlinks.
-- `doctor.py`: health check (env vars present, symlinks intact, MCP config
-  sane).
+- `doctor.py`: health check (required files, symlinks intact, the two MCP
+  configs listing the same servers with placeholders and no values, stale
+  context files).
+- `og_image.py` (planned): composes an article title over a brand
+  background using `brand/tokens.json` and `brand/templates/`.
 
 ### `playgrounds/`: unchanged
 
@@ -395,6 +412,22 @@ GitHub Action here opens a PR against the website repo whenever a content
 piece merges with `status: published`. The website repo stays dumb; it just
 receives content. A companion `marketing-as-code-website` Astro template repo
 is on the roadmap.
+
+## Where things run: no server
+
+Nothing is deployed. Work runs where a person is typing to a coding agent
+(Claude Code in the terminal or desktop app, Cursor, Codex), which is the
+primary mode and costs only that person's subscription; or unattended in
+GitHub Actions, which runs scripts by default and an agent as an opt-in
+with an API key, and in either case opens a pull request and never merges.
+Every recurring workflow can run either way, and the team chooses per
+workflow; the trade-off (cost, latency, human in the loop, which
+integrations work headless) is written down once in
+[operating-model.md](operating-model.md).
+
+*Rejected:* a hosted service or bot the team must deploy and keep alive.
+The audience is a marketing team; the runners GitHub already gives them
+are the only infrastructure this design assumes.
 
 ## Secrets: three tiers
 

@@ -4,6 +4,16 @@ The complete build list (structure, templates, agents & skills, scripts,
 integrations, docs), phased into three waves. The reasoning behind the
 structure and every design decision lives in [architecture.md](architecture.md).
 
+The stance, so the checkboxes read right: the maintainers ship the
+structure, the offline workflows, the guides, one worked example per way
+of connecting a tool (MCP server, CLI, script), and the guide for adding
+the rest ([integrations/adding-an-integration.md](../integrations/adding-an-integration.md)).
+Connectors for tools the maintainers do not use are not on this list; they
+are the team's job with its coding agent, and welcome back upstream as
+examples ([CONTRIBUTING.md](../CONTRIBUTING.md)). The repo is a blueprint
+([README](../README.md#a-blueprint-not-a-product)), not a product with a
+connector catalogue.
+
 Conventions used below:
 
 - **Agents & skills** are both Agent Skills definitions in `.agents/skills/`
@@ -12,10 +22,11 @@ Conventions used below:
 - Checkboxes track landing on `main`; completed items also get a CHANGELOG
   entry.
 
-Confirmed sequencing decisions: **Asana** is the first task-tool integration
-(monday.com second), **Granola** the first transcript source (Zoom later),
-`campaigns/` is renamed to `projects/`, and the template ships blank with a
-demo company on a separate branch later.
+Confirmed sequencing decisions: **Granola** is the shipped transcript
+connector and the worked example for the script tier; **Asana** is the
+worked example for a write-capable MCP in the guide (not wired; the team
+adds it in one PR); `campaigns/` is renamed to `projects/`; and the
+template ships blank with a demo company on a separate branch later.
 
 ---
 
@@ -100,12 +111,22 @@ ontology → answer.
       Calven as the documented example
 - [x] `last_reviewed` frontmatter on every context file + the staleness
       list in `scripts/doctor.py`
-- [ ] `.cursor/mcp.json`: the same list for Cursor
+- [x] `.cursor/mcp.json`: the same list for Cursor, in Cursor's syntax;
+      `scripts/doctor.py` checks the two files agree and hold no values
 - [x] `integrations/README.md`: the registry (tool, mechanism, auth, status,
       env vars)
 - [x] `integrations/tasks.md` template: the task-tool adapter document
-- [ ] Setup docs: **Asana** (first task tool), **HubSpot**, **PostHog**,
-      **GA4**, **DataForSEO**
+- [x] `integrations/adding-an-integration.md`: the guide (MCP server, then
+      CLI, then script; the runtime rule; per-agent MCP config; the script
+      contract; the deliverables checklist; Zoom and Asana worked examples)
+      and the `add-integration` skill. Per-tool setup docs are not planned:
+      the registry's "known routes" table plus the guide replace them, and
+      community connector examples are welcome
+- [x] `docs/operating-model.md`: where things run, the person-versus-Actions
+      trade-off per recurring workflow, what never runs unattended
+- [x] `.github/workflows/transcripts-process.yml`: the opt-in agent-in-Actions
+      example (chief-of-staff on the inbox, opens a PR, needs
+      `ANTHROPIC_API_KEY`)
 
 ### Agents & skills
 
@@ -125,8 +146,8 @@ the QMR data checklist with or without integrations), `make-dashboard`, and
 the full wave-1 agents & skills table above. Shipped since: `seo-analyst`,
 `campaign-discovery`, and the `chief-of-staff` upgrade (project status
 updates, action items per owner, risks and red flags, Slack notify via
-`scripts/slack_post.py`); the Asana filing part still waits on the Asana
-setup doc.
+`scripts/slack_post.py`); filing into a real task tool starts the day the
+team wires one per `integrations/tasks.md`.
 
 ### Scripts
 
@@ -135,7 +156,8 @@ setup doc.
       leadership channels)
 - [ ] `scripts/og_image.py`: port from the Calven website repo; reads
       `brand/tokens.json` + `brand/templates/`
-- [ ] Snapshot naming helper (shared by pull scripts)
+- [x] `scripts/_common.py`: `read_env_file`, `setting`, `snapshot_path`,
+      shared by every script
 
 ### Report infrastructure
 
@@ -159,8 +181,10 @@ setup doc.
 
 ### Integrations
 
-- [ ] monday.com as the second task adapter
-- [ ] Zoom transcripts in `pull_transcripts.py`
+- monday.com, Zoom, HubSpot, PostHog, GA4, Salesforce: not planned by the
+  maintainers. Each is a "known route" in `integrations/README.md`; a team
+  adds it with `add-integration`, and a connector contributed back as a
+  worked example is welcome
 - [ ] Data enrichment (vendor TBD: Apify actors vs Clay/Breeze; open
       question)
 - [ ] Optional context pull script: mirror a connected context layer into
@@ -187,8 +211,10 @@ setup doc.
 - **Enrichment vendor** (wave 3): no clean official integration exists for
   6sense-style enrichment. Apify actors, or a specific vendor (Clay,
   HubSpot Breeze)?
-- **Granola MCP**: official status of Granola's MCP endpoint to be verified
-  at build time; the pull script is the reliable fallback either way.
+- ~~**Granola MCP**~~: resolved. Granola's official MCP exists (remote,
+  OAuth-only, paid plans), which makes it a session tool; the pull script
+  stays because an OAuth server cannot run in the daily cron. That is the
+  ladder's runtime rule, not a fallback.
 - **Context-layer stubs**: once a team connects a context layer, the mirrored
   strategy files become two-line fallbacks flagged `source: context-layer`.
   Keep them (routing table stays intact) or delete them? Stubs for now.

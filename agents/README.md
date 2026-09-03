@@ -21,8 +21,6 @@ correctly.
 | [seo-analyst](../.agents/skills/seo-analyst/SKILL.md) | Keyword volumes, difficulty, current ranks, and SERP competitors against `data/seo/keywords.csv`; every pull saved as a snapshot, analysis in `reports/` | DataForSEO MCP |
 | [brand-monitor](../.agents/skills/brand-monitor/SKILL.md) | AI answer-engine (AEO) and LLM mention tracking for the prompt set in `data/seo/prompts.csv`: who is cited, and whether we are, in `reports/recurring/mentions/` | DataForSEO MCP |
 | [researcher](../.agents/skills/researcher/SKILL.md) | ABM account research with Apify actors (people at or formerly at target accounts, company signals) saved to `data/accounts/snapshots/`; private repo only, never contacts anyone | Apify MCP |
-| analyst *(wave 2)* | Routes any quantitative marketing question: snapshots → source pulls → ontology → answer | integrations |
-| web-analyst *(wave 2)* | Web/product analytics snapshots and reports | GA4 / PostHog |
 
 ## Workflows (invokable procedures)
 
@@ -37,8 +35,23 @@ correctly.
 | [qmr](../.agents/skills/qmr/SKILL.md) | Assembles the quarterly marketing review: data checklist → snapshots → deltas → report + dashboard | integrations help, not required |
 | [make-dashboard](../.agents/skills/make-dashboard/SKILL.md) | Turns data into a self-contained HTML dashboard beside its report | nothing |
 | [campaign-discovery](../.agents/skills/campaign-discovery/SKILL.md) | From a one-sentence campaign idea: competitive angle, keyword volumes and ranks, AI answer-engine coverage, content inventory, into one report in `reports/adhoc/` with a "what we would need to produce" list | DataForSEO MCP for the data parts; works partially without |
-| weekly-seo *(wave 2)* | Diffs ranking snapshots into a delta report | DataForSEO |
 
 "Needs: nothing" means it works offline out of the box. Integration setup
 lives in [`integrations/`](../integrations/); keys never live in this repo
 (see [docs/secrets.md](../docs/secrets.md)).
+
+## Running them, and adding your own
+
+Every one of these is run by a person in a coding agent by default. The
+recurring ones (transcript processing, the keyword refresh, the mentions
+report) can also run unattended in GitHub Actions if the team opts in;
+[docs/operating-model.md](../docs/operating-model.md) has the trade-off and
+a who-triggers-what table.
+
+An agent this roster lacks (a web analyst on your analytics tool, a weekly
+ranking diff, a newsletter assembler) is a Markdown file you add to
+`.agents/skills/<name>/SKILL.md` in the same shape as these, followed by
+`python3 scripts/sync_skills.py`. The tool it needs is added per
+[integrations/adding-an-integration.md](../integrations/adding-an-integration.md).
+Skills others could reuse are welcome upstream
+([CONTRIBUTING.md](../CONTRIBUTING.md)).

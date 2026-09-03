@@ -6,8 +6,8 @@ and none of them needs a server the team has to run.
 
 | Layer | What it does | Identity | Mechanism | Status |
 | --- | --- | --- | --- | --- |
-| 1. Outbound bot | Morning digest, Monday leadership update, "merged and live" notices, data alerts, export asks, transcript summaries and red flags | the team's own Slack app (this folder) | `scripts/slack_post.py` called by GitHub Actions and skills, with a bot token | manifest and `slack_post.py` ready; digests wave 2 |
-| 2. Inbound intake | Reads `#marketing-requests`, answers in-thread from the repo or routes to an owner; turns Slack decisions into decision-log entries with a permalink | same bot | polling with the bot token from a scheduled run; no Events API | wave 2 |
+| 1. Outbound bot | Morning digest, Monday leadership update, "merged and live" notices, data alerts, export asks, transcript summaries and red flags | the team's own Slack app (this folder) | `scripts/slack_post.py` called by GitHub Actions and skills, with a bot token | manifest and `slack_post.py` wired; the scheduled digests are workflows you add, calling the same script (`docs/operating-model.md`) |
+| 2. Inbound intake | Reads `#marketing-requests`, answers in-thread from the repo or routes to an owner; turns Slack decisions into decision-log entries with a permalink | same bot | polling with the bot token from a scheduled run; no Events API | not shipped; a script under the contract in `integrations/adding-an-integration.md`, if the team wants it |
 | 3. Ask the repo from Slack | A person mentions Claude in a thread; a Claude Code session opens on the repo, works, and posts a summary and PR link back | the person (Claude Code in Slack) or a shared org identity (Claude Tag, Team/Enterprise plans) | Anthropic's Slack app, configured by an admin; requires Claude Code on the web and a connected GitHub repo | available today, plan-dependent |
 
 Plus the off-the-shelf GitHub Slack app for "PR awaiting your review"
