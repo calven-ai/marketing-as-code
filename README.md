@@ -16,6 +16,7 @@
 
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
+  <a href="docs/is-this-for-you.md">Is this for you?</a> ·
   <a href="#how-this-repo-is-organized">Structure</a> ·
   <a href="docs/new-to-github.md">New to GitHub?</a> ·
   <a href="#project-status">Status</a>
@@ -68,6 +69,18 @@ and voice, connect the agents you want, and run your marketing from here.
   your agents operate via API, and which you merely index. Plus the review
   workflow that keeps a human in charge of everything that ships.
 
+## Is this for your team?
+
+Not necessarily. Marketing as code is designed for specific teams, and it
+is a change project before it is a tool project: team size, the appetite
+for semi-technical work (a repository, pull requests, MCP servers, API
+keys, a coding agent), and a leader who will read a diff decide whether it
+fits. [docs/is-this-for-you.md](docs/is-this-for-you.md) is the honest fit
+check, with profiles for teams of about 5, 20, and 100 and the change
+management each one needs. [docs/stages.md](docs/stages.md) is the path for
+everyone who is not there yet: use the AI tools you already pay for, then
+hand one activity to one agent, then this repo.
+
 ## Never used GitHub?
 
 You are the audience this repo was built for. You do not need to be a
@@ -89,7 +102,8 @@ parts for you.
    answers, and connects only the integrations your team actually uses.
 4. **Start with one workflow.** Publish one piece of content, process one
    meeting transcript, or run one report. Let the repo prove itself before you
-   move everything in.
+   move everything in. [docs/stages.md](docs/stages.md) explains why one
+   workflow, and what to do if even that is too much.
 
 ## Four kinds of files
 

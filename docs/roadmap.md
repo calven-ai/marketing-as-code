@@ -78,6 +78,9 @@ entirely offline. No API keys required for anything in this wave.
 - [x] `docs/workflow.md`: the PR review ritual, written for GitHub Desktop
       users
 - [x] `docs/secrets.md`: the three-tier secrets story
+- [x] `docs/is-this-for-you.md` and `docs/stages.md`: the fit check
+      (team-size profiles, change management) and the three-stage path;
+      README gains "Is this for your team?"
 - [ ] Finish `docs/new-to-github.md` and cross-link the new docs
 
 ---

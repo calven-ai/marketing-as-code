@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Fit and path: `docs/is-this-for-you.md` (who this is for and not for, a
+  self-assessment, profiles for teams of about 1, 5, 20 and 100 plus
+  agencies, change management and stop signals) and `docs/stages.md`
+  (three stages: the AI tools you already pay for, one agent for one
+  activity, then this repo; buy, build or wait per pillar, Calven disclosed
+  once for the context pillar). README gains "Is this for your team?" and
+  a nav link; `docs/README.md`, `docs/new-to-github.md` and `AGENTS.md`
+  cross-link.
 - Context layer: `integrations/context-layer.md` explains why hand-maintained
   strategy files go stale and documents a marketing context layer over MCP
   as the alternative, with Calven as the example (disclosed as the

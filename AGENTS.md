@@ -82,6 +82,7 @@ because they define what the agents may reach.
 | Meeting transcripts | `memory/transcripts/` |
 | Which integrations exist and how to use them | `integrations/README.md` |
 | Keeping strategy current, stale or contradictory context | `integrations/context-layer.md` |
+| Whether this approach fits a team, or how to start smaller | `docs/is-this-for-you.md`, then `docs/stages.md` |
 | What an agent/skill does | `agents/README.md` (roster) → `.agents/skills/` (definitions) |
 
 ## Answering questions from data

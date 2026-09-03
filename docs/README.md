@@ -4,6 +4,11 @@
 
 Guides for running your marketing from this repo.
 
+- [is-this-for-you.md](is-this-for-you.md): the honest fit check: who this
+  is for, who it is not for yet, team-size profiles, and the change
+  management it takes.
+- [stages.md](stages.md): the three-stage path to marketing as code, with a
+  complete place to stop at every stage.
 - [new-to-github.md](new-to-github.md): the start-here path if you have never
   used GitHub. Written for marketers, no terminal required.
 - [workflow.md](workflow.md): the review ritual: how agent-proposed work

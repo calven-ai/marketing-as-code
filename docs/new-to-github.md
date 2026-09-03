@@ -12,3 +12,7 @@
    issue) and the ones you can safely ignore.
 5. Your first change: edit one file, save it with a message, see the history.
 6. Pointing a coding agent at the repo and letting it do the technical parts.
+
+Not sure the repo is for your team at all? Read
+[is-this-for-you.md](is-this-for-you.md) first; this guide assumes you have
+decided to try.
