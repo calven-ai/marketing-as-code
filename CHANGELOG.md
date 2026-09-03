@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Day in the life: `scripts/pull_transcripts.py` (Granola to
+  `memory/transcripts/inbox/`, dedupes against inbox and processed) and
+  `.github/workflows/transcripts-cron.yml` (daily pull, opens a PR, never
+  merges); `scripts/slack_post.py` (post as the team's bot to the team,
+  requests, or leadership channel) plus `SLACK_LEADERSHIP_CHANNEL_ID`;
+  `chief-of-staff` upgraded to extract facts, decisions, project status
+  updates, action items per owner, and risks and red flags, and to post
+  the summary to Slack (red flags to leadership); new skills
+  `seo-analyst`, `brand-monitor` (with `data/seo/prompts.csv`),
+  `researcher` (alumni-list example with Apify actors), and
+  `campaign-discovery`; `.mcp.json` listing the DataForSEO and Apify MCP
+  servers with env placeholders only.
 - Slack: app manifest and install guide in `integrations/slack/` (bot
   token only, no server), registry row, env vars.
 - Review pass: `published:` date in content frontmatter (so "what shipped

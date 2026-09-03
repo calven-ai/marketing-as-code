@@ -12,6 +12,7 @@ adds only what is Claude-Code-specific.
   If a slash command is missing, run `python3 scripts/sync_skills.py`.
 - **Never read `.env`** — `.claude/settings.json` denies it; keys stay out of
   context by design (see [docs/secrets.md](docs/secrets.md)).
-- MCP servers for integrations will be declared in `.mcp.json` (wave 2 of
-  the [roadmap](docs/roadmap.md)); it does not exist yet. Once it does,
-  enable only what `/setup` configured.
+- MCP servers for integrations are declared in `.mcp.json` (DataForSEO and
+  Apify today; the list is explained in
+  [integrations/README.md](integrations/README.md)). Enable only what
+  `/setup` configured; Claude Code asks before starting a project server.

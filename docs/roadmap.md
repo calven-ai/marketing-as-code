@@ -89,7 +89,9 @@ ontology → answer.
 
 ### Integrations
 
-- [ ] `.mcp.json` + `.cursor/mcp.json` — servers listed, disabled by default
+- [x] `.mcp.json` — DataForSEO and Apify listed (keys via env placeholders;
+      Claude Code asks before enabling)
+- [ ] `.cursor/mcp.json` — the same list for Cursor
 - [x] `integrations/README.md` — the registry (tool, mechanism, auth, status,
       env vars)
 - [x] `integrations/tasks.md` template — the task-tool adapter document
@@ -107,14 +109,21 @@ ontology → answer.
 | `make-dashboard` | Workflow | Copy `reports/_templates/dashboard.html`, inline the data, save beside the report |
 | `qmr` | Workflow | The quarterly marketing review: pull snapshots, compute deltas vs last quarter via the ontology, fill the template, flag gaps as questions |
 | `chief-of-staff` (upgrade) | Role | Files action items as real Asana tasks per `integrations/tasks.md` |
+| `campaign-discovery` | Workflow | One-sentence campaign idea → competitive angle, keywords and ranks, AI answer-engine coverage, content inventory, one report in `reports/adhoc/` |
 
 Shipped early with wave 1 (offline-capable versions): the `qmr` skill (works
 the QMR data checklist with or without integrations), `make-dashboard`, and
-the full wave-1 agents & skills table above.
+the full wave-1 agents & skills table above. Shipped since: `seo-analyst`,
+`campaign-discovery`, and the `chief-of-staff` upgrade (project status
+updates, action items per owner, risks and red flags, Slack notify via
+`scripts/slack_post.py`); the Asana filing part still waits on the Asana
+setup doc.
 
 ### Scripts
 
-- [ ] `scripts/pull_transcripts.py` — **Granola** → `memory/transcripts/inbox/`
+- [x] `scripts/pull_transcripts.py` — **Granola** → `memory/transcripts/inbox/`
+- [x] `scripts/slack_post.py` — post as the team's Slack bot (team, requests,
+      leadership channels)
 - [ ] `scripts/og_image.py` — port from the Calven website repo; reads
       `brand/tokens.json` + `brand/templates/`
 - [ ] Snapshot naming helper (shared by pull scripts)
@@ -125,8 +134,8 @@ the full wave-1 agents & skills table above.
 - [x] `reports/_templates/dashboard.html` — single file, dependency-free
       inline chart helpers, `const DATA` block
 - [x] `reports/_templates/qmr/` — QMR report + dashboard scaffolds
-- [ ] Optional: `.github/workflows/transcripts-cron.yml` — runs the pipeline
-      on a schedule, **opens a PR, never merges**
+- [x] `.github/workflows/transcripts-cron.yml` — pulls transcripts daily,
+      **opens a PR, never merges**
 
 ---
 
@@ -136,8 +145,8 @@ the full wave-1 agents & skills table above.
 
 | Definition | Kind | Purpose |
 | --- | --- | --- |
-| `brand-monitor` | Role | LLM/AEO mention tracking via DataForSEO → `reports/recurring/mentions/` |
-| `researcher` | Role | ABM account research via Apify actors (LinkedIn/social) → `data/accounts/` |
+| `brand-monitor` | Role | LLM/AEO mention tracking via DataForSEO → `reports/recurring/mentions/` (shipped) |
+| `researcher` | Role | ABM account research via Apify actors (LinkedIn/social) → `data/accounts/` (shipped, alumni-list example) |
 
 ### Integrations
 

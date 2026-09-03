@@ -14,13 +14,13 @@ correctly.
 
 | Agent | What it does | Needs |
 | --- | --- | --- |
-| [chief-of-staff](../.agents/skills/chief-of-staff/SKILL.md) | Processes meeting transcripts: decisions → log, action items → your task tool, doc updates as reviewable diffs | nothing (task tool optional) |
+| [chief-of-staff](../.agents/skills/chief-of-staff/SKILL.md) | Processes meeting transcripts: facts → knowledge diffs, decisions → log, project status → `status.md`, action items per owner → your task tool, risks and red flags → summary and the leadership Slack channel | nothing (task tool and Slack optional) |
 | [prototype-builder](../.agents/skills/prototype-builder/SKILL.md) | Builds a disposable prototype in `playgrounds/` from one sentence, on-brand | nothing |
+| [seo-analyst](../.agents/skills/seo-analyst/SKILL.md) | Keyword volumes, difficulty, current ranks, and SERP competitors against `data/seo/keywords.csv`; every pull saved as a snapshot, analysis in `reports/` | DataForSEO MCP |
+| [brand-monitor](../.agents/skills/brand-monitor/SKILL.md) | AI answer-engine (AEO) and LLM mention tracking for the prompt set in `data/seo/prompts.csv`: who is cited, and whether we are, in `reports/recurring/mentions/` | DataForSEO MCP |
+| [researcher](../.agents/skills/researcher/SKILL.md) | ABM account research with Apify actors (people at or formerly at target accounts, company signals) saved to `data/accounts/snapshots/`; private repo only, never contacts anyone | Apify MCP |
 | analyst *(wave 2)* | Routes any quantitative marketing question: snapshots → source pulls → ontology → answer | integrations |
-| seo-analyst *(wave 2)* | Keyword & ranking analysis against `data/seo/keywords.csv` | DataForSEO |
 | web-analyst *(wave 2)* | Web/product analytics snapshots and reports | GA4 / PostHog |
-| brand-monitor *(wave 3)* | Brand & LLM/AEO mention tracking | DataForSEO |
-| researcher *(wave 3)* | ABM account research via scraping | Apify |
 
 ## Workflows (invokable procedures)
 
@@ -33,6 +33,7 @@ correctly.
 | [log-decision](../.agents/skills/log-decision/SKILL.md) | Appends a properly formatted entry to the decision log | nothing |
 | [qmr](../.agents/skills/qmr/SKILL.md) | Assembles the quarterly marketing review: data checklist → snapshots → deltas → report + dashboard | integrations help, not required |
 | [make-dashboard](../.agents/skills/make-dashboard/SKILL.md) | Turns data into a self-contained HTML dashboard beside its report | nothing |
+| [campaign-discovery](../.agents/skills/campaign-discovery/SKILL.md) | From a one-sentence campaign idea: competitive angle, keyword volumes and ranks, AI answer-engine coverage, content inventory, into one report in `reports/adhoc/` with a "what we would need to produce" list | DataForSEO MCP for the data parts; works partially without |
 | weekly-seo *(wave 2)* | Diffs ranking snapshots into a delta report | DataForSEO |
 
 "Needs: nothing" means it works offline out of the box. Integration setup
