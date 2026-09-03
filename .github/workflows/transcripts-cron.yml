@@ -1,12 +1,19 @@
 name: transcripts-cron
 
-# Pulls new Granola transcripts into memory/transcripts/inbox/ every day and
-# opens a pull request with them. It never merges: a human reviews the PR,
-# merges it, and runs the chief-of-staff skill on the inbox.
+# Pulls new meeting transcripts into memory/transcripts/inbox/ every day and
+# opens a pull request with them. It never merges: a human reviews the PR
+# and merges it. Processing the inbox is then either a person running the
+# chief-of-staff skill (the default) or transcripts-process.yml running it
+# unattended once the merge lands; docs/operating-model.md has the choice.
 #
-# Needs one repository secret: GRANOLA_API_KEY (Settings -> Secrets and
-# variables -> Actions). Nothing else. Uses only GitHub's own actions and
-# the gh CLI already present on the runner.
+# Granola is the shipped provider. Needs one repository secret:
+# GRANOLA_API_KEY (Settings -> Secrets and variables -> Actions). Nothing
+# else. Uses only GitHub's own actions and the gh CLI already present on
+# the runner.
+#
+# Another provider (Zoom, say) is a second "Pull" step below calling its own
+# script with its own secret, gated the same way; the PR step picks up
+# whatever landed. See integrations/adding-an-integration.md.
 
 on:
   schedule:
@@ -60,9 +67,9 @@ jobs:
           git commit -m "Transcripts: $date"
           git push -u origin "$branch"
           gh pr create --title "Transcripts: $date" --base "${{ github.ref_name }}" --head "$branch" --body "$(cat <<'EOF'
-          New meeting transcripts pulled from Granola into `memory/transcripts/inbox/`.
+          New meeting transcripts pulled into `memory/transcripts/inbox/`.
 
-          Reviewer: merge this PR, then run `/chief-of-staff` (or ask your agent to "process the transcript inbox"). It extracts facts, decisions, project status, action items per owner, and red flags, moves the files to `processed/`, and posts the summary to Slack.
+          Reviewer: merge this PR, then process the inbox. Either run `/chief-of-staff` (or ask your agent to "process the transcript inbox"), or, if the team has opted into `transcripts-process.yml`, the merge triggers it and a "Transcripts processed" PR follows. Processing extracts facts, decisions, project status, action items per owner, and red flags, moves the files to `processed/`, and posts the summary to Slack.
 
           Transcripts are sensitive. Keep this repository private.
           EOF

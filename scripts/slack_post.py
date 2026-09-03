@@ -23,14 +23,12 @@ with --dry-run. Agents do not read .env; this script may.
 
 import argparse
 import json
-import os
 import sys
 import urllib.error
 import urllib.request
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-ENV_FILE = ROOT / ".env"
+from _common import ENV_FILE, read_env_file, setting
+
 API = "https://slack.com/api/chat.postMessage"
 
 CHANNEL_VARS = {
@@ -38,24 +36,6 @@ CHANNEL_VARS = {
     "requests": "SLACK_REQUESTS_CHANNEL_ID",
     "leadership": "SLACK_LEADERSHIP_CHANNEL_ID",
 }
-
-
-def read_env_file(path):
-    """Minimal KEY=value parser. Ignores comments and blank lines."""
-    values = {}
-    if not path.is_file():
-        return values
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, val = line.partition("=")
-        values[key.strip()] = val.strip().strip('"').strip("'")
-    return values
-
-
-def setting(name, env_file):
-    return os.environ.get(name) or env_file.get(name) or ""
 
 
 def resolve_channel(arg, env_file):

@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """Pull new Granola meeting transcripts into memory/transcripts/inbox/.
 
+Granola is the shipped example of a transcript connector. A connector for
+another provider (Zoom, Fireflies, anything with an API) is a copy of this
+script that writes the same files: the inbox contract is in
+memory/transcripts/README.md, and integrations/adding-an-integration.md has
+the worked example. The chief-of-staff skill does not care who wrote the
+file.
+
 Standard library only. Talks to Granola's public API
 (https://docs.granola.ai/api-reference, Business plan or higher) and writes
 one Markdown file per meeting: a small frontmatter header followed by the
-transcript, speaker by speaker. The chief-of-staff skill takes it from there.
+transcript, speaker by speaker.
 
 Usage, from the repo root:
     python3 scripts/pull_transcripts.py                    # pull new notes
@@ -22,7 +29,6 @@ is skipped, so re-running is safe and processed meetings never come back.
 
 import argparse
 import json
-import os
 import re
 import sys
 import urllib.error
@@ -31,10 +37,10 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from _common import ROOT, setting
+
 INBOX = ROOT / "memory" / "transcripts" / "inbox"
 PROCESSED = ROOT / "memory" / "transcripts" / "processed"
-ENV_FILE = ROOT / ".env"
 
 BASE = "https://public-api.granola.ai/v1"
 PAGE_SIZE = 30          # API maximum for /notes
@@ -47,22 +53,8 @@ SPEAKER_LABELS = {"me": "Me", "them": "Them"}
 
 # --- key resolution ---------------------------------------------------------
 
-def read_env_file(path):
-    """Minimal KEY=value parser. Ignores comments and blank lines."""
-    values = {}
-    if not path.is_file():
-        return values
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, val = line.partition("=")
-        values[key.strip()] = val.strip().strip('"').strip("'")
-    return values
-
-
 def api_key():
-    key = os.environ.get("GRANOLA_API_KEY") or read_env_file(ENV_FILE).get("GRANOLA_API_KEY")
+    key = setting("GRANOLA_API_KEY")
     if not key:
         sys.exit(
             "error: GRANOLA_API_KEY is not set.\n"

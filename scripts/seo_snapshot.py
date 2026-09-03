@@ -22,26 +22,18 @@ import os
 import sys
 import urllib.error
 import urllib.request
-from pathlib import Path
+
+from _common import ROOT as REPO, read_env_file, snapshot_path
 
 API = "https://api.dataforseo.com/v3"
-REPO = Path(__file__).resolve().parents[1]
 KEYWORDS = REPO / "data" / "seo" / "keywords.csv"
-SNAPSHOTS = REPO / "data" / "seo" / "snapshots"
 COLUMNS = ["keyword", "volume", "difficulty", "rank", "url", "checked"]
 
 
 def load_env():
     """Fill os.environ from the repo .env for keys not already set."""
-    env = REPO / ".env"
-    if not env.exists():
-        return
-    for line in env.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+    for key, value in read_env_file().items():
+        os.environ.setdefault(key, value)
 
 
 def call(endpoint, payload):
@@ -99,8 +91,7 @@ def read_keywords():
 
 
 def write_snapshot(rows, today):
-    SNAPSHOTS.mkdir(parents=True, exist_ok=True)
-    path = SNAPSHOTS / f"{today}-dataforseo-volume.csv"
+    path = snapshot_path("seo", "dataforseo", "volume", day=today)
     with path.open("w", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=COLUMNS)
         writer.writeheader()

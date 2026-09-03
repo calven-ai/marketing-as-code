@@ -16,11 +16,14 @@ pipeline that feeds them.
 
 ## The pipeline
 
-1. A transcript lands in `transcripts/inbox/`, via
-   `scripts/pull_transcripts.py` (Granola; run it by hand, or let the daily
-   `transcripts-cron` GitHub Action run it and open a PR with the new files)
-   or a simple drag-and-drop. Any text format works; name it
-   `YYYY-MM-DD-<meeting>.md` (or `.txt`/`.vtt`).
+1. A transcript lands in `transcripts/inbox/`, via a pull script for your
+   meeting tool (`scripts/pull_transcripts.py` ships for Granola; run it by
+   hand, or let the daily `transcripts-cron` GitHub Action run it and open
+   a PR with the new files; a connector for another provider writes the
+   same files, per the inbox contract in
+   [`transcripts/README.md`](transcripts/README.md)) or a simple
+   drag-and-drop. Any text format works; name it `YYYY-MM-DD-<meeting>.md`
+   (or `.txt`/`.vtt`).
 2. The `chief-of-staff` skill processes each inbox file:
    **facts worth keeping** → proposed edits to `knowledge/` and any affected
    `strategy/` or `projects/` docs, **as a reviewable diff, never a silent
