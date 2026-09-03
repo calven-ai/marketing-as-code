@@ -15,15 +15,22 @@ pipeline that feeds them.
 ## The pipeline
 
 1. A transcript lands in `transcripts/inbox/` — via
-   `scripts/pull_transcripts.py` or a simple drag-and-drop. Any text format
-   works; name it `YYYY-MM-DD-<meeting>.md` (or `.txt`/`.vtt`).
+   `scripts/pull_transcripts.py` (Granola; run it by hand, or let the daily
+   `transcripts-cron` GitHub Action run it and open a PR with the new files)
+   or a simple drag-and-drop. Any text format works; name it
+   `YYYY-MM-DD-<meeting>.md` (or `.txt`/`.vtt`).
 2. The `chief-of-staff` skill processes each inbox file:
-   **decisions** → appended to `decision-log.md`;
-   **action items** → filed per `integrations/tasks.md`;
    **facts worth keeping** → proposed edits to `knowledge/` and any affected
    `strategy/` or `projects/` docs, **as a reviewable diff, never a silent
-   write**.
-3. The transcript moves to `processed/`. Nothing is deleted.
+   write**;
+   **decisions** → appended to `decision-log.md`;
+   **project status** → routine entries in `projects/<name>/status.md`;
+   **action items** → grouped per owner, filed per `integrations/tasks.md`;
+   **risks and red flags** → always in the summary, and posted to the
+   leadership Slack channel when Slack is configured.
+3. The transcript moves to `processed/`. Nothing is deleted. A "Transcript
+   processed" summary goes to the team Slack channel (or is printed when
+   Slack is not set up).
 
 ## For agents
 
