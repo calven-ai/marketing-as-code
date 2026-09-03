@@ -22,7 +22,10 @@ drop into `data/seo/snapshots/` and stop.
    additions in the report.
 2. **Check what exists.** The newest `data/seo/snapshots/*-dataforseo-*.csv`
    answers a weekly question; a "right now" question needs a fresh pull.
-3. **Pull with the DataForSEO MCP**, keeping calls small and stated:
+3. **Pull.** For the routine volume and difficulty refresh, run
+   `python3 scripts/seo_snapshot.py` (add `--update` to refresh the
+   canonical table); it saves the snapshot for you. For everything else,
+   **pull with the DataForSEO MCP**, keeping calls small and stated:
    - volumes and difficulty: keyword overview / search volume tools for the
      keyword list, one location and language (from the ontology, else ask);
    - current ranks: ranked keywords for our domain, or a live SERP check

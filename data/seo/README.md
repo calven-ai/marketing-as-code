@@ -11,7 +11,9 @@
 
   Add rows deliberately (a keyword here means "we care about ranking for
   this"); update `difficulty`, `volume`, `current_rank`, `last_checked` from
-  fresh pulls.
+  fresh pulls. The three rows it ships with are examples; replace them with
+  yours. `scripts/seo_snapshot.py` refreshes volume and difficulty for every
+  row and saves the pull as a snapshot.
 
 - **`prompts.csv`** — the canonical prompt set for AI answer-engine (AEO)
   tracking: the questions a buyer types into ChatGPT or Perplexity for
