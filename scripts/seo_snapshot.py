@@ -72,9 +72,11 @@ def search_volume(keywords, location=2840, language="en"):
     """Monthly search volume per keyword, one call for the whole list."""
     task = {"keywords": keywords, "location_code": location,
             "language_code": language}
-    body = call("keywords_data/google_ads/search_volume/live", [task])
+    body = call("keywords_data/google_ads/"
+                "search_volume/live", [task])
     result = body["tasks"][0].get("result") or []
-    return {row["keyword"]: row.get("search_volume") for row in result}
+    return {row["keyword"]: row.get("search_volume")
+            for row in result}
 
 
 def keyword_difficulty(keywords, location=2840, language="en"):
