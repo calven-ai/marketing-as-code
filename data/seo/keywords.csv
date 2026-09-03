@@ -1,4 +1,4 @@
 keyword,intent,target_url,difficulty,volume,current_rank,last_checked,notes
-"marketing operations platform",commercial,/platform,42,1900,18,2026-09-01,"example row: replace with your own"
-"ai agents for marketing teams",informational,/resources/ai-agents,31,720,7,2026-09-01,"example row"
-"meeting transcript to tasks",informational,/resources/meetings,12,260,,2026-09-01,"example row: not ranking yet"
+"ai product marketing platform",commercial,/platform,38,90,4,2026-09-01,"example row: the category term, kept even at low volume"
+"product marketing platform",commercial,/platform,45,320,12,2026-09-01,"example row: unbound category term"
+"best tools for product marketing",commercial,/resources/best-tools,29,480,,2026-09-01,"example row: not ranking yet"
