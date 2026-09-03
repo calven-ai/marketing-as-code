@@ -1,5 +1,7 @@
 # memory/
 
+**Kind:** context, what the team knows.
+
 The part that compounds: decisions, knowledge, and the meeting-transcript
 pipeline that feeds them.
 

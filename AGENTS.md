@@ -45,6 +45,22 @@ decides.
    by design, never production, and gets archived once the decision is
    logged.
 
+## Four kinds of files
+
+Every file here is one of four kinds. Use these words when talking about the repo.
+
+| Kind | What it is | Folders |
+| --- | --- | --- |
+| Context | What the team knows; load it before thinking | `strategy/`, `brand/`, `content/`, `projects/`, `memory/`, `docs/`, `AGENTS.md`, `CLAUDE.md` |
+| Agents | The workforce as instructions in English, plus what agents may reach; edit as text | `agents/`, `.agents/skills/`, `integrations/` |
+| Code | Deterministic scripts and throwaway prototypes; run them, don't reimplement them | `scripts/`, `playgrounds/`, `.github/workflows/` |
+| Data | Tables, dated snapshots, and the reports built from them; treat as evidence | `data/`, `reports/` |
+
+Content is an output that becomes context once published, because agents read
+it the way they read positioning. Playgrounds are code because prototypes are
+HTML the agent writes and the team throws away. Integrations sit with agents
+because they define what the agents may reach.
+
 ## Where things live
 
 | You are asked about… | Look in |

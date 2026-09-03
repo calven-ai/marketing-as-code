@@ -1,5 +1,7 @@
 # playgrounds/
 
+**Kind:** code, deterministic scripts and throwaway prototypes the agent writes.
+
 Come to meetings with prototypes, not decks.
 
 Each prototype is a disposable subfolder built by an agent from one sentence:

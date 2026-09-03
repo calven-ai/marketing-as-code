@@ -1,5 +1,7 @@
 # integrations/
 
+**Kind:** agents, the workforce as instructions in English.
+
 The registry of external tools this repo's agents can operate, and how each
 one connects. One setup doc per tool lands here as integrations come online
 (wave 2 of [the roadmap](../docs/roadmap.md)).

@@ -1,5 +1,7 @@
 # brand/
 
+**Kind:** context, what the team knows.
+
 How we sound and how we look. Any agent producing something an outsider will
 see (a draft, an email, a prototype, an image) loads this folder first.
 

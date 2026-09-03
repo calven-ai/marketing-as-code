@@ -29,6 +29,33 @@ Five rules generate almost every decision below:
    (transcript-driven doc updates, published content) moves through review,
    never through silent writes.
 
+## Four kinds of files
+
+Every file in the tree is one of four kinds. The folders are the
+implementation; the four kinds are the model.
+
+| Kind | Folders | What it is | Who writes it |
+| --- | --- | --- | --- |
+| Context | `strategy/`, `brand/`, `content/`, `projects/`, `memory/`, `docs/`, plus `AGENTS.md` and `CLAUDE.md` at the root | What the team knows: positioning, messaging, personas, brand, briefs and status, the decision log and knowledge base, published content, and the guides on how the team works here | The team |
+| Agents | `agents/` (the roster), `.agents/skills/` (the definitions), `integrations/` (registry, task adapter, Slack app, `.mcp.json`) | The workforce, as instructions in English: every agent or skill is a Markdown file a person can read and change, plus the registry of what agents are allowed to reach | A person editing text |
+| Code | `scripts/`, `playgrounds/`, `.github/workflows/` | Small deterministic scripts and throwaway prototypes, written by the agent, not by the team | The agent |
+| Data | `data/`, `reports/` | The numbers as tables, dated snapshots, and the reports built from them | The tools |
+
+Three judgment calls, stated so nobody re-litigates them:
+
+- Content is an output that becomes context once published, because agents
+  read it the way they read positioning.
+- Playgrounds are code because prototypes are HTML the agent writes and the
+  team throws away.
+- Integrations sit with agents because they define what the agents may reach.
+
+The split matters because each kind asks a different thing of an agent.
+Context is loaded before thinking, never guessed at. Code is run instead of
+reimplemented, because a script that already exists is cheaper and more
+reliable than a fresh one. Data is treated as evidence: queried, diffed, and
+quoted, never invented. Agents are edited as text, so changing what the
+workforce does is a reviewable diff, not a deploy.
+
 ## The target tree
 
 ```

@@ -1,5 +1,7 @@
 # data/
 
+**Kind:** data, the numbers as tables, dated snapshots, and the reports built from them.
+
 Machine-first working data: the CSV tables agents query, diff, and append.
 Human-readable analyses of this data go to [`reports/`](../reports/), never
 here.

@@ -1,5 +1,7 @@
 # content/
 
+**Kind:** context, what the team knows.
+
 The single source of truth for every piece of content, at every stage: idea,
 brief, draft, published, evergreen. Email sequences, webinar assets, and case
 studies are content *types* here — they don't get their own top-level folders.

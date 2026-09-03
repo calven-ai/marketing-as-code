@@ -1,5 +1,7 @@
 # strategy/
 
+**Kind:** context, what the team knows.
+
 Market truth: who we serve, what we claim, and against whom. This is what an
 agent loads before doing any marketing *thinking*. (How we sound and look
 lives in [`brand/`](../brand/), loaded at *making* time.)

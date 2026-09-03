@@ -1,5 +1,7 @@
 # agents/: the workforce roster
 
+**Kind:** agents, the workforce as instructions in English.
+
 Every agent and skill in this repo, what it does, and what it needs. This
 page is the index for humans; the definitions any coding agent actually loads
 live in [`.agents/skills/`](../.agents/skills/) (the Agent Skills open

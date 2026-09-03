@@ -1,5 +1,7 @@
 # projects/
 
+**Kind:** context, what the team knows.
+
 How the team organizes the work. **Everything is a project; a campaign is a
 project big enough to have children.**
 

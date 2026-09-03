@@ -1,5 +1,7 @@
 # docs/
 
+**Kind:** context, what the team knows.
+
 Guides for running your marketing from this repo.
 
 - [new-to-github.md](new-to-github.md): the start-here path if you have never

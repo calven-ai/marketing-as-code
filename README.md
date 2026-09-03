@@ -91,22 +91,48 @@ parts for you.
    meeting transcript, or run one report. Let the repo prove itself before you
    move everything in.
 
+## Four kinds of files
+
+Everything in this repo is one of four kinds of files:
+
+- **Context**, what the team knows: positioning, messaging, personas, brand,
+  briefs and status, the decision log and knowledge base, published content,
+  and the guides on how the team works here (`strategy/`, `brand/`,
+  `content/`, `projects/`, `memory/`, `docs/`, plus `AGENTS.md` and
+  `CLAUDE.md` at the root).
+- **Agents**, the workforce, as instructions in English: every agent or skill
+  is a Markdown file a person can read and change, plus the registry of what
+  agents are allowed to reach (`agents/` for the roster, `.agents/skills/`
+  for the definitions, `integrations/` for the registry, the task adapter,
+  the Slack app, and `.mcp.json`).
+- **Code**, small deterministic scripts and throwaway prototypes, written by
+  the agent, not by the team (`scripts/`, `playgrounds/`, plus
+  `.github/workflows/`).
+- **Data**, the numbers as tables, dated snapshots, and the reports built
+  from them (`data/`, `reports/`).
+
+Three judgment calls, stated once so nobody has to guess. Content is an
+output that becomes context once published, because agents read it the way
+they read positioning. Playgrounds are code because prototypes are HTML the
+agent writes and the team throws away. Integrations sit with agents because
+they define what the agents may reach.
+
 ## How this repo is organized
 
-| Folder | What lives there |
-| --- | --- |
-| `strategy/` | Positioning, messaging, ICP and personas, competitive battlecards: what every agent loads before doing marketing thinking |
-| `brand/` | Voice, visual identity, logos, design tokens: what every agent loads before making anything an outsider sees |
-| `content/` | Every piece of content, at every stage — the single source of truth projects link into |
-| `projects/` | How the work is organized: briefs and status, with campaigns as projects that contain projects |
-| `data/` | The machine-readable truth: keyword tables, analytics and CRM snapshots, target accounts — plus the ontology defining what your metrics mean |
-| `reports/` | What the data becomes: analyses, the quarterly marketing review, self-contained HTML dashboards |
-| `memory/` | The decision log and the living knowledge base, fed from meeting transcripts |
-| `agents/` | The workforce roster; the definitions live in `.agents/skills/`, readable by any coding agent |
-| `integrations/` | How the repo talks to your stack: task tool, CRM, analytics, SEO — and the conventions agents follow |
-| `playgrounds/` | Disposable prototypes: come to meetings with the thing itself, not a deck about it |
-| `scripts/` | Deterministic helpers with no AI inside: the transcript pull, the keyword snapshot, Slack posting, the health check, the skill-link sync |
-| `docs/` | Guides: the review workflow, secrets, architecture, roadmap, and the start-here path for people new to GitHub |
+| Kind | Folder | What lives there |
+| --- | --- | --- |
+| Context | `strategy/` | Positioning, messaging, ICP and personas, competitive battlecards: what every agent loads before doing marketing thinking |
+| Context | `brand/` | Voice, visual identity, logos, design tokens: what every agent loads before making anything an outsider sees |
+| Context | `content/` | Every piece of content, at every stage — the single source of truth projects link into |
+| Context | `projects/` | How the work is organized: briefs and status, with campaigns as projects that contain projects |
+| Context | `memory/` | The decision log and the living knowledge base, fed from meeting transcripts |
+| Context | `docs/` | Guides: the review workflow, secrets, architecture, roadmap, and the start-here path for people new to GitHub |
+| Agents | `agents/` | The workforce roster; the definitions live in `.agents/skills/`, readable by any coding agent |
+| Agents | `integrations/` | How the repo talks to your stack: task tool, CRM, analytics, SEO — and the conventions agents follow |
+| Code | `playgrounds/` | Disposable prototypes: come to meetings with the thing itself, not a deck about it |
+| Code | `scripts/` | Deterministic helpers with no AI inside: the transcript pull, the keyword snapshot, Slack posting, the health check, the skill-link sync |
+| Data | `data/` | The machine-readable truth: keyword tables, analytics and CRM snapshots, target accounts — plus the ontology defining what your metrics mean |
+| Data | `reports/` | What the data becomes: analyses, the quarterly marketing review, self-contained HTML dashboards |
 
 ## Project status
 

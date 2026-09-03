@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Four kinds of files: the repo is explained as context, agents, code, and
+  data (with the three judgment calls on content, playgrounds, and
+  integrations) in the README, `docs/architecture.md`, and `AGENTS.md`, and
+  every top-level folder README states its kind under the H1.
 - Day in the life: `scripts/pull_transcripts.py` (Granola to
   `memory/transcripts/inbox/`, dedupes against inbox and processed) and
   `.github/workflows/transcripts-cron.yml` (daily pull, opens a PR, never

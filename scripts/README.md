@@ -1,5 +1,7 @@
 # scripts/
 
+**Kind:** code, deterministic scripts and throwaway prototypes the agent writes.
+
 Deterministic, non-AI code. Skills call these instead of reimplementing them.
 Python 3.9 or newer, standard library only unless a script says otherwise.
 
