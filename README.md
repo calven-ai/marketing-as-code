@@ -51,8 +51,9 @@ and voice, connect the agents you want, and run your marketing from here.
   [docs/architecture.md](docs/architecture.md).
 - **A default agent set** (bring your own keys). Starter agents and skills
   for onboarding, content, project scaffolding, review, meeting-transcript
-  processing, and the quarterly marketing review — with SEO analysis,
-  analytics reporting, and brand-mention tracking landing next. Each one is
+  processing, the quarterly marketing review, keyword and ranking analysis,
+  AI answer-engine mention tracking, account research, and campaign
+  discovery — with analytics reporting landing next. Each one is
   a plain text file you can read and edit, in a format Claude Code, Cursor,
   and Codex all understand.
 - **A memory that compounds.** A decision log and a living knowledge base, fed
@@ -104,7 +105,7 @@ parts for you.
 | `agents/` | The workforce roster; the definitions live in `.agents/skills/`, readable by any coding agent |
 | `integrations/` | How the repo talks to your stack: task tool, CRM, analytics, SEO — and the conventions agents follow |
 | `playgrounds/` | Disposable prototypes: come to meetings with the thing itself, not a deck about it |
-| `scripts/` | Deterministic helpers with no AI inside: the health check, the skill-link sync, and (soon) the data pulls |
+| `scripts/` | Deterministic helpers with no AI inside: the transcript pull, the keyword snapshot, Slack posting, the health check, the skill-link sync |
 | `docs/` | Guides: the review workflow, secrets, architecture, roadmap, and the start-here path for people new to GitHub |
 
 ## Project status
