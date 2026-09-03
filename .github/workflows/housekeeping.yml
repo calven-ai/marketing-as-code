@@ -4,8 +4,8 @@ name: housekeeping
 #
 # "tidy" runs scripts/lint.py --fix on the approved copy and, if anything
 # changed (a roster table, a missing .gitkeep, a file that needed renaming),
-# opens one bookkeeping proposal "Housekeeping: <date>" that check.yml then
-# approves automatically. It never merges by itself.
+# opens one bookkeeping proposal "Housekeeping: <date>" that the gate then
+# merges once the checks are green. It never merges by itself.
 #
 # "stale" marks proposals nobody touched for 14 days and closes them a week
 # later, deleting the branch. A closed proposal is not lost: sync, then ask
@@ -17,18 +17,21 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
-  issues: write
+  contents: read
 
 jobs:
   tidy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Apply the safe fixes and open a proposal if anything changed
         env:
           GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.ref_name }}
         run: |
           python3 scripts/lint.py --fix --quiet || true
           if [ -z "$(git status --porcelain)" ]; then
@@ -43,17 +46,22 @@ jobs:
           git add -A
           git commit -m "Housekeeping: $date"
           git push -u origin "$branch"
-          gh pr create --title "Housekeeping: $date" --base "${{ github.ref_name }}" --head "$branch" --body "$(cat <<'EOF'
+          gh pr create --title "Housekeeping: $date" --base "$BASE" --head "$branch" --body "$(cat <<'BODY'
           The weekly tidy-up: the safe fixes from `python3 scripts/lint.py --fix` applied to the approved copy (regenerated roster tables, missing `.gitkeep` files, line endings, file names).
 
-          Nothing here changes what the team knows; it keeps the wiring straight. If the checks are green this proposal approves itself. If you would rather look first, read the diff; it is short.
-          EOF
+          Nothing here changes what the team knows; it keeps the wiring straight. If the checks are green the gate merges this proposal. If you would rather look first, read the diff; it is short.
+          BODY
           )"
+          gh workflow run check.yml --ref "$branch"
 
   stale:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9.1.0
         with:
           days-before-issue-stale: -1
           days-before-pr-stale: 14

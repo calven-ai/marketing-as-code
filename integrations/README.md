@@ -23,6 +23,13 @@ The Env vars column mirrors `.env.example`; agents are blocked from reading
 any `.env*` file (see [docs/secrets.md](../docs/secrets.md)), so keep the
 two in sync.
 
+Who holds which key: Apify is per person (OAuth, no key); `CALVEN_MCP_KEY`
+is per person; `DATAFORSEO_*` is per person where the vendor allows;
+`GRANOLA_API_KEY` and `SLACK_BOT_TOKEN` are bot keys that live only in the
+GitHub environment `automation`. The full table, with owners, rotation and
+what to do when someone leaves, is in [docs/secrets.md](../docs/secrets.md);
+add a row there for every integration you wire.
+
 ## Known routes for common tools
 
 Not wired. Each row says how your agent would add the tool, by the tier in
@@ -47,10 +54,13 @@ three servers; Codex users paste the TOML from
 into their own config. `scripts/doctor.py` checks the two JSON files agree.
 
 - **`dataforseo`**: the official `dataforseo-mcp-server` npm package, run
-  with `npx`, credentials taken from `DATAFORSEO_LOGIN` and
-  `DATAFORSEO_PASSWORD` in your environment (the files use placeholders, so
-  they hold no values). The package also accepts `DATAFORSEO_USERNAME` as
-  an alias. A remote endpoint exists too (`https://mcp.dataforseo.com/v3/mcp`,
+  with `npx` and **pinned to a version** (`@3.1.1`), because an unpinned
+  `npx -y` would run whatever was published last, with your DataForSEO
+  login in its environment. Bump the version deliberately, in a proposal.
+  Credentials come from `DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD` in
+  your environment (the files use placeholders, so they hold no values;
+  `DATAFORSEO_USERNAME` is set to the same login because the vendor's docs
+  use that name). A remote endpoint exists too (`https://mcp.dataforseo.com/v3/mcp`,
   Basic auth header); swap the entry if you prefer not to run `npx`.
 - **`apify`**: the official remote server at `https://mcp.apify.com`,
   OAuth in the browser on first use, no key.
@@ -65,7 +75,10 @@ servers; non-interactive runs (the GitHub action, `claude -p`) load them
 without asking, which is why the entries hold placeholders and never
 values. OAuth tools need no keys at all; each person authorizes in the
 browser. For the rest, keys go in `.env` (copied from `.env.example`, never
-committed); see [docs/secrets.md](../docs/secrets.md).
+committed), and the placeholders are filled from the **environment**, not
+from `.env`: start the agent with `sh scripts/with_env.sh claude` in a
+terminal, or add the variables in the Claude desktop app's Local
+environment editor; see [docs/secrets.md](../docs/secrets.md).
 
 ## [tasks.md](tasks.md): the task-tool adapter
 

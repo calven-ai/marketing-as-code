@@ -704,18 +704,41 @@ def check_mcp_configs(ctx):
 
 
 def check_settings(ctx):
-    """.claude/settings.json parses and still keeps agents out of .env."""
-    rel = ".claude/settings.json"
+    """.claude/settings.json parses and carries every deny rule docs/secrets.md promises."""
+    spec = ctx.schema.get("settings", {})
+    rel = spec.get("file", ".claude/settings.json")
     if not ctx.exists(rel):
         return []
     try:
         data = json.loads(ctx.text(rel))
     except json.JSONDecodeError as err:
         return [Finding(ERROR, rel, f"not valid JSON: {err}", "settings")]
-    deny = data.get("permissions", {}).get("deny", [])
-    if "Read(./.env)" not in deny:
-        return [Finding(ERROR, rel, "permissions.deny must include `Read(./.env)` (docs/secrets.md)", "settings")]
-    return []
+    perms = data.get("permissions", {})
+    deny = perms.get("deny", [])
+    required = spec.get("required_deny", ["Read(./.env)"])
+    missing = [d for d in required if d not in deny]
+    out = []
+    if missing:
+        out.append(Finding(ERROR, rel, "permissions.deny is missing " + ", ".join(f"`{d}`" for d in missing)
+                           + " (docs/secrets.md)", "settings", fix=lambda: _fix_settings(ctx, rel, spec)))
+    if spec.get("disable_bypass") and perms.get("disableBypassPermissionsMode") != "disable":
+        out.append(Finding(ERROR, rel, "permissions.disableBypassPermissionsMode must be \"disable\" "
+                           "(docs/secrets.md)", "settings", fix=lambda: _fix_settings(ctx, rel, spec)))
+    return out
+
+
+def _fix_settings(ctx, rel, spec):
+    """Add the missing deny rules and the bypass switch; keep everything else."""
+    data = json.loads(ctx.text(rel))
+    perms = data.setdefault("permissions", {})
+    deny = perms.setdefault("deny", [])
+    for rule in spec.get("required_deny", []):
+        if rule not in deny:
+            deny.append(rule)
+    if spec.get("disable_bypass"):
+        perms["disableBypassPermissionsMode"] = "disable"
+    ctx.path(rel).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    ctx.forget(rel)
 
 
 def check_skills(ctx):
@@ -974,17 +997,36 @@ def apply_fixes(ctx, findings):
     return fixed
 
 
-def classify(ctx, base):
-    """bookkeeping if every changed path matches a bookkeeping glob, else needs-review."""
-    for spec in (f"{base}...HEAD", f"{base}..HEAD", base):
+# Paths that are never bookkeeping, whatever docs/schema.json says: they are
+# the machinery that decides what bookkeeping is. Hard-coded on purpose, so a
+# proposal that edits the schema cannot widen the list for itself. The gate
+# (gate.yml) runs this file from main, never from the proposal.
+NEVER_BOOKKEEPING = (
+    ".github/**", "scripts/**", "docs/schema.json", ".claude/**", ".mcp.json", ".cursor/**",
+    ".agents/**", "integrations/**", "AGENTS.md", "CLAUDE.md", ".gitignore",
+)
+
+
+def classify_paths(schema, paths):
+    """bookkeeping if every path matches a bookkeeping glob and none is machinery, else needs-review."""
+    if not paths:
+        return "needs-review"
+    never = tuple(schema.get("bookkeeping", {}).get("never", ())) + NEVER_BOOKKEEPING
+    if any(match_glob(p, n) for p in paths for n in never):
+        return "needs-review"
+    globs = schema["bookkeeping"]["globs"]
+    return "bookkeeping" if all(any(match_glob(p, g) for g in globs) for p in paths) else "needs-review"
+
+
+def classify(ctx, base, head="HEAD"):
+    """The kind of the proposal BASE...HEAD, and its changed paths."""
+    for spec in (f"{base}...{head}", f"{base}..{head}", base):
         run = subprocess.run(["git", "-C", str(ctx.root), "diff", "--name-only", spec],
                              capture_output=True, text=True)
         if run.returncode == 0:
             break
     paths = [p for p in run.stdout.split("\n") if p]
-    globs = ctx.schema["bookkeeping"]["globs"]
-    kind = "bookkeeping" if paths and all(any(match_glob(p, g) for g in globs) for p in paths) else "needs-review"
-    return kind, paths
+    return classify_paths(ctx.schema, paths), paths
 
 
 # ------------------------------------------------------------------ cli --
@@ -1017,12 +1059,18 @@ def main(argv=None):
     ap.add_argument("--json", action="store_true", help="print findings as JSON")
     ap.add_argument("--file", help="check one file only (file-level checks)")
     ap.add_argument("--classify", metavar="BASE", help="bookkeeping or needs-review vs BASE")
+    ap.add_argument("--head", default="HEAD", help="with --classify: the proposal's commit (default HEAD)")
+    ap.add_argument("--root", help="check this checkout instead of the one this script lives in "
+                                   "(the schema and the checks still come from here; gate.yml uses it)")
     ap.add_argument("--quiet", action="store_true", help="no output, exit code only")
     args = ap.parse_args(argv)
 
-    ctx = Ctx()
+    if args.root:
+        ctx = Ctx(root=Path(args.root).resolve(), schema=json.loads(SCHEMA_PATH.read_text(encoding="utf-8")))
+    else:
+        ctx = Ctx()
     if args.classify:
-        kind, paths = classify(ctx, args.classify)
+        kind, paths = classify(ctx, args.classify, args.head)
         print(kind)
         for p in paths:
             print(p)

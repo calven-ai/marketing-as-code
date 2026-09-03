@@ -1,0 +1,77 @@
+name: gate
+
+# The review gate: the one workflow that may merge, and it never runs a
+# proposal's code. `workflow_run` executes this file, scripts/review_gate.py,
+# scripts/lint.py and docs/schema.json from main, whatever the proposal
+# changed in its own copies. It runs after every `check` run, finds the
+# proposal, and:
+#
+#   - classifies it: bookkeeping (agent-maintained files only, per
+#     docs/schema.json, never the machinery) or needs-review;
+#   - pushes the safe fixes to the proposal as a Tidy commit, from main's
+#     lint, and lets the next run decide;
+#   - publishes the `review-gate` check on the proposal's head commit, which
+#     the ruleset requires;
+#   - merges a bookkeeping proposal itself, only when the health check
+#     succeeded on that exact commit; a needs-review proposal passes only
+#     once someone other than the author has approved it.
+#
+# Run it by hand with the proposal number when a check run was missed.
+# No secrets, no AI, no third-party actions.
+
+on:
+  workflow_run:
+    workflows: [check]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "Proposal number"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.event.workflow_run.head_branch || inputs.pr }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    # The required check is the `review-gate` check run this job publishes,
+    # not the job itself.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Gate the proposal from main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_INPUT: ${{ inputs.pr }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          DOCTOR: ${{ github.event.workflow_run.conclusion }}
+          PRS: ${{ toJSON(github.event.workflow_run.pull_requests) }}
+        run: |
+          n="$PR_INPUT"
+          if [ -z "$n" ] && [ -n "$PRS" ] && [ "$PRS" != "null" ]; then
+            n="$(printf '%s' "$PRS" | python3 -c 'import json,sys; p=json.load(sys.stdin); print(p[0]["number"] if p else "")')"
+          fi
+          if [ -z "$n" ] && [ -n "$HEAD_BRANCH" ] && [ "$HEAD_BRANCH" != "main" ]; then
+            n="$(gh pr list --head "$HEAD_BRANCH" --state open --json number -q '.[0].number' || true)"
+          fi
+          if [ -z "$n" ]; then
+            echo "no open proposal for this run (a push to main, or a branch without a pull request); nothing to gate"
+            exit 0
+          fi
+          case "$DOCTOR" in success|failure) ;; *) DOCTOR=none ;; esac
+          if [ -n "$PR_INPUT" ]; then HEAD_SHA=""; DOCTOR=none; fi
+          python3 scripts/review_gate.py --pr "$n" --head-sha "$HEAD_SHA" --doctor "$DOCTOR"

@@ -1,26 +1,30 @@
 #!/usr/bin/env python3
-"""The review gate CI runs on every proposal: classifies it as bookkeeping
-(agent-maintained files only, per docs/schema.json) or needs-review, labels
-it, and either merges a green bookkeeping proposal itself or, for
-needs-review, passes only once someone other than the author has approved.
-Needs gh with a token that can write pull requests. --dry-run prints
-what it would do.
+"""The review gate: run from main by gate.yml after every check run,
+never from the proposal. Classifies a proposal as bookkeeping
+(agent-maintained files only, per docs/schema.json plus the hard-coded
+never-bookkeeping list in scripts/lint.py) or needs-review, applies the
+safe fixes as a Tidy commit, labels it, publishes the `review-gate` check
+on its head commit, and merges a bookkeeping proposal itself once the
+health check succeeded on that exact commit. A needs-review proposal
+passes only when someone other than the author has approved it.
 
-Usage, from the repo root (check.yml calls it):
-    python3 scripts/review_gate.py --pr 12 --base main
-    python3 scripts/review_gate.py --pr 12 --base main --dry-run
+Usage, from a checkout of main (gate.yml calls it):
+    python3 scripts/review_gate.py --pr 12 --head-sha <sha> --doctor success
+    python3 scripts/review_gate.py --pr 12 --dry-run     # classify and say what would happen
 
-Exit 0 means "this proposal may land" (or has landed). Exit 1 means it is
-waiting for a person, with the names to ask printed in plain words. On a
-GitHub plan where the check is required, that blocks the merge button; on
-GitHub Free it is advisory (docs/github-settings.md).
+Exit 0 means "this proposal may land" (or has landed). Exit 1 means it
+waits: for a green health check, a Tidy commit's re-run, or a person. The
+check it publishes needs an Actions token (checks: write); locally, use
+--dry-run.
 """
 
 import argparse
 import fnmatch
 import json
+import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -28,12 +32,21 @@ import lint  # noqa: E402
 
 ROOT = lint.ROOT
 LABELS = {"bookkeeping": "bookkeeping", "needs-review": "needs-review"}
+CHECK = "review-gate"
+BOT_NAME, BOT_EMAIL = "github-actions[bot]", "41898282+github-actions[bot]@users.noreply.github.com"
 
 
-def gh(*args, check=True):
-    run = subprocess.run(["gh", *args], capture_output=True, text=True, cwd=str(ROOT))
+def gh(*args, check=True, cwd=None):
+    run = subprocess.run(["gh", *args], capture_output=True, text=True, cwd=str(cwd or ROOT))
     if check and run.returncode != 0:
         sys.exit(f"gh {' '.join(args[:2])} failed: {run.stderr.strip()}")
+    return run.stdout
+
+
+def git(*args, cwd=None, check=True):
+    run = subprocess.run(["git", *args], capture_output=True, text=True, cwd=str(cwd or ROOT))
+    if check and run.returncode != 0:
+        sys.exit(f"git {' '.join(args[:2])} failed: {run.stderr.strip()}")
     return run.stdout
 
 
@@ -71,43 +84,118 @@ def approvals(pr):
     return author, approved
 
 
+def publish(repo, sha, conclusion, title, summary, url=""):
+    """One completed `review-gate` check run on the commit; the ruleset requires it."""
+    args = ["api", "-X", "POST", f"repos/{repo}/check-runs", "-f", f"name={CHECK}", "-f", f"head_sha={sha}",
+            "-f", "status=completed", "-f", f"conclusion={conclusion}",
+            "-f", f"output[title]={title}", "-f", f"output[summary]={summary}"]
+    if url:
+        args += ["-f", f"details_url={url}"]
+    gh(*args)
+    print(f"{CHECK}: {conclusion}. {title}")
+
+
+def tidy(pr, head_branch, head_sha):
+    """Apply the safe fixes from main's lint to the proposal's files; push them as one Tidy commit.
+    Returns True when a commit was pushed (the new commit gets its own check and gate run)."""
+    with tempfile.TemporaryDirectory(prefix="gate-tidy-") as tmp:
+        wt = Path(tmp) / "proposal"
+        git("worktree", "add", "--detach", str(wt), head_sha)
+        try:
+            subprocess.run([sys.executable, str(ROOT / "scripts" / "lint.py"), "--fix", "--quiet", "--root", str(wt)],
+                           capture_output=True, text=True, cwd=str(ROOT))
+            if not git("status", "--porcelain", cwd=wt).strip():
+                return False
+            git("-c", f"user.name={BOT_NAME}", "-c", f"user.email={BOT_EMAIL}", "add", "-A", cwd=wt)
+            git("-c", f"user.name={BOT_NAME}", "-c", f"user.email={BOT_EMAIL}", "commit", "-q", "-m",
+                "Tidy: apply the safe fixes from scripts/lint.py", cwd=wt)
+            git("push", "origin", f"HEAD:refs/heads/{head_branch}", cwd=wt)
+            print(f"pushed a Tidy commit to {head_branch}; the check and the gate run again on it")
+            gh("workflow", "run", "check.yml", "--ref", head_branch, check=False)
+            return True
+        finally:
+            git("worktree", "remove", "--force", str(wt), check=False)
+
+
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Classify, label and gate a proposal.")
+    ap = argparse.ArgumentParser(description="Classify, tidy, label and gate a proposal from main.")
     ap.add_argument("--pr", required=True, type=int)
-    ap.add_argument("--base", default="origin/main")
+    ap.add_argument("--head-sha", default="", help="the commit the triggering check ran on")
+    ap.add_argument("--doctor", default="none", choices=["success", "failure", "none"],
+                    help="how the check's doctor job concluded on that commit")
+    ap.add_argument("--no-tidy", action="store_true", help="do not push safe fixes to the proposal")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
 
-    ctx = lint.Ctx()
-    kind, paths = lint.classify(ctx, args.base)
-    print(f"proposal #{args.pr}: {kind} ({len(paths)} files)")
+    view = json.loads(gh("pr", "view", str(args.pr), "--json",
+                         "number,state,url,isCrossRepository,headRefName,headRefOid,baseRefName"))
+    if view.get("state") != "OPEN":
+        print(f"proposal #{args.pr} is {view.get('state', 'unknown').lower()}; nothing to do")
+        return 0
+    head_sha, head_branch = view["headRefOid"], view["headRefName"]
+    base = view.get("baseRefName") or "main"
+    fork = bool(view.get("isCrossRepository"))
+    if args.head_sha and args.head_sha != head_sha:
+        print(f"proposal #{args.pr} moved on since this check ran ({args.head_sha[:7]} -> {head_sha[:7]}); "
+              "the run on the newer commit decides")
+        return 0
+    repo = os.environ.get("GITHUB_REPOSITORY") or json.loads(gh("repo", "view", "--json", "nameWithOwner"))["nameWithOwner"]
+
+    if not fork:
+        git("fetch", "-q", "origin", base, head_branch)
+    else:
+        git("fetch", "-q", "origin", base, f"pull/{args.pr}/head")  # a fork's commits, without its remote
+    ctx = lint.Ctx()  # main's schema and checks, whatever the proposal did to its own copies
+    kind, paths = lint.classify(ctx, f"origin/{base}", head_sha)
+    if fork:
+        kind = "needs-review"
+    print(f"proposal #{args.pr}: {kind} ({len(paths)} files{', from a fork' if fork else ''})")
     for p in paths:
         print(f"  {p}")
 
     if args.dry_run:
-        print("dry run: would " + ("merge it once the checks are green." if kind == "bookkeeping"
-                                    else f"wait for an approval from {', '.join(codeowners_for(paths)) or 'a teammate'}."))
+        if kind == "bookkeeping":
+            print("dry run: would merge it once the health check is green on this commit.")
+        else:
+            print("dry run: would wait for an approval from "
+                  f"{', '.join(codeowners_for(paths)) or 'a teammate who is not the author'}.")
         return 0
+
+    if not fork and not args.no_tidy and tidy(args.pr, head_branch, head_sha):
+        return 1  # the Tidy commit's own run decides
+
     other = [v for k, v in LABELS.items() if k != kind][0]
     gh("pr", "edit", str(args.pr), "--add-label", LABELS[kind], "--remove-label", other, check=False)
 
     if kind == "bookkeeping":
-        print("bookkeeping only: the checks are green, so this proposal approves itself.")
-        # --auto waits for every required check (including this one) on plans
-        # that enforce rulesets; where auto-merge is unavailable, merge now.
-        if subprocess.run(["gh", "pr", "merge", str(args.pr), "--auto", "--squash", "--delete-branch"],
-                          capture_output=True, text=True, cwd=str(ROOT)).returncode != 0:
-            gh("pr", "merge", str(args.pr), "--squash", "--delete-branch")
+        if args.doctor != "success":
+            publish(repo, head_sha, "failure", "Waiting for a green health check",
+                    "This proposal only touches files the agents maintain (bookkeeping), so it merges itself, "
+                    "but only once the health check passes on this exact commit. Fix what the check names, or "
+                    "run `python3 scripts/doctor.py --fix`.", view["url"])
+            return 1
+        publish(repo, head_sha, "success", "Bookkeeping: merging",
+                "Only agent-maintained files changed and the health check passed on this commit, so the gate on "
+                "main merges this proposal itself (docs/workflow.md).", view["url"])
+        run = subprocess.run(["gh", "pr", "merge", str(args.pr), "--squash", "--delete-branch",
+                              "--match-head-commit", head_sha], capture_output=True, text=True, cwd=str(ROOT))
+        if run.returncode != 0:
+            print(f"merge refused: {run.stderr.strip()}")
+            print("The proposal stays open; a person can merge it, or the next gate run retries.")
+            return 1
+        print("merged.")
         return 0
 
     author, approved = approvals(args.pr)
     if approved:
-        print(f"approved by {', '.join(approved)}; this proposal may land.")
+        publish(repo, head_sha, "success", f"Approved by {', '.join(approved)}",
+                "A person who is not the author read the diff and approved it; this proposal may land.", view["url"])
         return 0
     owners = codeowners_for(paths)
     ask = ", ".join(owners) if owners else "a teammate who is not the author"
-    print(f"waiting for approval from {ask} (the author, {author or 'unknown'}, cannot approve their own proposal).")
-    print("Nothing is wrong with the files; a person reads the diff, then approves or requests changes.")
+    publish(repo, head_sha, "action_required", f"Waiting for approval from {ask}",
+            f"This proposal needs a person to read the diff and approve it (the author, {author or 'unknown'}, "
+            "cannot approve their own). Nothing is wrong with the files.", view["url"])
     return 1
 
 

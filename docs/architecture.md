@@ -429,22 +429,35 @@ integrations work headless) is written down once in
 The audience is a marketing team; the runners GitHub already gives them
 are the only infrastructure this design assumes.
 
-## Secrets: three tiers
+## Secrets: your keys and the bot keys
 
-Documented fully in `docs/secrets.md` (roadmap wave 1):
+Documented fully in `docs/secrets.md`. Two facts shape it: a secret in
+GitHub can be read by nobody except a workflow job, so it serves
+unattended runs only; and a key in a commit is burned.
 
 1. **Prefer OAuth remote MCPs** (Asana, monday, HubSpot, Apify). No key
    exists, so no key can leak or need sharing. This quietly solves most of
    the problem.
-2. **Local API keys** (DataForSEO, PostHog, Granola): `.env` copied from
-   `.env.example`, gitignored. For team sharing, use a secrets manager CLI
-   (1Password recommended): commit `.env.op` containing `op://` *references*
-   (not values) and run tooling via `op run --env-file=.env.op`. Bitwarden
-   Secrets Manager is the alternative. Never paste keys in Slack.
-3. **CI keys** (the transcript cron): GitHub Actions repository secrets.
+2. **Your keys** (Calven, DataForSEO): each person is invited to the vendor
+   and makes their own, kept in their own untracked `.env` (values, or
+   `op://` references resolved by `scripts/with_env.sh` through the
+   1Password CLI) and their own vault item. Nobody shares a personal key.
+3. **The bot keys** (Granola for the cron, the Slack bot, the Anthropic key
+   for the agent in Actions): one integrations owner makes them, keeps
+   them in the shared vault, and puts them in the GitHub environment
+   `automation`, which only `main` may use. No repository secrets.
+
+The agent in Actions is treated as something that can be talked into
+anything by the transcript it reads: no shell, no network, no Slack
+token, one branch to commit to, and a gate that runs from `main`
+(`.github/workflows/gate.yml`) decides what lands.
 
 *Rejected:* encrypted secrets committed in-repo (sops/age): a key-management
-ceremony this audience will get wrong.
+ceremony this audience will get wrong. *Rejected:* a committed `.env.op`
+of references: it fights the `.env*` gitignore and the lint for no gain
+over references inside the untracked `.env`. *Rejected:* GitHub Codespaces
+as the way to hand shared keys to laptops: it adds a runtime and a bill
+where per-person vendor keys already solve the problem.
 
 ## The routing design: "how many people attended event X and then signed up?"
 

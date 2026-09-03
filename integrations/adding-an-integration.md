@@ -45,7 +45,8 @@ Move down a tier only for one of these reasons, and say which in the PR:
    slow or wasteful.
 
 Never, at any tier: put a key value in `.mcp.json` or any committed file
-(env placeholders only; see below), read `.env` from an agent, or wire a
+(env placeholders only; see below), read `.env` from an agent, run an
+unpinned package (`npx -y name@1.2.3`, never `npx -y name`), or wire a
 tool nobody asked for.
 
 ## Known routes for common tools
@@ -180,8 +181,15 @@ One PR, reviewed like any other, with this list in its description:
 - [ ] For tier 1: the `.mcp.json` entry, the matching `.cursor/mcp.json`
       entry, and the Codex TOML snippet in the PR description
 - [ ] For tier 2 or 3: the script (contract above) and its
-      `scripts/README.md` row; for a scheduled run, the workflow step and
-      the repository secret it needs
+      `scripts/README.md` row; for a scheduled run, the workflow step
+      (`environment: automation` on the job) and the environment secret
+      it needs
+- [ ] A row in the "Who holds which key" table in
+      [docs/secrets.md](../docs/secrets.md): per person or bot, who owns
+      it, where it lives, how to rotate it
+- [ ] Every package or action the integration runs is pinned (an npm
+      version, a commit SHA), and the vendor's own server is preferred
+      over a community one
 - [ ] The skills that change: which `SKILL.md` "Needs:" line now names the
       tool, and what the skill does when it is not connected (say what
       export to drop where; never guess numbers)

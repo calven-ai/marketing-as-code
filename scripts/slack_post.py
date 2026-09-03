@@ -41,7 +41,7 @@ CHANNEL_VARS = {
 }
 
 
-def resolve_channel(arg, env_file):
+def resolve_channel(arg, env_file, allow_any=False):
     if arg in CHANNEL_VARS:
         var = CHANNEL_VARS[arg]
         value = setting(var, env_file)
@@ -50,18 +50,24 @@ def resolve_channel(arg, env_file):
                      "See integrations/slack/README.md.")
         return value
     if arg.startswith(("C", "G", "D")) and len(arg) >= 9 and arg.isalnum():
-        return arg
+        if allow_any:
+            return arg
+        sys.exit(f"error: {arg} is not one of the configured channels (team, requests, leadership). "
+                 "The bot posts only where the team configured it; a person who means to post elsewhere "
+                 "passes --allow-any-channel.")
     sys.exit(f"error: unknown channel {arg!r}. Use team, requests, leadership, "
-             "or a Slack channel ID such as C0123ABCD.")
+             "or, with --allow-any-channel, a Slack channel ID such as C0123ABCD.")
 
 
 def main():
     ap = argparse.ArgumentParser(description="Post a message to Slack as the team's bot.")
     ap.add_argument("--channel", required=True,
-                    help="team | requests | leadership | <channel id>")
+                    help="team | requests | leadership (a raw channel id needs --allow-any-channel)")
     ap.add_argument("--text", help="message text; read from stdin when omitted")
     ap.add_argument("--thread", metavar="TS",
                     help="reply in the thread with this message timestamp")
+    ap.add_argument("--allow-any-channel", action="store_true",
+                    help="accept a raw channel ID outside the three configured channels")
     ap.add_argument("--dry-run", action="store_true",
                     help="print the payload instead of sending it")
     args = ap.parse_args()
@@ -72,7 +78,7 @@ def main():
         sys.exit("error: nothing to post. Pass --text or pipe the message on stdin.")
 
     env_file = read_env_file(ENV_FILE)
-    payload = {"channel": resolve_channel(args.channel, env_file), "text": text}
+    payload = {"channel": resolve_channel(args.channel, env_file, args.allow_any_channel), "text": text}
     if args.thread:
         payload["thread_ts"] = args.thread
 

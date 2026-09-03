@@ -28,12 +28,17 @@ personal account, and that the only secret is one bot token.
    "Interactivity".
 4. On the app page, click **Install to Workspace** and **Allow**.
 5. Copy the **Bot User OAuth Token** (starts with `xoxb-`). This is the only
-   secret the app produces. Do not paste it in Slack; put it in the team's
-   password manager and share it with whoever owns the repo's integrations,
-   per [docs/secrets.md](../../docs/secrets.md).
-6. In Slack, open the requests channel (`#marketing-requests` is the
-   convention) and type `/invite @Marketing Bot`. Do the same in the team
-   channel (`#marketing`) so the bot is visible there.
+   secret the app produces, and it is a bot key: it goes in the team's
+   password manager and in the GitHub environment `automation`, and
+   nowhere else. Do not paste it in Slack or send it to a teammate; hand
+   it to whoever owns the repo's integrations, per
+   [docs/secrets.md](../../docs/secrets.md).
+6. In Slack, `/invite @Marketing Bot` to the requests channel
+   (`#marketing-requests` is the convention), the team channel
+   (`#marketing`) and the leadership channel. This step is not optional:
+   the app has no permission to join or post in a channel it was not
+   invited to, on purpose, so the team's three channels are the only
+   places the bot can ever write.
 7. Get the channel IDs: open the channel, click its name, scroll to the
    bottom of the "About" tab; the ID looks like `C0123ABCD`. These are not
    secrets.
@@ -45,7 +50,7 @@ this issues a new token and invalidates the old one.
 
 | Name | What | Where | Secret? |
 | --- | --- | --- | --- |
-| `SLACK_BOT_TOKEN` | the `xoxb-` token from step 5 | GitHub: repo **Settings → Secrets and variables → Actions → Secrets**; locally in `.env` | yes |
+| `SLACK_BOT_TOKEN` | the `xoxb-` token from step 5 | GitHub: repo **Settings → Environments → `automation` → Environment secrets** (only jobs on `main` can read it); the integrations owner's `.env` for hand runs | yes |
 | `SLACK_REQUESTS_CHANNEL_ID` | ID of the requests channel | same page, **Variables** tab; and `.env` | no |
 | `SLACK_TEAM_CHANNEL_ID` | ID of the team channel | same page, **Variables** tab; and `.env` | no |
 | `SLACK_LEADERSHIP_CHANNEL_ID` | ID of the leadership channel | same page, **Variables** tab; and `.env` | no |
@@ -56,7 +61,9 @@ Request URL and no Socket Mode. The four names mirror
 [`integrations/README.md`](../README.md). Red flags found while processing
 transcripts (slipped deadlines, blockers, customer escalations) go to the
 leadership channel; the "Transcript processed" summary goes to the team
-channel. Invite the bot to the leadership channel too.
+channel. When the agent in Actions did the processing, the unattended
+message is only a pointer to the proposal; the summary itself is posted
+by a person after review.
 
 Posting from a script or a skill:
 
@@ -65,6 +72,10 @@ python3 scripts/slack_post.py --channel team --text "Transcript processed: ..."
 python3 scripts/slack_post.py --channel leadership --text "Red flags from 2026-09-03-weekly-sync: ..."
 python3 scripts/slack_post.py --channel team --text "..." --dry-run   # prints the payload, sends nothing
 ```
+
+`--channel` accepts only the three configured names. A raw channel ID
+needs `--allow-any-channel`, which a person passes on purpose and no
+workflow or skill does.
 
 ## How the bot behaves (the contract every script and skill follows)
 

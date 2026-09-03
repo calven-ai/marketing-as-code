@@ -33,20 +33,26 @@ can run with nobody watching. Two flavours:
 
 - **Scripts only** (shipped, the default). A scheduled workflow runs a
   deterministic script and opens a pull request with the result; it never
-  merges. Keys come from repository secrets
-  ([secrets.md](secrets.md), tier 3). `transcripts-cron.yml` (Granola into
-  the inbox, daily), `check.yml` (the health check on every proposal, which
-  also approves bookkeeping proposals) and `housekeeping.yml` (the weekly
+  merges. Keys come from the `automation` environment, which only `main`
+  may use ([secrets.md](secrets.md)). `transcripts-cron.yml` (Granola into
+  the inbox, daily), `check.yml` (the health check on every proposal),
+  `gate.yml` (the review gate, run from `main`, which merges bookkeeping
+  proposals once the check is green) and `housekeeping.yml` (the weekly
   tidy-up) are the shipped examples.
 - **An agent in Actions** (opt-in). A workflow runs a Claude Code agent on
-  a schedule or on a trigger, with a skill as its prompt, and the agent
-  opens a pull request. It never merges, publishes, or sends. It needs an
-  Anthropic API key as a repository secret and pays per token.
-  `transcripts-process.yml` is the shipped example: it does nothing until
-  the `ANTHROPIC_API_KEY` secret exists. Two limits in this mode: OAuth
-  MCP servers cannot run headless, so only key-based servers and scripts
-  work; and project MCP servers load without the usual prompt, which is
-  why `.mcp.json` entries hold placeholders and never values.
+  a schedule or on a trigger, with a skill as its prompt. The agent can
+  read the repo, edit files and commit them to its own branch, and nothing
+  else: no shell, no network, no Slack token, no way to open, approve or
+  merge a pull request. Plain steps after it open the pull request and
+  post a fixed Slack pointer. It needs an Anthropic API key in the
+  `automation` environment and pays per token. `transcripts-process.yml`
+  is the shipped example: it does nothing until `ANTHROPIC_API_KEY`
+  exists. Three limits in this mode: OAuth MCP servers cannot run
+  headless, so only key-based servers and scripts work; project MCP
+  servers load without the usual prompt, which is why `.mcp.json` entries
+  hold placeholders and never values; and the agent reads whatever the
+  input holds, so an unattended agent is given as little as possible and
+  its output is always a proposal a person reads (AGENTS.md rule 11).
 
 ### 3. A session a person starts from Slack or the cloud (optional)
 
@@ -69,7 +75,7 @@ GitHub Actions on a schedule. Both are legitimate. The trade-off:
 | Cost | The coding-agent subscription the person already has; no API key | An API key as a repository secret, billed per token for agent runs; scripts cost nothing beyond the vendor's data bill |
 | Latency | When someone remembers | Same day, every day; nobody has to remember |
 | Human in the loop | By construction: the person watches the run and reads the diff | At review: the PR is the only checkpoint, so the PR description must carry the full summary |
-| Integrations | Everything, including OAuth MCP servers authorized in the browser | Key-based only; integration keys also become repository secrets |
+| Integrations | Everything, including OAuth MCP servers authorized in the browser | Key-based only; integration keys become secrets in the `automation` environment |
 | Review load | The same: a PR either way for anything that cascades | The same |
 | What can go wrong | It is not run | It runs on bad input with nobody watching; the PR catches it, if someone reads PRs |
 
@@ -93,7 +99,14 @@ Whatever the mode, these need a person, every time (AGENTS.md rule 3,
   tool.
 - Edits that cascade: `strategy/`, `brand/`, `data/ontology/`, pricing,
   and any published claim.
-- Merging. Merging is the approval, and only a person merges.
+- Merging. Merging is the approval, and a person merges everything
+  except bookkeeping: a proposal that touches only agent-maintained files
+  (status entries, decision-log appends, snapshots, the transcript inbox,
+  recurring reports) is merged by the gate on `main` once the health check
+  is green, because nobody should have to merge a snapshot. The list of
+  what counts is `bookkeeping` in `docs/schema.json`, and the machinery
+  that decides it (workflows, scripts, the schema, the skills, the agent
+  settings) is never bookkeeping.
 
 ## Who triggers what
 
@@ -108,7 +121,8 @@ Whatever the mode, these need a person, every time (AGENTS.md rule 3,
 | Account research | `/researcher` (Apify MCP, OAuth) | Not headless |
 | Campaign discovery, content, review, prototypes, projects | Always a person | Never |
 | Slack digests and alerts | `python3 scripts/slack_post.py` from a skill | Scheduled workflows calling the same script, yours to add; the message table is in `integrations/slack/README.md` |
-| Health check | `python3 scripts/doctor.py` | `check.yml` on every proposal and on `main`: tests the lint, pushes the safe fixes, annotates, labels, and merges bookkeeping proposals (shipped) |
+| Health check | `python3 scripts/doctor.py` | `check.yml` on every proposal and on `main`: tests the lint, annotates, keeps the sticky comment current; read-only, no secrets (shipped) |
+| Review gate | `python3 scripts/review_gate.py --pr N --dry-run` | `gate.yml` after every check run, from `main`: classifies, pushes the safe fixes as a Tidy commit, labels, publishes `review-gate`, merges green bookkeeping proposals (shipped) |
 | Tidy the approved copy | `python3 scripts/doctor.py --fix` | `housekeeping.yml`, Mondays: the safe fixes as one bookkeeping proposal; stale proposals closed after three weeks (shipped) |
 | Repository settings | `sh scripts/github_setup.sh`, then `python3 scripts/doctor.py --github` | Never; settings are applied once by an admin ([github-settings.md](github-settings.md)) |
 

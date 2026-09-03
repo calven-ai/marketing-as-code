@@ -1,0 +1,11 @@
+# Keeps the pinned GitHub Actions current. Every `uses:` in
+# .github/workflows/ is pinned to a commit SHA with the version in a
+# comment; Dependabot opens a needs-review proposal when a new release
+# exists, so nobody edits a SHA by hand (docs/github-settings.md).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels: [needs-review]

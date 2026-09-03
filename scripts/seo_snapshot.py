@@ -22,28 +22,23 @@ import base64
 import csv
 import datetime as dt
 import json
-import os
 import sys
 import urllib.error
 import urllib.request
 
-from _common import ROOT as REPO, read_env_file, snapshot_path
+from _common import ROOT as REPO, setting, snapshot_path
 
 API = "https://api.dataforseo.com/v3"
 KEYWORDS = REPO / "data" / "seo" / "keywords.csv"
 COLUMNS = ["keyword", "volume", "difficulty", "rank", "url", "checked"]
 
 
-def load_env():
-    """Fill os.environ from the repo .env for keys not already set."""
-    for key, value in read_env_file().items():
-        os.environ.setdefault(key, value)
-
-
 def call(endpoint, payload):
     """POST one task list to a DataForSEO endpoint and return the JSON body."""
-    login = os.environ.get("DATAFORSEO_LOGIN")
-    password = os.environ.get("DATAFORSEO_PASSWORD")
+    # Only the two variables this script needs are read; nothing else in .env
+    # enters the process (scripts/_common.py).
+    login = setting("DATAFORSEO_LOGIN")
+    password = setting("DATAFORSEO_PASSWORD")
     if not login or not password:
         sys.exit("DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD are not set. "
                  "See integrations/README.md.")
@@ -131,7 +126,6 @@ def main():
     parser.add_argument("--language", default="en")
     args = parser.parse_args()
 
-    load_env()
     existing = read_keywords()
     keywords = [row["keyword"] for row in existing]
     today = dt.date.today().isoformat()

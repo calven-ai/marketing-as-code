@@ -17,6 +17,7 @@ print what they find there.
 
 import os
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
@@ -41,10 +42,18 @@ def read_env_file(path=ENV_FILE):
 
 
 def setting(name, env_file=None):
-    """The value of NAME: the environment wins, then the .env file, else ""."""
+    """The value of NAME: the environment wins, then the .env file, else "".
+
+    A 1Password reference (op://...) is not a value: it resolves only when the
+    command runs through `op run`, which scripts/with_env.sh does for you.
+    """
     if env_file is None:
         env_file = read_env_file()
-    return os.environ.get(name) or env_file.get(name) or ""
+    value = os.environ.get(name) or env_file.get(name) or ""
+    if value.startswith("op://"):
+        sys.exit(f"{name} is a 1Password reference, not a value. Start the command through "
+                 "`sh scripts/with_env.sh <command>` (or `op run`) so it resolves; docs/secrets.md.")
+    return value
 
 
 def snapshot_path(domain, source, what, ext="csv", day=None):

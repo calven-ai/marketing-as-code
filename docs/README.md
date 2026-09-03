@@ -16,11 +16,13 @@ Guides for running your marketing from this repo.
 - [operating-model.md](operating-model.md): where things run (a person at a
   coding agent, GitHub Actions, never a server), the two ways to run any
   recurring workflow and their trade-off, and what never runs unattended.
-- [secrets.md](secrets.md): API keys without the pain: OAuth first, local
-  `.env`, team sharing via a secrets manager.
+- [secrets.md](secrets.md): who holds which key and where it lives: your
+  keys on your machine, the bot keys in a GitHub environment only `main`
+  can use, what the agent can and cannot read, rotation and leaving.
 - [github-settings.md](github-settings.md): the repository settings the
-  lifecycle assumes, the script that applies them, and which GitHub plan
-  enforces them.
+  lifecycle assumes (the read-only check, the gate that runs from `main`,
+  the `automation` environment, pinned actions, secret scanning), the
+  script that applies them, and which GitHub plan enforces them.
 - [schema.json](schema.json): what "valid" means here, in one machine- and
   human-readable file: frontmatter per folder, naming rules, CSV headers,
   which files count as bookkeeping. `scripts/lint.py` enforces it.

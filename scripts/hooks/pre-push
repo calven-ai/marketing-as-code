@@ -1,0 +1,22 @@
+#!/bin/sh
+# Refuses a push straight to main and runs the lint before any push.
+# Enable once per clone:  git config core.hooksPath scripts/hooks
+# scripts/doctor.py reminds you when it is not set. docs/workflow.md.
+#
+# An admin who really means to push to main:  ALLOW_MAIN_PUSH=1 git push ...
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master)
+      if [ "${ALLOW_MAIN_PUSH:-}" != "1" ]; then
+        echo "pre-push: refusing to push straight to main. Push a branch and open a pull request instead (docs/workflow.md)." >&2
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+if ! python3 scripts/lint.py --quiet; then
+  echo "pre-push: the lint found problems; run python3 scripts/doctor.py and fix what it names." >&2
+  exit 1
+fi

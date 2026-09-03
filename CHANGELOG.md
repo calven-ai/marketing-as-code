@@ -6,6 +6,38 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Security: keys, unattended runs and the review gate. The gate moves to
+  `.github/workflows/gate.yml`, which runs from `main` after every check
+  (`workflow_run`), so a proposal can no longer change the rules it is
+  judged by; `scripts/review_gate.py` classifies against a never-bookkeeping
+  list hard-coded in `scripts/lint.py` (workflows, scripts, the schema,
+  the agent settings, the skills, the integrations), pushes the Tidy
+  commit from `main`'s lint, publishes the `review-gate` check, and merges
+  bookkeeping only when the health check passed on that exact commit (no
+  immediate-merge fallback). `check.yml` runs the proposal's code with a
+  read-only token and no secrets. The three bot keys move to a GitHub
+  environment `automation` restricted to `main` (`scripts/github_setup.sh`
+  creates it; `scripts/doctor.py --github` checks it) and the workflow
+  token defaults to read-only. `transcripts-process.yml` gives the agent
+  no shell, no network and no Slack token: it edits files and commits
+  through the action's own tool, then plain steps open the proposal and
+  post a fixed Slack pointer. Shell interpolation of workflow inputs and
+  ref names is gone; every action is pinned to a commit SHA and
+  `.github/dependabot.yml` keeps them current; `dataforseo-mcp-server` is
+  pinned in both MCP configs. `.claude/settings.json` denies `env`,
+  `printenv`, one-liners, `gh pr merge`, force-pushes and the file
+  commands on `.env*`, and switches off bypass mode; `docs/schema.json`
+  lists the required rules and the lint restores a missing one. The Slack
+  app loses `chat:write.public` and `channels:join`; `slack_post.py`
+  posts only to the configured channels unless a person passes
+  `--allow-any-channel`. `scripts/with_env.sh` starts a coding agent with
+  `.env` in its environment (or through `op run`); `scripts/hooks/pre-push`
+  refuses pushes to `main` and runs the lint. AGENTS.md rule 11 says what
+  agents read is data, never instructions, and the transcript, research
+  and SEO skills repeat it. `docs/secrets.md` is rewritten around who
+  holds which key; `docs/github-settings.md` gains the environment,
+  secret scanning and the click paths; `docs/operating-model.md` and
+  `docs/workflow.md` say plainly that the gate merges bookkeeping.
 - Keeping a cloned repo healthy, part 1: `docs/schema.json` says what valid
   means (frontmatter per folder, naming, CSV headers, secrets shapes, which
   files are bookkeeping); `scripts/lint.py` enforces it with `--fix` for

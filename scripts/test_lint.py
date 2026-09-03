@@ -44,7 +44,8 @@ def make_repo(root):
     mcp = {"mcpServers": {"dataforseo": {"command": "npx", "env": {"DATAFORSEO_LOGIN": "${DATAFORSEO_LOGIN}"}}}}
     write(root, ".mcp.json", json.dumps(mcp))
     write(root, ".cursor/mcp.json", json.dumps(mcp).replace("${", "${env:"))
-    write(root, ".claude/settings.json", json.dumps({"permissions": {"deny": ["Read(./.env)", "Read(./.env.*)"]}}))
+    write(root, ".claude/settings.json", json.dumps({"permissions": {
+        "deny": list(SCHEMA["settings"]["required_deny"]), "disableBypassPermissionsMode": "disable"}}))
     write(root, "integrations/README.md", "# integrations\n\n`DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD`\n")
     write(root, "memory/decision-log.md", "# Decision log\n\nFormat.\n\n---\n")
     write(root, "content/README.md", "# content\n\n  status: idea | brief | draft | in-review | published | evergreen\n"
@@ -302,6 +303,19 @@ class TestConfigs(LintCase):
         write(self.root, ".claude/settings.json", json.dumps({"permissions": {"deny": []}}))
         self.assertTrue(self.findings("settings", lint.ERROR))
 
+    def test_settings_one_missing_rule_is_fixable(self):
+        deny = [d for d in SCHEMA["settings"]["required_deny"] if d != "Bash(env)"]
+        write(self.root, ".claude/settings.json", json.dumps({"permissions": {"deny": deny, "allow": ["Bash(ls)"]}}))
+        found = self.findings("settings", lint.ERROR)
+        self.assertTrue(found and all(f.fixable for f in found))
+        self.assertTrue(any("Bash(env)" in f.message for f in found))
+        self.assertTrue(any("disableBypassPermissionsMode" in f.message for f in found))
+        self.fix()
+        self.assertFalse(self.findings("settings"))
+        data = json.loads((self.root / ".claude/settings.json").read_text())
+        self.assertEqual(["Bash(ls)"], data["permissions"]["allow"])
+        self.assertEqual("disable", data["permissions"]["disableBypassPermissionsMode"])
+
 
 class TestSkillsAndDocs(LintCase):
     def test_skill_name_and_metadata(self):
@@ -341,6 +355,25 @@ class TestClassify(unittest.TestCase):
         for path in ["projects/launch/brief.md", "strategy/positioning.md", "content/2026-09-x/draft.md",
                      "reports/adhoc/2026-01-01-q/report.md", ".agents/skills/review/SKILL.md"]:
             self.assertFalse(any(lint.match_glob(path, g) for g in globs), path)
+
+    def test_classify_paths(self):
+        cp = lint.classify_paths
+        self.assertEqual("needs-review", cp(SCHEMA, []))
+        self.assertEqual("bookkeeping", cp(SCHEMA, ["memory/decision-log.md", "data/seo/snapshots/2026-01-01-x-y.csv"]))
+        self.assertEqual("needs-review", cp(SCHEMA, ["memory/decision-log.md", "strategy/positioning.md"]))
+        for machinery in ["docs/schema.json", "scripts/review_gate.py", ".github/workflows/gate.yml",
+                          ".claude/settings.json", ".mcp.json", ".cursor/mcp.json", "AGENTS.md", ".gitignore",
+                          ".agents/skills/review/SKILL.md", "integrations/README.md"]:
+            self.assertEqual("needs-review", cp(SCHEMA, ["memory/decision-log.md", machinery]), machinery)
+
+    def test_schema_cannot_widen_bookkeeping(self):
+        """A proposal that edits the schema to call itself bookkeeping is still needs-review."""
+        widened = json.loads(json.dumps(SCHEMA))
+        widened["bookkeeping"]["globs"] = ["**"]
+        widened["bookkeeping"]["never"] = []
+        self.assertEqual("needs-review", lint.classify_paths(widened, ["docs/schema.json"]))
+        self.assertEqual("needs-review", lint.classify_paths(widened, ["scripts/lint.py", "memory/decision-log.md"]))
+        self.assertEqual("bookkeeping", lint.classify_paths(widened, ["strategy/positioning.md"]))  # globs still apply below the constant
 
     def test_match_glob(self):
         self.assertTrue(lint.match_glob("a/b/c.md", "a/**"))

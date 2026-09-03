@@ -8,7 +8,8 @@
 #
 # What it sets: proposals land as one squashed commit, their branches are
 # deleted on merge, auto-merge is allowed (bookkeeping proposals use it), the
-# three labels exist, and a ruleset named "main" requires a pull request with
+# three labels exist, the workflow token is read-only by default, the bot keys
+# have an environment only main may use, and a ruleset named "main" requires a pull request with
 # the "doctor" and "review-gate" checks green before anything reaches the
 # approved copy. Rulesets are enforced on public repositories and on private
 # ones under GitHub Pro or Team; on GitHub Free private repositories they are
@@ -40,7 +41,20 @@ for label in "bookkeeping:0E8A16:Only agent-maintained files; approves itself wh
   echo "   $name"
 done
 
-echo "3. ruleset 'main': pull request required, squash only, checks doctor + review-gate, no deletion, no force-push"
+echo "3. workflow token: read-only by default, and Actions may not approve pull requests"
+$dry gh api -X PUT "repos/$repo/actions/permissions/workflow" \
+  -f default_workflow_permissions=read -F can_approve_pull_request_reviews=false >/dev/null
+
+echo "4. environment 'automation': the bot keys live here, and only main may use it"
+$dry gh api -X PUT "repos/$repo/environments/automation" --input - <<EOF >/dev/null
+{"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}
+EOF
+if ! $dry gh api -X POST "repos/$repo/environments/automation/deployment-branch-policies" \
+     -f name=main -f type=branch >/dev/null 2>&1; then
+  echo "   (branch policy already present, or not available on this plan; docs/github-settings.md)"
+fi
+
+echo "5. ruleset 'main': pull request required, code-owner review, squash only, checks doctor + review-gate, no deletion, no force-push"
 existing="$(gh api "repos/$repo/rulesets" -q '.[] | select(.name=="main") | .id' 2>/dev/null || true)"
 body='{
   "name": "main",
@@ -54,7 +68,7 @@ body='{
     {"type": "pull_request", "parameters": {
       "required_approving_review_count": 0,
       "dismiss_stale_reviews_on_push": false,
-      "require_code_owner_review": false,
+      "require_code_owner_review": true,
       "require_last_push_approval": false,
       "required_review_thread_resolution": false,
       "allowed_merge_methods": ["squash"]}},
@@ -85,7 +99,10 @@ if [ "$private" = "true" ]; then
 else
   echo "  - Public repository: rulesets are enforced on every plan."
 fi
-echo "  - Repository secrets for the optional automations (ANTHROPIC_API_KEY, SLACK_BOT_TOKEN, GRANOLA_API_KEY)"
-echo "    live under Settings -> Secrets and variables -> Actions; docs/secrets.md."
+echo "  - The bot keys for the optional automations (ANTHROPIC_API_KEY, GRANOLA_API_KEY, SLACK_BOT_TOKEN) go in"
+echo "    Settings -> Environments -> automation -> Environment secrets, never in repository secrets; docs/secrets.md."
+echo "  - Secret scanning and push protection: Settings -> Advanced Security (free on public repositories;"
+echo "    private ones need the GitHub Secret Protection add-on on the Team plan); docs/github-settings.md."
 echo "  - .github/CODEOWNERS names who is asked to review; replace the placeholder with real GitHub handles."
+echo "  - Each clone turns on the pre-push hook once: git config core.hooksPath scripts/hooks"
 echo "done; python3 scripts/doctor.py --github re-checks these settings any time."

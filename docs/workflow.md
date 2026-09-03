@@ -15,7 +15,9 @@ entirely? Start with [new-to-github.md](new-to-github.md).)
    lines. The PR template's checklist is the reviewer's list: on-strategy,
    on-voice, numbers traceable, no credentials, decisions logged.
 4. **The human merges.** Merging *is* the approval. Agents never merge,
-   publish, or send.
+   publish, or send. The one exception is bookkeeping (below), which the
+   gate on `main` merges once the check is green, and the gate is a script
+   a person can read, not an agent.
 
 ## What must always take this path
 
@@ -23,25 +25,30 @@ entirely? Start with [new-to-github.md](new-to-github.md).)
 - Anything sent to the outside world: emails, social posts, website changes
 - Strategy, brand, and ontology changes: these cascade everywhere
 - Automated pipelines: anything running in GitHub Actions, script or agent,
-  opens proposals; only the check merges, and only bookkeeping ones
+  opens proposals; only the gate merges, and only bookkeeping ones
   ([operating-model.md](operating-model.md))
 
 ## Two kinds of proposals, one path
 
 Every change travels the same way: a branch and a pull request, which this
-repo calls a proposal. The check (`.github/workflows/check.yml`) then sorts
-it into one of two kinds:
+repo calls a proposal. The check (`.github/workflows/check.yml`) tests it,
+and the gate (`.github/workflows/gate.yml`, which runs from the approved
+copy so a proposal cannot change the rules it is judged by) sorts it into
+one of two kinds:
 
 - **Bookkeeping.** It touches only files the agents maintain: project
   `status.md` entries, decision-log appends, data snapshots, transcripts
   moving through the inbox, recurring reports (the list is `bookkeeping` in
-  `docs/schema.json`). Once the checks are green it approves itself and
-  lands. Nobody has to merge a snapshot.
+  `docs/schema.json`). Once the check is green on its latest commit, the
+  gate merges it. Nobody has to merge a snapshot.
 - **Needs review.** Everything else: content, strategy, brand, ontology,
-  skills, scripts, docs. A person who is not the author reads the diff and
-  approves; the `review-gate` check says whose approval it is waiting for.
+  skills, scripts, workflows, docs. A person who is not the author reads
+  the diff and approves; the `review-gate` check says whose approval it is
+  waiting for. Anything that touches the machinery (`.github/`, `scripts/`,
+  `docs/schema.json`, the agent settings, the skills, the integrations)
+  is needs-review no matter what else is in the proposal.
 
-When in doubt the check decides, not the author, and it always errs toward
+When in doubt the gate decides, not the author, and it always errs toward
 review. On GitHub Team or Pro the two checks are enforced; on Free they
 advise ([github-settings.md](github-settings.md)).
 

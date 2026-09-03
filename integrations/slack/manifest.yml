@@ -10,12 +10,14 @@
 #   - No Request URL, no Events API, no interactivity, no Socket Mode.
 #     Slack never calls us; the repo's scripts and GitHub Actions call
 #     Slack with the bot token. No server to host, no signing secret.
-#   - Reading is limited to channels the bot is invited to (the requests
-#     channel). Posting is allowed in public channels.
+#   - Reading and posting are limited to channels the bot is invited to.
+#     No chat:write.public and no channels:join, so a script (or an agent
+#     talked into running one) cannot reach a channel the team did not
+#     choose. /invite the bot to the three configured channels.
 #
 # Resulting secret: one Bot User OAuth Token (starts with xoxb-), stored as
-# the GitHub Actions repository secret SLACK_BOT_TOKEN and, for local runs,
-# in .env (never committed).
+# SLACK_BOT_TOKEN in the GitHub environment `automation` (docs/secrets.md)
+# and, for a person's own runs, in that person's .env (never committed).
 
 _metadata:
   major_version: 1
@@ -46,12 +48,9 @@ oauth_config:
       # Read the requests channel (public). The bot must be invited to it.
       - channels:read
       - channels:history
-      # Let the bot join a public channel by itself (so /invite is optional).
-      - channels:join
-      # Post replies (in-thread) and announcements.
+      # Post replies (in-thread) and announcements, only in channels the bot
+      # was invited to.
       - chat:write
-      # Post to public channels the bot has not joined.
-      - chat:write.public
       # Acknowledge a request with an emoji (eyes = seen, check = answered,
       # raised hand = needs a human).
       - reactions:write

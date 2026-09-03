@@ -11,8 +11,11 @@ adds only what is Claude-Code-specific.
   `/new-content`, `/qmr`, `/add-integration`, and more; the roster is
   [agents/README.md](agents/README.md).
   If a slash command is missing, run `python3 scripts/sync_skills.py`.
-- **Never read `.env`**: `.claude/settings.json` denies it; keys stay out of
-  context by design (see [docs/secrets.md](docs/secrets.md)).
+- **Never read `.env`**: `.claude/settings.json` denies the Read tool and
+  the file commands on it, plus `env`, `printenv`, one-liners and the
+  merge and force-push commands a person owns; keys stay out of context
+  by design, and [docs/secrets.md](docs/secrets.md) says exactly what the
+  rules stop and what they do not.
 - MCP servers for integrations are declared in `.mcp.json` (DataForSEO, Apify
   and Calven today; the list is explained in
   [integrations/README.md](integrations/README.md)). Enable only what

@@ -9,10 +9,17 @@ strategy/            @owner-placeholder
 brand/               @owner-placeholder
 data/ontology/       @owner-placeholder
 
-# The agents, their instructions, and the machinery
+# The agents, their instructions, and the machinery. These paths are never
+# bookkeeping (docs/schema.json), and the ruleset asks the owner named here
+# to review them once the placeholder is replaced.
 AGENTS.md            @owner-placeholder
 CLAUDE.md            @owner-placeholder
 .agents/             @owner-placeholder
+integrations/        @owner-placeholder
 scripts/             @owner-placeholder
 .github/             @owner-placeholder
+.claude/             @owner-placeholder
+.cursor/             @owner-placeholder
+.mcp.json            @owner-placeholder
+.gitignore           @owner-placeholder
 docs/schema.json     @owner-placeholder

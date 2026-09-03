@@ -29,29 +29,58 @@ def github_settings():
     """Warnings about repo settings scripts/github_setup.sh would apply. Needs gh."""
     out = []
     try:
-        view = subprocess.run(["gh", "repo", "view", "--json",
-                               "squashMergeAllowed,mergeCommitAllowed,rebaseMergeAllowed,deleteBranchOnMerge,"
-                               "autoMergeAllowed,isPrivate,nameWithOwner"],
+        view = subprocess.run(["gh", "repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"],
                               capture_output=True, text=True, check=True, cwd=str(ROOT))
-        repo = json.loads(view.stdout)
-    except (subprocess.CalledProcessError, FileNotFoundError, json.JSONDecodeError):
+        name = view.stdout.strip()
+        repo = _api(f"repos/{name}") or {}
+        if not repo:
+            raise subprocess.CalledProcessError(1, "gh api")
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return ["gh is not available or not logged in; skipped the GitHub settings check"]
-    if not repo.get("squashMergeAllowed") or repo.get("mergeCommitAllowed") or repo.get("rebaseMergeAllowed"):
+    if not repo.get("allow_squash_merge") or repo.get("allow_merge_commit") or repo.get("allow_rebase_merge"):
         out.append("merge method is not squash-only (proposals should land as one commit)")
-    if not repo.get("deleteBranchOnMerge"):
+    if not repo.get("delete_branch_on_merge"):
         out.append("branches are not deleted on merge (old proposals will pile up)")
-    if not repo.get("autoMergeAllowed"):
-        out.append("auto-merge is off (bookkeeping proposals wait for the checks, then merge themselves)")
-    try:
-        rules = subprocess.run(["gh", "api", f"repos/{repo['nameWithOwner']}/rulesets"],
-                               capture_output=True, text=True, check=True, cwd=str(ROOT))
-        names = [r.get("name") for r in json.loads(rules.stdout)]
-    except (subprocess.CalledProcessError, json.JSONDecodeError):
-        names = []
-    if "main" not in names:
+    if not repo.get("allow_auto_merge"):
+        out.append("auto-merge is off (a person cannot click 'merge when ready' on a checking proposal)")
+    rules = _api(f"repos/{name}/rulesets") or []
+    if "main" not in [r.get("name") for r in rules]:
         out.append("no ruleset named 'main' (nothing stops a push to the approved copy)")
+    out += environment_settings(name)
     if out:
         out.append("run: scripts/github_setup.sh (docs/github-settings.md explains each setting and the plan it needs)")
+    return out
+
+
+def _api(path):
+    run = subprocess.run(["gh", "api", path], capture_output=True, text=True, cwd=str(ROOT))
+    if run.returncode != 0:
+        return None
+    try:
+        return json.loads(run.stdout)
+    except json.JSONDecodeError:
+        return None
+
+
+def environment_settings(repo):
+    """The `automation` environment holds the bot keys and only main may use it; the workflow
+    token is read-only by default and cannot approve proposals (docs/secrets.md)."""
+    out = []
+    env = _api(f"repos/{repo}/environments/automation")
+    if env is None:
+        out.append("no environment named 'automation' (the bot keys for unattended runs have nowhere safe to live)")
+    else:
+        policy = env.get("deployment_branch_policy") or {}
+        branches = _api(f"repos/{repo}/environments/automation/deployment-branch-policies") or {}
+        names = [b.get("name") for b in branches.get("branch_policies", [])]
+        if not policy.get("custom_branch_policies") or names != ["main"]:
+            out.append("environment 'automation' is not restricted to main (a workflow on any branch could read the bot keys)")
+    perms = _api(f"repos/{repo}/actions/permissions/workflow")
+    if perms is not None:
+        if perms.get("default_workflow_permissions") != "read":
+            out.append("the workflow token defaults to write (each job should ask for what it needs)")
+        if perms.get("can_approve_pull_request_reviews"):
+            out.append("GitHub Actions may approve pull requests (an agent in Actions could approve its own proposal)")
     return out
 
 
@@ -95,6 +124,9 @@ def main(argv=None):
         print("info: .env present (gitignored; keep it that way)")
     else:
         print("info: no .env; fine unless you use key-based integrations (copy .env.example)")
+    hooks = subprocess.run(["git", "config", "core.hooksPath"], capture_output=True, text=True, cwd=str(ROOT)).stdout.strip()
+    if hooks != "scripts/hooks":
+        print("info: the pre-push hook is off in this clone; turn it on once: git config core.hooksPath scripts/hooks")
 
     if unfilled:
         print(f"\nunfilled templates ({len(unfilled)}), run /setup to fill them:")

@@ -162,10 +162,15 @@ team wires one per `integrations/tasks.md`.
       proposals closed
 - [x] `scripts/github_setup.sh`, `.github/CODEOWNERS`,
       `docs/github-settings.md`: the settings that cannot live in a file
-- [ ] `scripts/sync.py`, `scripts/propose.py`, `.githooks/pre-push` and the
-      `sync`, `propose`, `doctor` skills: the five-word lifecycle for people
-      who do not know Git; `docs/troubleshooting.md`; `docs/new-to-github.md`
-      finished
+- [x] Security hardening: `gate.yml` runs the review gate from `main`;
+      `check.yml` is read-only; the bot keys live in the `automation`
+      environment; the agent in Actions has no shell; actions and the
+      DataForSEO server are pinned; `scripts/hooks/pre-push`,
+      `scripts/with_env.sh`; `docs/secrets.md` rewritten around who holds
+      which key; AGENTS.md rule 11 (untrusted content)
+- [ ] `scripts/sync.py`, `scripts/propose.py` and the `sync`, `propose`,
+      `doctor` skills: the five-word lifecycle for people who do not know
+      Git; `docs/troubleshooting.md`; `docs/new-to-github.md` finished
 - [ ] The AI layer: `audit`, `cascade`, `integration-check` skills;
       `context-review.yml`, `weekly-audit.yml`, `integration-check.yml`,
       `claude.yml`; Claude Code hooks that run the lint after every edit;

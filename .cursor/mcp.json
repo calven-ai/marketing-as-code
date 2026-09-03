@@ -4,10 +4,11 @@
       "command": "npx",
       "args": [
         "-y",
-        "dataforseo-mcp-server"
+        "dataforseo-mcp-server@3.1.1"
       ],
       "env": {
         "DATAFORSEO_LOGIN": "${env:DATAFORSEO_LOGIN}",
+        "DATAFORSEO_USERNAME": "${env:DATAFORSEO_LOGIN}",
         "DATAFORSEO_PASSWORD": "${env:DATAFORSEO_PASSWORD}"
       }
     },

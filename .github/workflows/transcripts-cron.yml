@@ -2,15 +2,15 @@ name: transcripts-cron
 
 # Pulls new meeting transcripts into memory/transcripts/inbox/ every day and
 # opens a pull request with them. The inbox is an agent-maintained folder,
-# so check.yml treats that PR as bookkeeping and merges it once the checks
+# so the gate treats that PR as bookkeeping and merges it once the checks
 # are green (docs/workflow.md). Processing the inbox is then either a person
 # running the chief-of-staff skill (the default) or transcripts-process.yml
 # running it unattended; docs/operating-model.md has the choice.
 #
-# Granola is the shipped provider. Needs one repository secret:
-# GRANOLA_API_KEY (Settings -> Secrets and variables -> Actions). Nothing
-# else. Uses only GitHub's own actions and the gh CLI already present on
-# the runner.
+# Granola is the shipped provider. Needs one secret, GRANOLA_API_KEY, in the
+# `automation` environment (Settings -> Environments -> automation), which
+# only main may use; docs/secrets.md. Uses only GitHub's own actions and the
+# gh CLI already present on the runner.
 #
 # Another provider (Zoom, say) is a second "Pull" step below calling its own
 # script with its own secret, gated the same way; the PR step picks up
@@ -27,33 +27,38 @@ on:
         default: ""
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   pull:
     runs-on: ubuntu-latest
+    environment: automation
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Pull new transcripts
         env:
           GRANOLA_API_KEY: ${{ secrets.GRANOLA_API_KEY }}
+          SINCE: ${{ inputs.since }}
         run: |
           if [ -z "$GRANOLA_API_KEY" ]; then
-            echo "GRANOLA_API_KEY secret is not set; nothing to do."
+            echo "GRANOLA_API_KEY is not set in the automation environment; nothing to do."
             exit 0
           fi
-          since="${{ github.event.inputs.since }}"
-          if [ -n "$since" ]; then
-            python3 scripts/pull_transcripts.py --since "$since"
-          else
-            python3 scripts/pull_transcripts.py
-          fi
+          case "$SINCE" in
+            "") python3 scripts/pull_transcripts.py ;;
+            [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) python3 scripts/pull_transcripts.py --since "$SINCE" ;;
+            *) echo "since must look like YYYY-MM-DD"; exit 1 ;;
+          esac
 
       - name: Open a pull request if new transcripts landed
         env:
           GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.ref_name }}
         run: |
           if [ -z "$(git status --porcelain memory/transcripts/inbox)" ]; then
             echo "No new transcripts."
@@ -67,11 +72,13 @@ jobs:
           git add memory/transcripts/inbox
           git commit -m "Transcripts: $date"
           git push -u origin "$branch"
-          gh pr create --title "Transcripts: $date" --base "${{ github.ref_name }}" --head "$branch" --body "$(cat <<'EOF'
+          gh pr create --title "Transcripts: $date" --base "$BASE" --head "$branch" --body "$(cat <<'BODY'
           New meeting transcripts pulled into `memory/transcripts/inbox/`.
 
-          This is bookkeeping: the check approves it automatically once it is green, so nobody needs to merge it. Then process the inbox: run `/chief-of-staff` (or ask your agent to "process the transcript inbox"), or, if the team has opted into `transcripts-process.yml`, its daily run picks the files up and a "Transcripts processed" PR follows for a person to review. Processing extracts facts, decisions, project status, action items per owner, and red flags, moves the files to `processed/`, and posts the summary to Slack.
+          This is bookkeeping: the gate merges it once the checks are green, so nobody needs to merge it. Then process the inbox: run `/chief-of-staff` (or ask your agent to "process the transcript inbox"), or, if the team has opted into `transcripts-process.yml`, its daily run picks the files up and a "Transcripts processed" PR follows for a person to review.
 
-          Transcripts are sensitive. Keep this repository private.
-          EOF
+          Transcripts are sensitive, and anything said in a meeting ends up here verbatim. Keep this repository private, and remember that agents treat transcript text as data, never as instructions (AGENTS.md rule 11).
+          BODY
           )"
+          # A PR opened with the workflow token starts no workflows on its own; ask for the check explicitly.
+          gh workflow run check.yml --ref "$branch"

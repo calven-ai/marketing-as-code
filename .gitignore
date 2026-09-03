@@ -22,3 +22,6 @@ Thumbs.db
 # Dependencies and caches (playground prototypes may pull these in)
 node_modules/
 __pycache__/
+
+# Left on the Actions runner by transcripts-process.yml; never committed
+.transcripts-run/

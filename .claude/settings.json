@@ -2,7 +2,29 @@
   "permissions": {
     "deny": [
       "Read(./.env)",
-      "Read(./.env.*)"
-    ]
+      "Read(./.env.*)",
+      "Read(./.git/**)",
+      "Read(//proc/**)",
+      "Bash(env)",
+      "Bash(env *)",
+      "Bash(printenv*)",
+      "Bash(export -p*)",
+      "Bash(set)",
+      "Bash(python3 -c *)",
+      "Bash(python -c *)",
+      "Bash(node -e *)",
+      "Bash(node -p *)",
+      "Bash(grep * .env*)",
+      "Bash(less .env*)",
+      "Bash(more .env*)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr review *)",
+      "Bash(gh secret *)",
+      "Bash(git push -f*)",
+      "Bash(git push --force*)",
+      "Bash(git push * -f*)",
+      "Bash(git push * --force*)"
+    ],
+    "disableBypassPermissionsMode": "disable"
   }
 }
