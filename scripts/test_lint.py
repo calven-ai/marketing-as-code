@@ -533,6 +533,10 @@ class TestReviewGate(unittest.TestCase):
         finally:
             os.environ.pop("REVIEW_SELF_MERGE", None)
         self.assertFalse(review_gate.self_merge_allowed(team))
+    def test_rule_changing_proposals_are_not_tidied(self):
+        self.assertTrue(review_gate.tidy_allowed(["memory/decision-log.md", "projects/x/status.md"]))
+        self.assertFalse(review_gate.tidy_allowed(["scripts/lint.py", "scripts/README.md"]))
+        self.assertFalse(review_gate.tidy_allowed(["docs/schema.json"]))
 
 
 if __name__ == "__main__":
