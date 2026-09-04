@@ -58,19 +58,31 @@ change in this repo, by a person or an agent, goes through it.
 
 ## Let the agent do the technical parts
 
-Install [Claude Code](https://claude.com/claude-code) in the desktop app and
-open your repo folder. Then talk to it. "Set up this repo for our team."
-"Draft a blog post on X." "Process the transcript in the inbox." The agent
-reads the repo, does the work on a branch, and opens the pull request for
-you to review. You never type a command.
+Install [Claude Code](https://claude.com/claude-code) in the desktop app
+and open your repo folder. One-time setup: install the
+[GitHub CLI](https://cli.github.com) and run `gh auth login --web` in a
+terminal (it shows a code and opens your browser). Or say `/doctor` and
+it walks you through it.
 
-When the agent needs something technical, like connecting your CRM or
-storing an API key, it tells you exactly what to do and where. If it asks
-for a key value in chat, that is a red flag. Keys go in a file the agent
-never reads ([secrets.md](secrets.md)).
+Then the whole loop is three words:
+
+1. **`/sync`** brings in the latest approved copy and tells you what is
+   waiting on you.
+2. **Work.** "Draft a blog post on X." "Process the transcript in the
+   inbox." "Set up this repo for our team." The agent does it on a branch.
+3. **`/propose`** checks the files, saves the change, and hands you the
+   link to the proposal. Open it, read the diff, click Merge. Bookkeeping
+   proposals merge themselves.
+
+You never type a command. When the agent needs something technical, like
+connecting your CRM or storing an API key, it tells you exactly what to
+do and where. If it asks for a key value in chat, that is a red flag. Keys
+go in a file the agent never reads ([secrets.md](secrets.md)).
 
 ## Where to go next
 
 - [workflow.md](workflow.md): how review works here, in more detail.
+- [troubleshooting.md](troubleshooting.md): every message the commands
+  print, and the one thing to do.
 - [stages.md](stages.md): if you want to start smaller than a full repo.
 - [../README.md](../README.md): the quick start, once you are comfortable.

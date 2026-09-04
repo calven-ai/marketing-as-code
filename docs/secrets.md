@@ -113,7 +113,10 @@ intact (`docs/schema.json` lists them). What the rules do:
 - **Do not stop:** a script the agent may run, which opens `.env` itself.
   That is why the scripts read only the variables they need and never print
   one. Nor do they stop a person typing `cat .env` in their own terminal.
-  That is their key to print.
+  That is their key to print. The lifecycle scripts (`scripts/sync.py`,
+  `scripts/propose.py`, `scripts/doctor.py`) run git for you and are
+  allowed to run without a prompt; by design they never push to `main`,
+  force-push or merge, and `scripts/test_lifecycle.py` proves it.
 - **Cursor and Codex** read the same skills but not this settings file.
   Their guardrail is the skills' own rules, so hand a Cursor user a
   per-person key, not a bot key.

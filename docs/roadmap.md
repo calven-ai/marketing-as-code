@@ -13,12 +13,8 @@ welcome ([CONTRIBUTING.md](../CONTRIBUTING.md)). The repo is a blueprint
 ([README](../README.md#a-blueprint-not-a-product)), not a product with a
 connector catalogue.
 
-## Wave 2: the lifecycle for people who do not know Git
+## Wave 2: the AI layer and the analysts
 
-- [ ] `scripts/sync.py`, `scripts/propose.py` and the `sync`, `propose`
-      and `doctor` skills: the five-word lifecycle for people who never
-      open a terminal
-- [ ] `docs/troubleshooting.md`
 - [ ] The AI layer: `audit`, `cascade` and `integration-check` skills;
       `context-review.yml`, `weekly-audit.yml`, `integration-check.yml`
       and `claude.yml` workflows; Claude Code hooks that run the lint

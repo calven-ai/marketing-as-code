@@ -96,6 +96,8 @@ Whatever the mode, these need a person every time (AGENTS.md rule 3,
 
 | Workflow | A person, on demand | Unattended, in Actions |
 | --- | --- | --- |
+| Sync a checkout with the approved copy | `/sync`, `python3 scripts/sync.py` | Never |
+| Propose a change | `/propose`, `python3 scripts/propose.py` | The workflows open their own proposals (`transcripts-cron.yml`, `housekeeping.yml`) |
 | Pull transcripts into the inbox | `python3 scripts/pull_transcripts.py` | `transcripts-cron.yml`, daily, opens a PR (shipped) |
 | Process the inbox | `/chief-of-staff` after the meeting (the default) | `transcripts-process.yml`, on merge of an inbox PR, opens a PR (opt-in, needs `ANTHROPIC_API_KEY`) |
 | Refresh keyword volumes and difficulty | `python3 scripts/seo_snapshot.py --update` | A cron step running the same script, yours to add |
@@ -105,7 +107,7 @@ Whatever the mode, these need a person every time (AGENTS.md rule 3,
 | Account research | `/researcher` (Apify MCP, OAuth) | Not headless |
 | Campaign discovery, content, review, prototypes, projects | Always a person | Never |
 | Slack digests and alerts | `python3 scripts/slack_post.py` from a skill | Scheduled workflows calling the same script, yours to add; the message table is in `integrations/slack/README.md` |
-| Health check | `python3 scripts/doctor.py` | `check.yml` on every proposal and on `main`: tests the lint, annotates, keeps the sticky comment current; read-only, no secrets (shipped) |
+| Health check | `/doctor`, `python3 scripts/doctor.py` | `check.yml` on every proposal and on `main`: tests the lint, annotates, keeps the sticky comment current; read-only, no secrets (shipped) |
 | Review gate | `python3 scripts/review_gate.py --pr N --dry-run` | `gate.yml` after every check run, from `main`: classifies, pushes the safe fixes as a Tidy commit, labels, publishes `review-gate`, merges green bookkeeping proposals (shipped) |
 | Tidy the approved copy | `python3 scripts/doctor.py --fix` | `housekeeping.yml`, Mondays: the safe fixes as one bookkeeping proposal; stale proposals closed after three weeks (shipped) |
 | Repository settings | `sh scripts/github_setup.sh`, then `python3 scripts/doctor.py --github` | Never; settings are applied once by an admin ([github-settings.md](github-settings.md)) |
