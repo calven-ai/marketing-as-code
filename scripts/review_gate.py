@@ -109,6 +109,17 @@ def publish(repo, sha, conclusion, title, summary, url=""):
     print(f"{CHECK}: {conclusion}. {title}")
 
 
+# A proposal that changes the rules themselves is not tidied by main's lint:
+# main's fixes would fight the proposal's own (a regenerated table in the old
+# format, a default the proposal just changed) and the two would ping-pong.
+RULE_FILES = ("scripts/lint.py", "docs/schema.json")
+
+
+def tidy_allowed(paths):
+    """Main's lint may push safe fixes only to a proposal that leaves the rules alone."""
+    return not any(p in RULE_FILES for p in paths)
+
+
 def tidy(pr, head_branch, head_sha):
     """Apply the safe fixes from main's lint to the proposal's files; push them as one Tidy commit.
     Returns True when a commit was pushed (the new commit gets its own check and gate run)."""
@@ -177,7 +188,9 @@ def main(argv=None):
                   f"{', '.join(codeowners_for(paths)) or 'a teammate who is not the author'}.")
         return 0
 
-    if not fork and not args.no_tidy and tidy(args.pr, head_branch, head_sha):
+    if not fork and not args.no_tidy and not tidy_allowed(paths):
+        print("the proposal changes the rules (scripts/lint.py or docs/schema.json); main's lint does not tidy it")
+    elif not fork and not args.no_tidy and tidy(args.pr, head_branch, head_sha):
         return 1  # the Tidy commit's own run decides
 
     other = [v for k, v in LABELS.items() if k != kind][0]
