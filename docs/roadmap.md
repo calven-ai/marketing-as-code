@@ -4,31 +4,30 @@ What has landed is in [CHANGELOG.md](../CHANGELOG.md). The reasoning behind
 the structure is in [architecture.md](architecture.md). This page is only
 what remains.
 
-The stance: the maintainers ship the structure, the offline workflows, the
-guides, one worked example per way of connecting a tool (MCP server, CLI,
-script), and the guide for adding the rest. Connectors for tools the
-maintainers do not use are not on this list. A team adds them with its
-coding agent, and a connector contributed back as a worked example is
-welcome ([CONTRIBUTING.md](../CONTRIBUTING.md)). The repo is a blueprint
-([README](../README.md#a-blueprint-not-a-product)), not a product with a
-connector catalogue.
+The stance: the maintainers ship the structure, the skills for every
+marketing function, the guides, one worked example per way of connecting a
+tool (MCP server, CLI, script), the catalog of vendor routes per
+integration category, and the guide for adding what the catalog lacks.
+The catalog is a list of routes with a verification date, not a set of
+connectors the maintainers run: a team wires the vendor it uses with
+`scripts/wire_integration.py`, verifies the entry on the day, and a
+corrected entry contributed back is welcome
+([CONTRIBUTING.md](../CONTRIBUTING.md)). The repo is a blueprint
+([README](../README.md#a-blueprint-not-a-product)), not a product.
 
-## Wave 2: the AI layer and the analysts
+## Next
 
-- [ ] The AI layer: `audit`, `cascade` and `integration-check` skills;
-      `context-review.yml`, `weekly-audit.yml`, `integration-check.yml`
-      and `claude.yml` workflows; Claude Code hooks that run the lint
-      after every edit; `scripts/integration_check.py`
+- [ ] Re-verify the catalog every six months (the check warns per entry
+      after 180 days); promote `listing` entries to `vendor` as the
+      vendors' own pages confirm them
+- [ ] A `role-<skill>.yml` caller for each role once a team wires its
+      categories to key-based servers; a dispatch run of `role-run.yml`
+      against a real key to confirm `--mcp-config` alongside the action's
+      own server, and `secrets: inherit` into the `automation` environment
+- [ ] `scripts/doctor.py`: warn when a wired server's variable is not set
+      in the person's environment, without printing values
 - [ ] `scripts/og_image.py`: port from the Calven website repo; reads
       `brand/tokens.json` and `brand/templates/`
-- [ ] `analyst` and `web-analyst` roles and the `weekly-seo` workflow: the
-      data-question router with worked examples, web analytics snapshots
-      into `reports/recurring/analytics/`, and the weekly SEO delta report
-
-## Wave 3: breadth, story, ecosystem
-
-- [ ] Data enrichment for account research (vendor open: Apify actors, or
-      a specific provider)
 - [ ] Optional context pull script: mirror a connected context layer into
       `strategy/` as dated files, for teams that need offline copies
 - [ ] `docs/website.md`: the sibling-repo pattern, and the content-to-website
@@ -38,16 +37,12 @@ connector catalogue.
 - [ ] Optional GitHub Pages workflow serving `reports/` at a URL
 - [ ] Claude Code plugin or skill-marketplace packaging of the skill set
 
-Not planned by the maintainers: monday.com, Zoom, HubSpot, PostHog, GA4,
-Salesforce. Each is a known route in the
-[integration guide](../integrations/adding-an-integration.md); a team adds
-it with `/add-integration`.
-
 ## Open questions
 
-- **Enrichment vendor.** No clean official integration exists for
-  6sense-style enrichment. Apify actors, or a specific vendor?
 - **Context-layer stubs.** Once a team connects a context layer, the
   mirrored strategy files become two-line fallbacks flagged
   `source: context-layer`. Keep them so the routing table stays intact, or
   delete them? Stubs for now.
+- **Thin categories.** `intent` has one optional user and `billing` two.
+  Kept because the vendors are distinct; fold into `enrichment` and `crm`
+  if no team wires them within a year.

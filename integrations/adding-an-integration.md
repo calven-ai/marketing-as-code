@@ -3,10 +3,18 @@
 **Kind:** agents, the workforce as instructions in English.
 
 Five integrations ship wired, as worked examples of the three ways to
-connect a tool. Everything else in your stack is added by your coding
-agent, following this page. Read it when the team says "we use X, connect
-it", "automate pulling Y", or "why can't the agent see Z". The
+connect a tool. For the rest of your stack, [the catalog](catalog/README.md)
+holds the routes for the common vendors in every integration category, and
+`python3 scripts/wire_integration.py <vendor>` wires one in a minute. This
+page is the contract every route follows, and what your coding agent does
+for a tool the catalog does not know. Read it when the team says "we use
+X, connect it", "automate pulling Y", or "why can't the agent see Z". The
 `add-integration` skill walks through it step by step.
+
+Skills never name a vendor. They name a category (`crm`, `web-analytics`,
+`ads`; the full list is the category table in [README.md](README.md)), and
+[`wired.json`](wired.json) says which vendor fills it in this repo. Wiring
+a vendor therefore changes no skill; it binds a category.
 
 Two principles decide most of what follows:
 
@@ -44,26 +52,40 @@ Never, at any tier: put a key value in `.mcp.json` or any committed file
 (env placeholders only), read `.env` from an agent, run an unpinned package
 (`npx -y name@1.2.3`, never `npx -y name`), or wire a tool nobody asked for.
 
-## Known routes for common tools
+## The catalog
 
-Checked September 2026 against the vendors' own documentation. Vendors
-change their servers often. Verify the endpoint and the tool list on the
-day you wire it, and correct this table in the same PR.
+[`catalog/README.md`](catalog/README.md) is rendered from one JSON file per
+category under `catalog/`. Each vendor entry records the official MCP
+server where one exists (transport, endpoint, auth model, the `${VAR}`
+placeholders it needs, whether it can run headless, its write tools and
+any read-only switch), the vendor CLI, the script route, and the by-hand
+export every category keeps. Each entry also says how it was verified
+(`vendor`: read on the vendor's own docs or repo; `listing`: only a
+directory said so; `unverified`: nobody checked) and when; the check warns
+after 180 days, and the wire script refuses an unverified entry without
+`--force`. Vendors change their servers often: verify the endpoint and the
+tool list on the day you wire one, and update `checked` in the same PR.
 
-| Tool | Official MCP | Writes over MCP | CLI | The usual route |
-| --- | --- | --- | --- | --- |
-| Asana | remote, OAuth (`https://mcp.asana.com/v2/mcp`) | yes: create and update tasks; interactive tools confirm before committing | none official | MCP for everything, including filing tasks. `integrations/tasks.md` carries the conventions |
-| monday.com | official MCP, OAuth | check the tool list | none official | MCP; same shape as Asana |
-| HubSpot | remote, OAuth (`mcp.hubspot.com`), GA | yes on CRM objects and engagements; marketing content and campaign metrics read-only | `hs` exists but is developer tooling for CMS and projects, not CRM data | MCP for questions and CRM writes; a script for scheduled pipeline snapshots |
-| Salesforce | vendor MCP offerings exist; verify which one your org licenses | check the tool list | `sf` CLI: queries, exports, record updates | MCP for questions; `sf` for scheduled exports and bulk work |
-| PostHog | remote, personal API key (`https://mcp.posthog.com/mcp`) | yes, with read-only filtering available | `posthog-cli` | MCP for questions; the CLI for scripted, scheduled pulls |
-| Google Analytics 4 | official, but a local stdio server (Python, `pipx`) using Google credentials | read-only | none for reporting; `gcloud` for auth only | stdio MCP in a session; a script with a service account for schedules |
-| DataForSEO | stdio (`npx dataforseo-mcp-server`) or remote with Basic auth; wired in `.mcp.json` | n/a (data vendor) | none | MCP in a session; `scripts/seo_snapshot.py` for the weekly refresh |
-| Apify | remote, OAuth (`https://mcp.apify.com`); wired | runs actors | `apify` CLI | MCP for research in a session; the CLI if a run is ever scheduled |
-| Granola | remote, OAuth (`https://mcp.granola.ai/mcp`), paid plans | read-only | none | MCP for "what did we discuss"; `scripts/pull_transcripts.py` for the daily inbox pull (the MCP cannot run headless) |
-| Zoom | a vendor MCP exists (transcripts, summaries, recordings; OAuth); verify its tool list | check | none for transcripts | MCP for ad-hoc reading; a Server-to-Server OAuth script for the inbox pull |
-| Slack | Anthropic's own Slack app for "ask the repo from Slack"; no vendor MCP wired here | n/a | none needed | the team's own bot via `scripts/slack_post.py` (`slack/`); see the three layers there |
-| GitHub | n/a inside a repo | n/a | `gh`, present on every Actions runner | the CLI, as `.github/workflows/transcripts-cron.yml` does |
+To wire a vendor the catalog knows:
+
+```
+python3 scripts/wire_integration.py --category crm      # what the catalog knows
+python3 scripts/wire_integration.py hubspot --dry-run   # what would change
+python3 scripts/wire_integration.py hubspot             # wire the default route
+python3 scripts/lint.py --fix                           # regenerate the tables
+```
+
+The script edits `.mcp.json` and `.cursor/mcp.json` (placeholders only),
+adds the variables to `.env.example`, denies the server's write tools in
+`.claude/settings.json` unless `--allow-writes`, records the binding in
+`wired.json`, and prints the Codex TOML and the `docs/secrets.md` row. A
+vendor with several routes (OAuth for sessions, a key for unattended runs)
+is wired as `<vendor>:<variant>`.
+
+To add a vendor the catalog lacks, add its entry to
+`catalog/<category>.json` in the shape of a neighbour, then wire it. A
+community server goes in as `listing` with a caveat naming its
+maintainer: it is somebody's script, and the ladder judges it as tier 3.
 
 ## Configuring an MCP server, per coding agent
 
@@ -88,7 +110,10 @@ Three traps:
   checks that both files list the same server names.
 - **Codex gets a snippet, not a committed file.** Its project config only
   loads for trusted projects and its auth fields differ. Put the TOML in
-  the PR description and in the registry row.
+  the PR description (the wire script prints it).
+- **Cursor and `${env:VAR}` inside `args`.** Cursor expands it in `env`
+  and `headers` for certain; whether it does inside a stdio server's
+  `args` is not verified. Keep keys in `env`, never in an argument.
 
 The chat surfaces (the Claude desktop app's chat, ChatGPT) run connectors,
 not this repo's skills or scripts. They are stage 1 in
@@ -169,25 +194,31 @@ reference; a new connector copies the closest one.
 
 One PR, reviewed like any other, with this list in its description:
 
-- [ ] A row in the registry table in [README.md](README.md) (tool, for,
-      mechanism, auth, env vars, status), or a corrected "known route" row
-- [ ] `.env.example` lines for every variable the mechanism reads, and the
-      registry's Env vars column kept identical (agents cannot read `.env*`)
-- [ ] For tier 1: the `.mcp.json` entry, the matching `.cursor/mcp.json`
-      entry, and the Codex TOML snippet in the PR description
+- [ ] The catalog entry in `catalog/<category>.json` (new, or corrected,
+      with `verified` and `checked` set) and the binding in `wired.json`
+      written by `python3 scripts/wire_integration.py <vendor>`; the
+      tables in [README.md](README.md) regenerated with
+      `python3 scripts/lint.py --fix`, never edited by hand
+- [ ] `.env.example` lines for every variable the mechanism reads (the
+      wire script appends them; agents cannot read `.env*`)
+- [ ] For tier 1: the `.mcp.json` and `.cursor/mcp.json` entries the wire
+      script wrote, the Codex TOML it printed in the PR description, and
+      the write-tool deny rules it added to `.claude/settings.json`
 - [ ] For tier 2 or 3: the script (contract above) and its
       `scripts/README.md` row; for a scheduled run, the workflow step
       (`environment: automation` on the job) and the environment secret
       it needs
 - [ ] A row in the "Who holds which key" table in
       [docs/secrets.md](../docs/secrets.md): per person or bot, who owns
-      it, where it lives, how to rotate it
+      it, where it lives, how to rotate it (the wire script prints it)
 - [ ] Every package or action the integration runs is pinned (an npm
       version, a commit SHA), and the vendor's own server is preferred
       over a community one
-- [ ] The skills that change: which `SKILL.md` "Needs:" line now names the
-      tool, and what the skill does when it is not connected (say what
-      export to drop where; never guess numbers)
+- [ ] `references/<vendor>.md` in every skill that lists the category as a
+      need (the category table in [README.md](README.md) says which;
+      [docs/skill-authoring.md](../docs/skill-authoring.md) says what goes
+      in it); the skills already say what they do when the category is
+      not wired
 - [ ] If the workflow recurs: both run modes stated where the workflow is
       described, per [docs/operating-model.md](../docs/operating-model.md)
 - [ ] A `CHANGELOG.md` line
@@ -215,8 +246,10 @@ Tier 3, because it is unattended. The PR contains:
   block naming the Zoom App Marketplace page they come from.
 - `.github/workflows/transcripts-cron.yml`: a second "Pull new transcripts"
   step calling the Zoom script, gated on its secrets like the Granola step.
-- `integrations/README.md`: a Zoom row in "Wired in this template" and the
-  "known route" row removed.
+- `integrations/wired.json`: `transcripts` bound to `zoom` with the
+  `script` route (`python3 scripts/wire_integration.py zoom` binds the MCP
+  half; the script route is added by hand in the same entry), and the
+  Wired table regenerated.
 - `scripts/README.md`: one row. `memory/README.md` and
   `memory/transcripts/README.md`: "Granola or Zoom" where the pull is named.
 - `CHANGELOG.md` line; decision-log entry "Transcripts pulled from Zoom".
@@ -228,12 +261,14 @@ care which provider wrote the file. That is what the inbox contract is for.
 
 Tier 1, with writes. The PR contains:
 
-- `.mcp.json` and `.cursor/mcp.json`: the Asana entry (remote, OAuth, no
-  key); the Codex snippet in the PR description.
+- `python3 scripts/wire_integration.py asana`: the entries in `.mcp.json`
+  and `.cursor/mcp.json` (remote, OAuth, no key), the binding of `tasks`
+  in `wired.json`, the deny rules for Asana's write tools, and the Codex
+  snippet for the PR description. Then `--allow-writes`, because filing
+  tasks is the point: logged as the team's decision.
 - `integrations/tasks.md`: the "Current tool" section rewritten from its
   embedded example. Every task-creating skill already reads that file, so
   no skill changes.
-- The registry row moved from "known routes" to "wired".
 - `CHANGELOG.md` line; decision-log entry "Tasks live in Asana".
 
 No script, no key, no workflow. The first time a person's agent files a

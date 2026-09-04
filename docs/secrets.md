@@ -18,8 +18,10 @@ holds a key, and agents never read one.
 | `SLACK_*_CHANNEL_ID` | not a secret | anyone | repository Actions variables; `.env` | n/a | n/a |
 | `GITHUB_TOKEN` | automatic, per workflow job | GitHub | nowhere; it exists for the length of a job with only the permissions the job declares | automatic | n/a |
 
-Add a row for every integration you wire. The
-[integration guide](../integrations/adding-an-integration.md) asks for it.
+Add a row for every integration you wire: `python3 scripts/wire_integration.py
+<vendor>` prints the row to paste, the
+[integration guide](../integrations/adding-an-integration.md) asks for it,
+and the check warns when a variable in `.mcp.json` has no row here.
 
 Two facts shape the table:
 

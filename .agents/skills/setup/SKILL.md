@@ -1,9 +1,14 @@
 ---
 name: setup
 description: Onboard a team into this repo. Use when asked to "set up the repo", "run the setup interview", or when the strategy/brand/ontology templates are clearly unfilled and the user wants to start working. Interviews the team, fills the templates from their answers, connects integrations, and writes the task-tool adapter.
+license: MIT
 metadata:
   kind: workflow
-  needs: nothing
+  area: core
+  needs: []
+  optional: [context-layer, tasks]
+  writes: repo
+  runs: person
 ---
 
 # Setup: the onboarding interview
@@ -64,18 +69,21 @@ already filled in without asking.
       Rewrite `integrations/tasks.md` per its embedded example: workspace,
       default project, filing conventions. If none, leave the in-repo
       fallback.
-   9. *Integrations*: which tools the team uses, against the two tables in
-      `integrations/README.md`. For a tool that is **wired**, follow its
-      registry row: OAuth MCPs need nothing but the browser prompt on first
-      use; for key-based ones, have them copy `.env.example` → `.env` and
-      fill only what they use (the variable names are in the registry's
-      Env vars column, since you cannot read `.env*` files yourself). For
-      a tool that is **not wired**, do not build it during the interview:
-      list it in the closing summary as a follow-up, "add with
-      `add-integration`", one line per tool with the job it must do. Enable
-      only what they asked for; never edit `.env` yourself. Say once: the
-      first session asks whether to start the three project MCP servers;
-      No to all three is the right answer until one is connected here.
+   9. *Integrations*: which tools the team uses. Run
+      `python3 scripts/wire_integration.py --list`: it prints every
+      category (CRM, web analytics, ads, and so on), the vendor wired today,
+      and the vendors the catalog knows. For each tool the team names: if it
+      is **already wired**, follow the Wired table in
+      `integrations/README.md` (OAuth needs only the browser prompt on first
+      use; key-based ones need the variable names from the Env vars column
+      in their `.env`, which you never read or edit). If it is **in the
+      catalog but not wired**, say so and list it in the closing summary as
+      one line, "wire with `add-integration`: `<vendor>`"; do not wire it
+      during the interview. If it is **not in the catalog**, list it as
+      "add with `add-integration`" with the job it must do. Enable only what
+      they asked for. Say once: the first session asks whether to start the
+      project MCP servers in `.mcp.json`; No is the right answer for any
+      server whose key is not in their `.env` yet.
    10. *Make the repo real*: the settings a fresh copy ships without.
       - Who reviews strategy and brand, and who reviews the machinery
         (`scripts/`, `.github/`, the skills)? One GitHub handle each is
