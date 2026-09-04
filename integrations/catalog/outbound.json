@@ -1,0 +1,205 @@
+{
+  "id": "outbound",
+  "title": "Outbound",
+  "for": "outbound sequencing and sales engagement: loading approved sequences, reading reply and meeting outcomes",
+  "data_domain": null,
+  "manual": {
+    "export": "the sequence stays in content/ as text; a person loads it into the tool by hand",
+    "drop": "content/<piece>/ (the sequence steps as Markdown, one heading per step)"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "outreach",
+      "name": "Outreach",
+      "source": "outreach",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://support.outreach.io/support/solutions/articles/159000425158-outreach-mcp-server-overview",
+      "capabilities": ["sequences", "prospects", "mailings", "meetings"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__outreach`) until checked",
+        "requires the Amplify add-on and an Outreach admin to enable the server",
+        "read, create and delete, no update by design; the admin toggles create (on by default) and delete (off by default), so there is no read-only endpoint, only the admin toggles",
+        "in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "outreach",
+            "transport": "http",
+            "url": "https://api.outreach.io/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (OAuth 2.1 with dynamic client registration)"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "salesloft",
+      "name": "Salesloft",
+      "source": "salesloft",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.salesloft.com/company/newsroom/salesloft-mcp-server-revenue-data-ai-ecosystem",
+      "capabilities": ["cadences", "people", "tasks", "engagement", "transcripts"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "an official server exists and is in the Claude connectors directory (OAuth, requires the Salesloft Agentic add-on); the endpoint is not published on the newsroom page, so add it from the directory or after a person reads the Salesloft help article",
+        "write tool names not verified; deny the whole server (`mcp__salesloft`) until checked",
+        "third-party servers (CData read-only, StackOne, Gumloop) are generic connectors or community code, not the vendor server"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "lemlist",
+      "name": "lemlist",
+      "source": "lemlist",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "http://help.lemlist.com/en/articles/13728466",
+      "capabilities": ["campaigns", "sequences", "leads", "enrichment"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__lemlist`) until checked (40+ actions)",
+        "an API-key mode also exists; the header format is not in the survey, so only the OAuth entry is listed",
+        "endpoint seen in a secondary listing; confirm on the help page before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "lemlist",
+            "transport": "http",
+            "url": "https://app.lemlist.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "instantly",
+      "name": "Instantly",
+      "source": "instantly",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://help.instantly.ai/en/articles/12980002",
+      "capabilities": ["campaigns", "leads", "campaign analytics"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__instantly`) until checked (the help page names create and manage campaigns, add leads; destructive actions are marked)",
+        "the API key goes in the Authorization header; the help page does not print the scheme, a bearer token is assumed, confirm before wiring (the key may also go in the URL path, which this catalog does not use)",
+        "community `bcharleson/instantly-mcp` exists; judge as a script, not a vendor tool",
+        "endpoint read on the vendor help page today; the survey marks it as a secondary listing"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "instantly",
+            "transport": "http",
+            "url": "https://mcp.instantly.ai/mcp",
+            "headers": {"Authorization": "Bearer ${INSTANTLY_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["INSTANTLY_API_KEY"], "where": "Instantly > Settings > Integrations > API keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "smartlead",
+      "name": "Smartlead",
+      "source": "smartlead",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://helpcenter.smartlead.ai/en/articles/300-smartlead-mcp-server",
+      "capabilities": ["campaigns", "leads", "deliverability"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__smartlead`) until checked (the help page documents `get_campaign_status`, `fetch_lead_data`, `check_deliverability` and says campaigns can be managed)",
+        "SSE only, no streamable HTTP, and the API key travels as a URL query parameter; the vendor's own setup bridges it with `mcp-remote` over stdio, which is what is listed here",
+        "the key in a URL shows up in process lists and logs on the machine; rotate it if the machine is shared",
+        "the community `LeadMagic/smartlead-mcp-server` is archived; do not wire it"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "remote",
+            "default": true,
+            "server": "smartlead",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "mcp-remote@0.8.3", "https://mcp.smartlead.ai/sse?user_api_key=${SMARTLEAD_API_KEY}"],
+            "env": {},
+            "auth": {"model": "env", "env": ["SMARTLEAD_API_KEY"], "where": "Smartlead dashboard > Settings > API Keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "apollo",
+      "name": "Apollo.io sequences",
+      "source": "apollo",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/apolloio/apollo-mcp-plugin",
+      "capabilities": ["sequences (not verified)", "people search", "enrichment"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "the same `apollo` server as enrichment.json; sequence tools were not verified in the survey, and if the tool list shows any add-to-sequence or send tool, deny the whole server (`mcp__apollo`) until reviewed",
+        "in the Claude connectors directory for Claude, not for Claude Code",
+        "endpoint from a secondary listing; confirm before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "apollo",
+            "transport": "http",
+            "url": "https://mcp.apollo.io/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    }
+  ]
+}

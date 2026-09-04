@@ -1,0 +1,504 @@
+{
+  "id": "web-analytics",
+  "title": "Web and product analytics",
+  "for": "traffic, sessions, conversions, funnels, retention, session replay",
+  "data_domain": "data/analytics",
+  "manual": {
+    "export": "Open the report in the analytics tool (GA4: Reports > Explore or a standard report; PostHog and Mixpanel: the insight), export it as CSV from the report's share or export menu, and drop the file into the snapshots folder.",
+    "drop": "data/analytics/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": [
+    "generic"
+  ],
+  "vendors": [
+    {
+      "id": "ga4",
+      "name": "Google Analytics 4",
+      "source": "ga4",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/googleanalytics/google-analytics-mcp",
+      "capabilities": [
+        "reports",
+        "funnel-reports",
+        "realtime",
+        "account-summaries",
+        "property-details",
+        "ads-links"
+      ],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Experimental, local stdio only (Python via pipx); there is no remote endpoint and no Claude connector",
+        "Auth is Application Default Credentials: `gcloud auth application-default login --scopes=https://www.googleapis.com/auth/analytics.readonly,https://www.googleapis.com/auth/cloud-platform` for a person, or a service-account JSON at GOOGLE_APPLICATION_CREDENTIALS for an unattended run; GOOGLE_PROJECT_ID is the Cloud project with the Analytics Data and Admin APIs enabled",
+        "Tools: run_report, run_funnel_report, run_realtime_report, get_account_summaries, get_property_details, list_google_ads_links",
+        "GOOGLE_APPLICATION_CREDENTIALS and GOOGLE_PROJECT_ID are file path and project id, not secrets; the service-account file itself is the secret"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "ga4",
+            "transport": "stdio",
+            "command": "pipx",
+            "args": [
+              "run",
+              "analytics-mcp==0.7.0"
+            ],
+            "env": {
+              "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}",
+              "GOOGLE_PROJECT_ID": "${GOOGLE_PROJECT_ID}"
+            },
+            "auth": {
+              "model": "env",
+              "env": [
+                "GOOGLE_APPLICATION_CREDENTIALS",
+                "GOOGLE_PROJECT_ID"
+              ],
+              "where": "Google Cloud console: a service account with Viewer on the GA4 property, its JSON key on disk; or gcloud ADC for a person"
+            },
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {
+          "tool": "gcloud",
+          "install": "https://cloud.google.com/sdk/docs/install",
+          "notes": "auth only (application-default login); gcloud has no GA4 reporting command, so schedules use a script"
+        },
+        "script": {
+          "path": null,
+          "env": [
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "GA4_PROPERTY_ID"
+          ],
+          "notes": "copy scripts/seo_snapshot.py; a service account calls the Analytics Data API runReport (analyticsdata.googleapis.com) for the weekly traffic snapshot"
+        }
+      }
+    },
+    {
+      "id": "posthog",
+      "name": "PostHog",
+      "source": "posthog",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://posthog.com/docs/model-context-protocol/faq",
+      "capabilities": [
+        "insights",
+        "hogql-sql",
+        "dashboards",
+        "feature-flags",
+        "surveys",
+        "session-replay",
+        "error-tracking"
+      ],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": {
+        "kind": "url",
+        "name": "readonly",
+        "value": "true"
+      },
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__posthog`) until checked, or keep ?readonly=true in the URL (the header x-posthog-read-only: true does the same); the entries below pin it",
+        "?features=... and ?tools=... in the URL narrow the tool list further",
+        "The remote server routes US and EU automatically; a personal API key with the 'MCP Server' preset scopes is the headless path",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "posthog",
+            "transport": "http",
+            "url": "https://mcp.posthog.com/mcp?readonly=true",
+            "headers": {},
+            "auth": {
+              "model": "oauth",
+              "env": [],
+              "where": "browser grant on first use"
+            },
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "token",
+            "default": false,
+            "server": "posthog",
+            "transport": "http",
+            "url": "https://mcp.posthog.com/mcp?readonly=true",
+            "headers": {
+              "Authorization": "Bearer ${POSTHOG_API_KEY}"
+            },
+            "auth": {
+              "model": "bearer",
+              "env": [
+                "POSTHOG_API_KEY"
+              ],
+              "where": "PostHog: Settings > Personal API keys, preset 'MCP Server' (a phx_ key)"
+            },
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {
+          "tool": "posthog-cli",
+          "install": "npm i -g @posthog/cli",
+          "notes": "posthog-cli api runs any endpoint and HogQL query with JSON output; run `posthog-cli api --agent-help` first; the route for scripted, scheduled pulls"
+        },
+        "script": {
+          "path": null,
+          "env": [
+            "POSTHOG_API_KEY",
+            "POSTHOG_PROJECT_ID"
+          ],
+          "notes": "usually unnecessary: a workflow step runs posthog-cli and saves the JSON as a snapshot; a stdlib script posting to /api/projects/{id}/query is the fallback"
+        }
+      }
+    },
+    {
+      "id": "mixpanel",
+      "name": "Mixpanel",
+      "source": "mixpanel",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.mixpanel.com/docs/mcp",
+      "capabilities": [
+        "events",
+        "funnels",
+        "retention",
+        "flows",
+        "reports"
+      ],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Read-only report tools; OAuth only",
+        "EU and India residency use https://mcp-eu.mixpanel.com/mcp and https://mcp-in.mixpanel.com/mcp",
+        "Listed in the Claude connectors directory",
+        "A scheduled pull uses the Query API with a service account (basic auth), so it lands in a script"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "mixpanel",
+            "transport": "http",
+            "url": "https://mcp.mixpanel.com/mcp",
+            "headers": {},
+            "auth": {
+              "model": "oauth",
+              "env": [],
+              "where": "browser grant on first use"
+            },
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "oauth-eu",
+            "default": false,
+            "server": "mixpanel",
+            "transport": "http",
+            "url": "https://mcp-eu.mixpanel.com/mcp",
+            "headers": {},
+            "auth": {
+              "model": "oauth",
+              "env": [],
+              "where": "browser grant on first use (EU residency)"
+            },
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {
+          "path": null,
+          "env": [
+            "MIXPANEL_SERVICE_ACCOUNT",
+            "MIXPANEL_SERVICE_SECRET",
+            "MIXPANEL_PROJECT_ID"
+          ],
+          "notes": "copy scripts/seo_snapshot.py; a service account (Organization Settings > Service Accounts) calls the Query API /api/query/insights for a scheduled snapshot"
+        }
+      }
+    },
+    {
+      "id": "amplitude",
+      "name": "Amplitude",
+      "source": "amplitude",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://amplitude.com/docs/amplitude-ai/amplitude-mcp",
+      "capabilities": [
+        "charts",
+        "dashboards",
+        "cohorts",
+        "experiments",
+        "taxonomy"
+      ],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__amplitude`) until checked",
+        "Writes create charts, dashboards and cohorts; no event data is written",
+        "The Claude connectors directory lists it for Claude but not Claude Code; the URL entry below works in Claude Code as a custom server",
+        "EU residency uses https://mcp.eu.amplitude.com/mcp"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "amplitude",
+            "transport": "http",
+            "url": "https://mcp.amplitude.com/mcp",
+            "headers": {},
+            "auth": {
+              "model": "oauth",
+              "env": [],
+              "where": "browser grant on first use"
+            },
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "oauth-eu",
+            "default": false,
+            "server": "amplitude",
+            "transport": "http",
+            "url": "https://mcp.eu.amplitude.com/mcp",
+            "headers": {},
+            "auth": {
+              "model": "oauth",
+              "env": [],
+              "where": "browser grant on first use (EU residency)"
+            },
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {
+          "path": null,
+          "env": [
+            "AMPLITUDE_API_KEY",
+            "AMPLITUDE_SECRET_KEY"
+          ],
+          "notes": "copy scripts/seo_snapshot.py; the project API key and secret key (Settings > Projects) call the Dashboard REST API /api/2/events/segmentation with basic auth for a scheduled snapshot"
+        }
+      }
+    },
+    {
+      "id": "plausible",
+      "name": "Plausible",
+      "source": "plausible",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/getsentry/plausible-mcp",
+      "capabilities": [
+        "traffic",
+        "pages",
+        "sources",
+        "conversions"
+      ],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "community server maintained by Sentry (getsentry/plausible-mcp); judge as a script, not a vendor tool",
+        "Plausible ships no official MCP server; Sentry hosts this one at https://plausible-mcp.sentry.dev and it passes your Plausible API key straight through as a bearer token (no secret stored on their side)",
+        "Self-hosted Plausible needs a PLAUSIBLE_BASE_URL, which the hosted bridge does not take; run the repo locally for that"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "remote",
+            "default": true,
+            "server": "plausible",
+            "transport": "http",
+            "url": "https://plausible-mcp.sentry.dev/mcp",
+            "headers": {
+              "Authorization": "Bearer ${PLAUSIBLE_API_KEY}"
+            },
+            "auth": {
+              "model": "bearer",
+              "env": [
+                "PLAUSIBLE_API_KEY"
+              ],
+              "where": "Plausible: Settings > API keys (Stats API key)"
+            },
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {
+          "path": null,
+          "env": [
+            "PLAUSIBLE_API_KEY",
+            "PLAUSIBLE_SITE_ID"
+          ],
+          "notes": "copy scripts/seo_snapshot.py; the Stats API v2 (/api/v2/query) is one POST per report and the simplest scheduled route"
+        }
+      }
+    },
+    {
+      "id": "matomo",
+      "name": "Matomo",
+      "source": "matomo",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://matomo.org/faq/how-to/how-to-configure-the-matomo-mcp-server/",
+      "capabilities": [
+        "reports",
+        "visits",
+        "pages",
+        "referrers",
+        "goals"
+      ],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Built into Matomo Cloud; on-premise installs add the 'MCP Server' plugin from the Marketplace",
+        "The endpoint URL is instance-specific and shown in the info box next to the MCP Server setting in Matomo's administration, so there is no committed entry; a person copies it from there when wiring",
+        "Auth is a Matomo API token (Administration > Personal > Security > Auth tokens) or OAuth 2.0; the FAQ says OAuth access tokens expire hourly and the plugin does not refresh them, so use the token; the header format is not printed on the FAQ",
+        "Any client holding the token reads what that user can read; rotate it periodically"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {
+          "path": null,
+          "env": [
+            "MATOMO_HOST",
+            "MATOMO_TOKEN_AUTH",
+            "MATOMO_SITE_ID"
+          ],
+          "notes": "copy scripts/seo_snapshot.py; the Reporting API (index.php?module=API&method=VisitsSummary.get&format=csv) already returns CSV"
+        }
+      }
+    },
+    {
+      "id": "adobe-cja",
+      "name": "Adobe Analytics / Customer Journey Analytics",
+      "source": "adobecja",
+      "verified": "unverified",
+      "checked": "2026-09-04",
+      "source_url": "https://developer.adobe.com/analytics-mcp/docs/",
+      "capabilities": [
+        "reports",
+        "segments",
+        "components"
+      ],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__adobe-cja`) until checked",
+        "GA since May 2026 and listed in the Claude connectors directory, but the overview page omits the endpoint URL and auth flow (Adobe IMS assumed); no .mcp.json entry until a person reads them from the Adobe Developer Console",
+        "Writes manage segments and components, not data"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {
+          "path": null,
+          "env": [
+            "ADOBE_CLIENT_ID",
+            "ADOBE_CLIENT_SECRET",
+            "ADOBE_ORG_ID"
+          ],
+          "notes": "copy scripts/seo_snapshot.py; an Adobe Developer Console project with OAuth server-to-server credentials calls the CJA Reporting API /reports for a scheduled snapshot"
+        }
+      }
+    },
+    {
+      "id": "clarity",
+      "name": "Microsoft Clarity",
+      "source": "clarity",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/microsoft/clarity-mcp-server",
+      "capabilities": [
+        "traffic-by-dimension",
+        "scroll-depth",
+        "engagement",
+        "dead-clicks"
+      ],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Local stdio server (microsoft/clarity-mcp-server, npm @microsoft/clarity-mcp-server) over the Clarity data export API; read-only",
+        "The token is passed as a command-line argument (--clarity_api_token), which shows in the process list on shared machines; the env-placeholder keeps it out of the file",
+        "The data export API returns up to three days of data per call"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "clarity",
+            "transport": "stdio",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@microsoft/clarity-mcp-server@2.0.1",
+              "--clarity_api_token=${CLARITY_API_TOKEN}"
+            ],
+            "env": {},
+            "auth": {
+              "model": "env",
+              "env": [
+                "CLARITY_API_TOKEN"
+              ],
+              "where": "Clarity: Settings > Data Export > Generate new API token"
+            },
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {
+          "path": null,
+          "env": [
+            "CLARITY_API_TOKEN"
+          ],
+          "notes": "copy scripts/seo_snapshot.py; the same token calls the data export API (www.clarity.ms/export-data/api/v1/project-live-insights) for a scheduled snapshot"
+        }
+      }
+    },
+    {
+      "id": "heap-hotjar",
+      "name": "Heap and Hotjar (Contentsquare)",
+      "source": "contentsquare",
+      "verified": "unverified",
+      "checked": "2026-09-04",
+      "source_url": "https://amplitude.com/docs/amplitude-ai/amplitude-mcp",
+      "capabilities": [
+        "heatmaps",
+        "session-replay",
+        "product-analytics"
+      ],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No standalone Heap or Hotjar server was found; a Contentsquare MCP that covers both is mentioned only on a competitor's comparison page and could not be verified on Contentsquare's own docs",
+        "Until a vendor page exists, use the manual export or a generic connector"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": null
+      }
+    }
+  ]
+}

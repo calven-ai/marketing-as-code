@@ -1,0 +1,273 @@
+{
+  "id": "cms",
+  "title": "CMS",
+  "for": "the website and blog CMS: publishing approved content, reading what is live",
+  "data_domain": null,
+  "manual": {
+    "export": "paste the draft into the CMS by hand; the agent only sets published_url in the repo",
+    "drop": "content/<piece>/ frontmatter (published_url and status)"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "webflow",
+      "name": "Webflow",
+      "source": "webflow",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.webflow.com/mcp/reference/how-it-works",
+      "capabilities": ["CMS items", "pages", "page SEO", "components"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__webflow`) until checked",
+        "publishing a site or CMS item is a live, user-visible write: humans decide (AGENTS.md rule 3)",
+        "in the Claude connectors directory; the repo `webflow/mcp-server` is read on the vendor page, the endpoint is from a secondary listing (an `/sse` endpoint also exists)"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "webflow",
+            "transport": "http",
+            "url": "https://mcp.webflow.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "contentful",
+      "name": "Contentful",
+      "source": "contentful",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.contentful.com/developers/docs/tools/mcp-server/",
+      "capabilities": ["entries", "assets", "content types"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__contentful`) until checked",
+        "the local server also reads a space id and environment id from its environment; the exact variable names are in the package README at the pinned version, confirm them before wiring",
+        "publishing an entry is a live write: humans decide"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "contentful",
+            "transport": "http",
+            "url": "https://mcp.contentful.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (OAuth 2.1)"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "local",
+            "default": false,
+            "server": "contentful-local",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@contentful/mcp-server@1.19.0"],
+            "env": {"CONTENTFUL_MANAGEMENT_ACCESS_TOKEN": "${CONTENTFUL_MANAGEMENT_TOKEN}"},
+            "auth": {"model": "env", "env": ["CONTENTFUL_MANAGEMENT_TOKEN"], "where": "Contentful > Settings > CMA tokens (a personal or a space-scoped Content Management API token)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "sanity",
+      "name": "Sanity",
+      "source": "sanity",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.sanity.io/docs",
+      "capabilities": ["documents", "schema", "queries"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__sanity`) until checked",
+        "remote only: the local `@sanity/mcp-server` package is deprecated and its repo archived; do not wire it",
+        "the host is confirmed; check on the day you wire it whether the path is `/` or `/mcp` (the vendor docs page moved and returned 404 today)"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "sanity",
+            "transport": "http",
+            "url": "https://mcp.sanity.io",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "wordpress",
+      "name": "WordPress",
+      "source": "wordpress",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/WordPress/mcp-adapter",
+      "capabilities": ["posts", "pages", "media"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__wordpress`) until checked",
+        "two parts: the `WordPress/mcp-adapter` plugin installed on the site (the successor of `Automattic/wordpress-mcp`, archived 2025-08) exposes the server, and the `@automattic/mcp-wordpress-remote` npm proxy connects a stdio client to it; both are needed",
+        "the proxy reads the site URL and an application password (or a JWT) from its environment; the exact variable names are in the proxy's README at the pinned version, confirm them before wiring",
+        "the mcp-adapter plugin is young; verify its maturity and that it is active on the site",
+        "publishing a post is a live write: humans decide",
+        "WordPress.org also runs a docs-only MCP for plugin developers; it is not a site server"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "wordpress",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@automattic/mcp-wordpress-remote@0.4.0"],
+            "env": {
+              "WP_API_URL": "${WORDPRESS_SITE_URL}",
+              "WP_API_USERNAME": "${WORDPRESS_USERNAME}",
+              "WP_API_PASSWORD": "${WORDPRESS_APP_PASSWORD}"
+            },
+            "auth": {"model": "basic", "env": ["WORDPRESS_SITE_URL", "WORDPRESS_USERNAME", "WORDPRESS_APP_PASSWORD"], "where": "WordPress admin > Users > Profile > Application Passwords, on the site running the mcp-adapter plugin"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "storyblok",
+      "name": "Storyblok",
+      "source": "storyblok",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/storyblok/mcp-server",
+      "capabilities": ["stories", "components"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__storyblok`) until checked",
+        "hosted on Storyblok Labs (innovation phase); the open-source `storyblok/mcp-server` repo is archived",
+        "auth is a management token; the header format is assumed as a bearer token and must be confirmed on the Labs page before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "token",
+            "default": true,
+            "server": "storyblok",
+            "transport": "http",
+            "url": "https://mcp.labs.storyblok.com/mcp",
+            "headers": {"Authorization": "Bearer ${STORYBLOK_MANAGEMENT_TOKEN}"},
+            "auth": {"model": "bearer", "env": ["STORYBLOK_MANAGEMENT_TOKEN"], "where": "Storyblok > My account > Personal access tokens (a management API token)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "hygraph",
+      "name": "Hygraph",
+      "source": "hygraph",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://hygraph.com/docs/hygraph-ai/mcp-server",
+      "capabilities": ["content", "localization", "publish"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Early Access",
+        "write tool names not verified; deny the whole server (`mcp__hygraph`) until checked",
+        "delete and unpublish are not available over MCP by design; a permanent auth token's permissions decide read, create, update and publish",
+        "the global endpoint signs in with the Hygraph account; project-scoped endpoints take a permanent auth token; the token header format is not on the docs page, confirm before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "token",
+            "default": true,
+            "server": "hygraph",
+            "transport": "http",
+            "url": "https://mcp.hygraph.com/mcp",
+            "headers": {"Authorization": "Bearer ${HYGRAPH_PAT}"},
+            "auth": {"model": "bearer", "env": ["HYGRAPH_PAT"], "where": "Hygraph project > Settings > Permanent Auth Tokens (an MCP Server token)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "ghost",
+      "name": "Ghost",
+      "source": "ghost",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://ghost.org/docs/admin-api/",
+      "capabilities": ["posts", "members"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server",
+        "community server maintained by MFYDev (`MFYDev/ghost-mcp`, Admin API key, read and write on posts and members); judge as a script, not a vendor tool",
+        "use the manual route or a script against the Admin API"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "framer",
+      "name": "Framer",
+      "source": "framer",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.framer.com/marketplace/",
+      "capabilities": ["pages", "CMS"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server; only a third-party marketplace plugin",
+        "use the manual route"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

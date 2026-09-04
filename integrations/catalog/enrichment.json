@@ -1,0 +1,297 @@
+{
+  "id": "enrichment",
+  "title": "Enrichment",
+  "for": "contact and company data: enriching target accounts and people in data/accounts",
+  "data_domain": "data/accounts",
+  "manual": {
+    "export": "export the enriched list from the tool as CSV (one row per person or account, with the company domain and the fields you asked for)",
+    "drop": "data/accounts/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "apollo",
+      "name": "Apollo.io",
+      "source": "apollo",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/apolloio/apollo-mcp-plugin",
+      "capabilities": ["people search", "company search", "enrichment"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "the survey confirmed read tools only; sequence write tools are not verified, and if the tool list shows any create, add or send tool, deny the whole server (`mcp__apollo`) until reviewed",
+        "the same `apollo` server appears in outbound.json for sequences",
+        "in the Claude connectors directory for Claude, not for Claude Code",
+        "the plugin repo is on the vendor's GitHub; the endpoint is from a secondary listing, confirm before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "apollo",
+            "transport": "http",
+            "url": "https://mcp.apollo.io/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "clay",
+      "name": "Clay",
+      "source": "clay",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.clay.com/concepts/mcp",
+      "capabilities": ["search", "enrich", "tables"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__clay`) until checked",
+        "writes drive Clay tables, which spend credits; humans decide before a bulk run",
+        "in the Claude connectors directory; endpoint seen in a secondary listing, confirm on the developer page before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "clay",
+            "transport": "http",
+            "url": "https://api.clay.com/v3/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "zoominfo",
+      "name": "ZoomInfo",
+      "source": "zoominfo",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.zoominfo.com/docs/connect-to-zoominfo-mcp",
+      "capabilities": ["contacts", "companies", "enrichment", "intent"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "needs a ZoomInfo licence for the signing-in user",
+        "in the Claude connectors directory; endpoint seen in a secondary listing, confirm on the docs page before wiring",
+        "Chorus (call intelligence) has no separate server"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "zoominfo",
+            "transport": "http",
+            "url": "https://mcp.zoominfo.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "lusha",
+      "name": "Lusha",
+      "source": "lusha",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.lusha.com/mcp-docs",
+      "capabilities": ["contact search", "company search", "enrichment", "signals", "lookalikes"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "17 read tools; no write tools documented",
+        "the API key header is `x-api-key`, lowercase; OAuth exists only through the official connectors in Claude, ChatGPT and Codex",
+        "repo `lusha-oss/lusha-public-api-mcp` is on the vendor's GitHub; the endpoint was read on the vendor docs page today"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "lusha",
+            "transport": "http",
+            "url": "https://mcp.lusha.com",
+            "headers": {"x-api-key": "${LUSHA_API_KEY}"},
+            "auth": {"model": "header", "env": ["LUSHA_API_KEY"], "where": "Lusha dashboard > API"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "hunter",
+      "name": "Hunter.io",
+      "source": "hunter",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://hunter.io/mcp",
+      "capabilities": ["find companies", "find and verify emails", "build lists", "leads"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__hunter`) until checked (the vendor page names leads create and update and list organisation)",
+        "available on all plans; verifications and searches spend credits",
+        "endpoint read on the vendor page today; the survey marks it as a secondary listing"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "hunter",
+            "transport": "http",
+            "url": "https://mcp.hunter.io/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use, where the client supports it"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "key",
+            "default": false,
+            "server": "hunter-key",
+            "transport": "http",
+            "url": "https://mcp.hunter.io/mcp",
+            "headers": {"X-API-Key": "${HUNTER_API_KEY}"},
+            "auth": {"model": "header", "env": ["HUNTER_API_KEY"], "where": "hunter.io > API"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "fullenrich",
+      "name": "FullEnrich",
+      "source": "fullenrich",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://help.fullenrich.com/en/articles/14190120-mcp-server",
+      "capabilities": ["waterfall email enrichment", "phone enrichment"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "every enrichment spends credits; humans decide before a bulk run",
+        "auth is a browser sign-in with the FullEnrich account; no API key header is documented for the MCP",
+        "endpoint read on the vendor help page today; the survey marks it as a secondary listing"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "fullenrich",
+            "transport": "http",
+            "url": "https://mcp.fullenrich.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser sign-in with the FullEnrich account on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "dropcontact",
+      "name": "Dropcontact",
+      "source": "dropcontact",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.dropcontact.com/mcp-dropcontact",
+      "capabilities": ["email enrichment"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "an official server is announced on the vendor page with API-key auth, but the endpoint was not on the page fetched; wire it only after reading the setup instructions there"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "people-data-labs",
+      "name": "People Data Labs",
+      "source": "pdl",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.peopledatalabs.com/",
+      "capabilities": ["person enrichment", "company enrichment", "search"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server",
+        "community server maintained by phxdev1 (`phxdev1/peopledatalabs-mcp`, 2 stars, stale); judge as a script, not a vendor tool",
+        "a stdlib script against the REST API is the sensible route"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "clearbit",
+      "name": "Clearbit (HubSpot Breeze Intelligence)",
+      "source": "clearbit",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://knowledge.hubspot.com/breeze-intelligence",
+      "capabilities": ["company enrichment", "contact enrichment"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server; Breeze Intelligence is HubSpot-locked, so reach the enriched properties through the HubSpot MCP (crm.json) instead",
+        "Pipedream and Composio expose a Clearbit action; those are generic connectors, not a vendor server"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "cognism",
+      "name": "Cognism",
+      "source": "cognism",
+      "verified": "unverified",
+      "checked": "2026-09-04",
+      "source_url": "https://www.cognism.com/",
+      "capabilities": ["contact data", "company data"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "conflicting reports of an MCP server; nothing verified on the vendor site",
+        "use the manual route: export the list as CSV"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

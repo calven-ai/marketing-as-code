@@ -1,0 +1,314 @@
+{
+  "id": "tasks",
+  "title": "Tasks",
+  "for": "the team's task tool: filing follow-ups per integrations/tasks.md",
+  "data_domain": null,
+  "manual": {
+    "export": "file the task as a `- [ ]` line with the owner in parentheses under `## Tasks` in the project's status.md, or on the follow-ups line of the decision in memory/decision-log.md when it belongs to no project (the fallback in integrations/tasks.md)",
+    "drop": "projects/<name>/status.md (the ## Tasks checklist)"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "linear",
+      "name": "Linear",
+      "source": "linear",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://linear.app/docs/mcp",
+      "capabilities": ["issues", "projects", "comments", "cycles", "documents"],
+      "writes": true,
+      "write_tools": ["create_issue", "update_issue", "create_comment", "create_project", "update_project"],
+      "read_only_switch": {"kind": "url", "name": "path", "value": "/mcp/readonly"},
+      "caveats": [
+        "in the Claude connectors directory",
+        "write tool names taken from Linear's published tool list; confirm them in the session's tool list before writing deny rules",
+        "the read-only endpoint (`/mcp/readonly`) or the `read` OAuth scope gives a server with no write tools at all; prefer it for anything that only reads",
+        "endpoint seen in a secondary listing; confirm on linear.app/docs/mcp on the day you wire it"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "linear",
+            "transport": "http",
+            "url": "https://mcp.linear.app/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (OAuth 2.1 with dynamic client registration)"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "readonly",
+            "default": false,
+            "server": "linear-readonly",
+            "transport": "http",
+            "url": "https://mcp.linear.app/mcp/readonly",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "token",
+            "default": false,
+            "server": "linear-token",
+            "transport": "http",
+            "url": "https://mcp.linear.app/mcp",
+            "headers": {"Authorization": "Bearer ${LINEAR_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["LINEAR_API_KEY"], "where": "Linear > Settings > Security & access > Personal API keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "asana",
+      "name": "Asana",
+      "source": "asana",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.asana.com/docs/mcp-server",
+      "capabilities": ["tasks", "projects"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__asana`) until checked",
+        "interactive tools show a confirmation before creating or updating anything",
+        "already a known route in integrations/adding-an-integration.md; the worked example there covers the PR",
+        "in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "asana",
+            "transport": "http",
+            "url": "https://mcp.asana.com/v2/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "jira",
+      "name": "Jira (Atlassian Rovo MCP)",
+      "source": "jira",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/atlassian/atlassian-mcp-server",
+      "capabilities": ["issues", "projects", "search", "confluence pages (same server)"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__atlassian`) until checked",
+        "one server serves Jira and Confluence; the same `atlassian` entry appears in docs.json on purpose",
+        "no read-only endpoint; an Atlassian admin restricts a user to the `read_*` permission scopes (read_jira, read_confluence) to get a read-only server",
+        "the v2 endpoint is the recommended one; v1 endpoints remain supported",
+        "in the Claude connectors directory as Atlassian Rovo; community `sooperset/mcp-atlassian` exists for self-hosted Data Center (judge as a script, not a vendor tool)"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "atlassian",
+            "transport": "http",
+            "url": "https://mcp.atlassian.com/v2/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (OAuth 2.1)"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "token",
+            "default": false,
+            "server": "atlassian-token",
+            "transport": "http",
+            "url": "https://mcp.atlassian.com/v2/mcp",
+            "headers": {"Authorization": "Bearer ${ATLASSIAN_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["ATLASSIAN_API_KEY"], "where": "an Atlassian service-account API key (admin.atlassian.com); a personal token uses Basic auth with email:token instead"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "clickup",
+      "name": "ClickUp",
+      "source": "clickup",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://help.clickup.com/hc/en-us/articles/33335772678423",
+      "capabilities": ["tasks", "docs"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "public beta",
+        "write tool names not verified; deny the whole server (`mcp__clickup`) until checked",
+        "in the Claude connectors directory; endpoint seen in a secondary listing, confirm on the help page before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "clickup",
+            "transport": "http",
+            "url": "https://mcp.clickup.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "monday",
+      "name": "monday.com",
+      "source": "monday",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://support.monday.com/hc/en-us/articles/28588158981266",
+      "capabilities": ["boards", "items"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__monday`) until checked",
+        "already a known route in integrations/adding-an-integration.md (same shape as Asana)",
+        "in the Claude connectors directory; endpoint seen in a secondary listing, confirm on the support page before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "monday",
+            "transport": "http",
+            "url": "https://mcp.monday.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "trello",
+      "name": "Trello",
+      "source": "trello",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/atlassian/trello-mcp-server",
+      "capabilities": ["boards", "lists", "cards"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__trello`) until checked",
+        "published by Atlassian; separate from the Rovo server"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "trello",
+            "transport": "http",
+            "url": "https://mcp.trello.com/v1",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "github",
+      "name": "GitHub Issues",
+      "source": "github",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/github/github-mcp-server",
+      "capabilities": ["issues", "pull requests", "repositories", "code search"],
+      "writes": true,
+      "write_tools": ["create_issue", "update_issue", "add_issue_comment", "create_pull_request", "create_or_update_file", "push_files", "create_branch", "merge_pull_request"],
+      "read_only_switch": {"kind": "url", "name": "path", "value": "/readonly"},
+      "caveats": [
+        "the repo already uses the `gh` CLI (.github/workflows/transcripts-cron.yml); prefer it for anything unattended",
+        "write tool names taken from the github-mcp-server tool list; confirm them in the session's tool list before writing deny rules",
+        "read-only also via the header `X-MCP-Readonly: true`; `X-MCP-Toolsets` narrows the tool set",
+        "the local server is a Go binary or Docker image, not an npm package, so no stdio entry is listed here"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "github",
+            "transport": "http",
+            "url": "https://api.githubcopilot.com/mcp/",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "readonly",
+            "default": false,
+            "server": "github-readonly",
+            "transport": "http",
+            "url": "https://api.githubcopilot.com/mcp/readonly",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "token",
+            "default": false,
+            "server": "github-token",
+            "transport": "http",
+            "url": "https://api.githubcopilot.com/mcp/",
+            "headers": {"Authorization": "Bearer ${GITHUB_TOKEN}"},
+            "auth": {"model": "bearer", "env": ["GITHUB_TOKEN"], "where": "a fine-grained personal access token (github.com > Settings > Developer settings)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {
+          "tool": "gh",
+          "install": "https://cli.github.com; present on every GitHub Actions runner",
+          "notes": "the repo's own route; `gh issue create`, `gh pr create` and the API via `gh api`"
+        },
+        "script": null
+      }
+    }
+  ]
+}

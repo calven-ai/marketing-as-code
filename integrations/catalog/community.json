@@ -1,0 +1,116 @@
+{
+  "id": "community",
+  "title": "Community",
+  "for": "forums, member communities, community chat servers",
+  "data_domain": "data/social",
+  "manual": {
+    "export": "Export members, topics or posts as CSV from the community admin panel (Discourse: Admin > Data Explorer; Circle: Members > Export).",
+    "drop": "data/social/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["chat", "generic"],
+  "vendors": [
+    {
+      "id": "discourse",
+      "name": "Discourse",
+      "source": "discourse",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/discourse/discourse-mcp",
+      "capabilities": ["search topics and posts", "read topics", "categories and tags", "user directory", "Data Explorer queries"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": {"kind": "arg", "name": "--allow_writes", "value": "absent (writes are off unless the flag is passed)"},
+      "caveats": [
+        "Writes are off by default; `--allow_writes` registers post, topic, message, category and user mutation tools. Do not add the flag to a committed entry.",
+        "Authentication goes through a JSON profile file kept outside the repo (`--profile`), never on the command line; public forums need none.",
+        "Requires Node 24 or newer. Pinned to @discourse/mcp 0.3.1 (npm, checked 2026-09-04)."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "stdio",
+            "default": true,
+            "server": "discourse",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@discourse/mcp@0.3.1", "--site", "${DISCOURSE_SITE_URL}", "--profile", "${DISCOURSE_MCP_PROFILE}"],
+            "env": {},
+            "auth": {"model": "env", "env": ["DISCOURSE_SITE_URL", "DISCOURSE_MCP_PROFILE"], "where": "DISCOURSE_MCP_PROFILE is the path to a JSON profile holding auth_pairs (Discourse: Admin > API > New key); DISCOURSE_SITE_URL is the forum URL"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "circle",
+      "name": "Circle",
+      "source": "circle",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://app.circle.so/api/mcp",
+      "capabilities": ["members", "spaces and posts", "events", "comments"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__circle`) until checked",
+        "Business plan or higher.",
+        "Endpoint seen in secondary listings only; confirm on Circle's developer docs before wiring."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "circle",
+            "transport": "http",
+            "url": "https://app.circle.so/api/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "source": "discord",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://discord.com/developers/docs",
+      "capabilities": ["channels and messages", "members (via a bot)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official server as of 2026-09-04. Community servers SaseQ/discord-mcp and hanweg/mcp-discord run with a bot token and can post; community server maintained by SaseQ / hanweg; judge as a script, not a vendor tool.",
+        "A bot token in a community server's environment is a full write credential; prefer a read-scoped script or a generic connector."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "slack",
+      "name": "Slack (community workspace)",
+      "source": "slack",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.slack.dev/ai/slack-mcp-server/",
+      "capabilities": ["community channels, threads and search through the chat category's Slack server"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "wire Slack under chat; the same server serves community channels",
+        "This repo already posts to Slack through its own bot (scripts/slack_post.py); a community workspace is a second workspace, so it needs its own token or OAuth grant."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

@@ -1,0 +1,196 @@
+{
+  "id": "docs",
+  "title": "Docs",
+  "for": "the team's document and wiki tools: reading briefs and notes, publishing reports where the team reads them",
+  "data_domain": null,
+  "manual": {
+    "export": "the agent writes Markdown into the repo; a person copies it into the doc tool by hand",
+    "drop": "reports/ or memory/knowledge/ (the repo copy stays canonical)"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "notion",
+      "name": "Notion",
+      "source": "notion",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/makenotion/notion-mcp-server",
+      "capabilities": ["search", "pages", "databases", "comments"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__notion`) until checked",
+        "in the Claude connectors directory",
+        "the local server needs an internal integration token and only sees pages shared with that integration; the env var name in the package README should be confirmed at the pinned version"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "notion",
+            "transport": "http",
+            "url": "https://mcp.notion.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "local",
+            "default": false,
+            "server": "notion-local",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@notionhq/notion-mcp-server@2.5.1"],
+            "env": {"NOTION_TOKEN": "${NOTION_TOKEN}"},
+            "auth": {"model": "env", "env": ["NOTION_TOKEN"], "where": "notion.so/profile/integrations, an internal integration's secret"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "google-workspace",
+      "name": "Google Workspace (Drive, Docs, Sheets)",
+      "source": "gworkspace",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.google.com/workspace",
+      "capabilities": ["Drive", "Docs", "Sheets", "Gmail", "Calendar", "Chat"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Public Developer Preview; a Workspace admin must allow-list the MCP client",
+        "write tool names not verified; deny the whole server (`mcp__google-workspace`) until checked",
+        "endpoint seen in a secondary listing; confirm on the Google Workspace developer site before wiring",
+        "community `aaronsb/google-workspace-mcp` exists; judge as a script, not a vendor tool"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "google-workspace",
+            "transport": "http",
+            "url": "https://workspacemcp.googleapis.com/mcp/v1",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "Google sign-in in the browser"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "confluence",
+      "name": "Confluence (Atlassian Rovo MCP)",
+      "source": "confluence",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/atlassian/atlassian-mcp-server",
+      "capabilities": ["pages", "spaces", "search", "jira issues (same server)"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__atlassian`) until checked",
+        "one server serves Confluence and Jira; the same `atlassian` entry appears in tasks.json on purpose",
+        "no read-only endpoint; an Atlassian admin restricts a user to the `read_*` permission scopes to get a read-only server",
+        "in the Claude connectors directory as Atlassian Rovo"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "atlassian",
+            "transport": "http",
+            "url": "https://mcp.atlassian.com/v2/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (OAuth 2.1)"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "token",
+            "default": false,
+            "server": "atlassian-token",
+            "transport": "http",
+            "url": "https://mcp.atlassian.com/v2/mcp",
+            "headers": {"Authorization": "Bearer ${ATLASSIAN_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["ATLASSIAN_API_KEY"], "where": "an Atlassian service-account API key (admin.atlassian.com)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "airtable",
+      "name": "Airtable",
+      "source": "airtable",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://support.airtable.com/articles/9897799762",
+      "capabilities": ["bases", "tables", "records"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__airtable`) until checked",
+        "in the Claude connectors directory; endpoint seen in a secondary listing, confirm on the support page before wiring",
+        "community `domdomegg/airtable-mcp-server` exists; judge as a script, not a vendor tool"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "airtable",
+            "transport": "http",
+            "url": "https://mcp.airtable.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "coda",
+      "name": "Coda",
+      "source": "coda",
+      "verified": "unverified",
+      "checked": "2026-09-04",
+      "source_url": "https://coda.io/developers",
+      "capabilities": ["docs", "tables"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server confirmed; official status unclear",
+        "community server maintained by orellazri (`orellazri/coda-mcp`); judge as a script, not a vendor tool",
+        "until confirmed, use the manual route or a generic connector"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": null
+      }
+    }
+  ]
+}

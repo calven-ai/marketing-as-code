@@ -1,0 +1,442 @@
+{
+  "id": "marketing-automation",
+  "title": "Marketing automation and email",
+  "for": "campaigns, flows and journeys, audiences and segments, email performance",
+  "data_domain": "data/email",
+  "manual": {
+    "export": "Open the campaign or email performance report in the tool, export it as CSV (most tools have Export on the report or campaign list page) and drop the file into the snapshots folder.",
+    "drop": "data/email/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "hubspot",
+      "name": "HubSpot Marketing Hub",
+      "source": "hubspot",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server",
+      "capabilities": ["marketing-email", "email-analytics", "landing-pages", "blog-posts", "campaigns", "campaign-attribution", "content-analytics"],
+      "writes": true,
+      "write_tools": ["manage_marketing_email", "manage_landing_page", "manage_blog_post", "manage_campaign_objects", "manage_crm_objects"],
+      "read_only_switch": null,
+      "caveats": [
+        "Same server as the CRM row (server name `hubspot`); one .mcp.json entry serves both categories",
+        "Read tools: get_marketing_email_analytics, get_content_analytics_report, get_campaign_attribution_reports; deny mcp__hubspot__manage_* unless writes are wanted",
+        "The vendor page documents https://mcp.hubspot.com; Claude Code examples elsewhere use https://mcp.hubspot.com/anthropic; confirm the path when wiring",
+        "Publishing an email or page through manage_* is a user-visible action; humans decide (AGENTS.md rule 3)"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "hubspot",
+            "transport": "http",
+            "url": "https://mcp.hubspot.com",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use; scopes follow the HubSpot user's permissions"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "hs", "install": "npm i -g @hubspot/cli", "notes": "developer tooling for CMS and apps; it does not export marketing analytics"},
+        "script": {"path": null, "env": ["HUBSPOT_ACCESS_TOKEN"], "notes": "copy scripts/seo_snapshot.py; a private-app token reads /marketing/v3/emails/statistics/list for a scheduled email-performance snapshot"}
+      }
+    },
+    {
+      "id": "marketo",
+      "name": "Marketo (Adobe)",
+      "source": "marketo",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://experienceleague.adobe.com/en/docs/marketo-developer/marketo/mcp-server",
+      "capabilities": ["programs", "smart-campaigns", "leads", "lists", "emails", "forms", "bulk-export"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__marketo`) until checked",
+        "100+ operations, most of them writes (create programs, campaigns, emails, forms); no read-only mode is documented",
+        "Credentials travel as per-request headers, so the entry uses ${MARKETO_CLIENT_ID}, ${MARKETO_CLIENT_SECRET} and ${MARKETO_MUNCHKIN_ID} placeholders; an IMS bearer token is the alternative",
+        "Smart List and Smart Campaign create/update were slated for September 2026; check the changelog"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "marketo",
+            "transport": "http",
+            "url": "https://marketo-mcp.adobe.io/mcp",
+            "headers": {"X-Marketo-Client-Id": "${MARKETO_CLIENT_ID}", "X-Marketo-Client-Secret": "${MARKETO_CLIENT_SECRET}", "X-Marketo-Munchkin-Id": "${MARKETO_MUNCHKIN_ID}"},
+            "auth": {"model": "header", "env": ["MARKETO_CLIENT_ID", "MARKETO_CLIENT_SECRET", "MARKETO_MUNCHKIN_ID"], "where": "Marketo: Admin > Integration > LaunchPoint (custom service) for the client id and secret; Admin > Munchkin for the Munchkin id"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["MARKETO_CLIENT_ID", "MARKETO_CLIENT_SECRET", "MARKETO_MUNCHKIN_ID"], "notes": "copy scripts/seo_snapshot.py; the same LaunchPoint credentials mint a REST token for the bulk activity export endpoints"}
+      }
+    },
+    {
+      "id": "customerio",
+      "name": "Customer.io",
+      "source": "customerio",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.customer.io/ai/mcp/get-started/",
+      "capabilities": ["campaigns", "campaign-performance", "segments", "broadcasts"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__customerio`) until checked",
+        "Writes (campaigns, segments, broadcasts) arrived in Spring 2026; a broadcast is a send, so it is a humans-decide action",
+        "An account admin enables the MCP server once for the workspace; EU workspaces use https://mcp-eu.customer.io/mcp",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "customerio",
+            "transport": "http",
+            "url": "https://mcp.customer.io/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use, after an admin enables MCP in Workspace Settings"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "oauth-eu",
+            "default": false,
+            "server": "customerio",
+            "transport": "http",
+            "url": "https://mcp-eu.customer.io/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (EU data center)"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["CUSTOMERIO_APP_API_KEY"], "notes": "copy scripts/seo_snapshot.py; an App API key (Settings > API Credentials) reads /v1/campaigns/{id}/metrics for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "braze",
+      "name": "Braze",
+      "source": "braze",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://www.braze.com/docs/user_guide/brazeai/mcp_server/setup",
+      "capabilities": ["campaign-analytics", "canvas-analytics", "segment-analytics", "kpis", "templates", "content-blocks"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__braze`) until checked",
+        "Early access: an admin grants the 'Use MCP Server' permission per user; the older local beta server is deprecated",
+        "Writes cover templates, Content Blocks and media, not sends; no user-profile PII is exposed",
+        "EU clusters use https://mcp.braze.eu/mcp"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "braze",
+            "transport": "http",
+            "url": "https://mcp.braze.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (dynamic client registration, SSO supported)"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "oauth-eu",
+            "default": false,
+            "server": "braze",
+            "transport": "http",
+            "url": "https://mcp.braze.eu/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (EU cluster)"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["BRAZE_API_KEY", "BRAZE_REST_ENDPOINT"], "notes": "copy scripts/seo_snapshot.py; a REST API key with campaigns.data_series reads /campaigns/data_series on the cluster's REST endpoint"}
+      }
+    },
+    {
+      "id": "klaviyo",
+      "name": "Klaviyo",
+      "source": "klaviyo",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.klaviyo.com/en/docs/klaviyo_mcp_server",
+      "capabilities": ["campaigns", "flows", "metrics", "profiles", "segments"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": {"kind": "env", "name": "READ_ONLY", "value": "true"},
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__klaviyo`) until checked, or run the local variant with READ_ONLY=true which is pinned below",
+        "The remote server is OAuth-only; the local variant with a private API key is the headless path and honours READ_ONLY",
+        "Only Owner, Admin and Manager roles can connect",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "remote",
+            "default": true,
+            "server": "klaviyo",
+            "transport": "http",
+            "url": "https://mcp.klaviyo.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (dynamic client registration)"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "local",
+            "default": false,
+            "server": "klaviyo",
+            "transport": "stdio",
+            "command": "uvx",
+            "args": ["klaviyo-mcp-server==0.4.1"],
+            "env": {"PRIVATE_API_KEY": "${KLAVIYO_PRIVATE_API_KEY}", "READ_ONLY": "true"},
+            "auth": {"model": "env", "env": ["KLAVIYO_PRIVATE_API_KEY"], "where": "Klaviyo: Settings > Account > API keys (private key with read scopes)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["KLAVIYO_PRIVATE_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the private key reads /api/campaign-values-reports for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "mailchimp",
+      "name": "Mailchimp",
+      "source": "mailchimp",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://mandrillapp.com/mcp",
+      "capabilities": ["transactional-email"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__mandrill`) until checked",
+        "The only official server is for Mailchimp Transactional (Mandrill): nine developer tools, none for audiences or campaign reports",
+        "The Marketing API (audiences, campaigns, reports) has no official server; community servers (pipeworx, cyanheads) and the generic connectors are the alternatives; judge a community server as a script",
+        "Mandrill auth model not verified on the vendor page; expect an API key"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "mandrill",
+            "transport": "http",
+            "url": "https://mandrillapp.com/mcp",
+            "headers": {"Authorization": "Bearer ${MANDRILL_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["MANDRILL_API_KEY"], "where": "Mandrill: Settings > SMTP & API Info; header format assumed, confirm on the vendor page"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["MAILCHIMP_API_KEY", "MAILCHIMP_SERVER_PREFIX"], "notes": "copy scripts/seo_snapshot.py; the Marketing API key (Account > Extras > API keys) reads /3.0/reports for a scheduled campaign-performance snapshot; this is the practical route for audiences and campaigns"}
+      }
+    },
+    {
+      "id": "activecampaign",
+      "name": "ActiveCampaign",
+      "source": "activecampaign",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.activecampaign.com/page/mcp",
+      "capabilities": ["contacts", "deals", "automations", "campaigns"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__activecampaign`) until checked",
+        "The vendor documents OAuth setup through the Claude and ChatGPT connector flows (developers.activecampaign.com/page/connect-claude) but does not print a raw endpoint URL; no .mcp.json entry until a person reads it from the connect page",
+        "Listed in the Claude connectors directory for Claude and Claude Code, which is the easiest way in",
+        "The Postmark server (ActiveCampaign/postmark-mcp, transactional stats) is a separate product"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["ACTIVECAMPAIGN_API_URL", "ACTIVECAMPAIGN_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the account API key (Settings > Developer) reads /api/3/campaigns for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "brevo",
+      "name": "Brevo",
+      "source": "brevo",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.brevo.com/docs/mcp-protocol",
+      "capabilities": ["contacts", "email-campaigns", "sms-campaigns", "templates", "campaign-analytics"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__brevo`) until checked",
+        "The token is an API key generated with the MCP option (Brevo: SMTP & API > API keys); the docs show it as Authorization: Bearer",
+        "Per-module servers exist beside the all-modules URL; the all-modules one is wired here",
+        "Sending a campaign is a humans-decide action"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "token",
+            "default": true,
+            "server": "brevo",
+            "transport": "http",
+            "url": "https://mcp.brevo.com/v1/brevo/mcp",
+            "headers": {"Authorization": "Bearer ${BREVO_MCP_TOKEN}"},
+            "auth": {"model": "bearer", "env": ["BREVO_MCP_TOKEN"], "where": "Brevo: SMTP & API > API keys > Generate with the MCP option"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["BREVO_API_KEY"], "notes": "copy scripts/seo_snapshot.py; a v3 API key reads /v3/emailCampaigns with statistics for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "iterable",
+      "name": "Iterable",
+      "source": "iterable",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/Iterable/mcp-server",
+      "capabilities": ["templates", "journeys", "campaigns", "variants"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__iterable`) until checked",
+        "Beta and open source; Iterable says it may change or be discontinued",
+        "The package prefers keys managed by `npx @iterable/mcp keys add` (stored in the OS keychain); ITERABLE_API_KEY in the environment is the documented alternative and the one wired here; ITERABLE_BASE_URL selects the EU endpoint"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "iterable",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@iterable/mcp@1.8.1"],
+            "env": {"ITERABLE_API_KEY": "${ITERABLE_API_KEY}"},
+            "auth": {"model": "env", "env": ["ITERABLE_API_KEY"], "where": "Iterable: Integrations > API keys (server-side key)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["ITERABLE_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the same key reads /api/campaigns/metrics for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "intercom",
+      "name": "Intercom",
+      "source": "intercom",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/intercom/intercom-mcp-server",
+      "capabilities": ["conversations", "contacts", "companies", "help-center-articles"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__intercom`) until checked",
+        "Mostly read; the writes are Help Center article create and update",
+        "US-hosted workspaces only",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "intercom",
+            "transport": "http",
+            "url": "https://mcp.intercom.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["INTERCOM_ACCESS_TOKEN"], "notes": "copy scripts/seo_snapshot.py; an access token from a private app (Developer Hub) reads /conversations/search for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "resend",
+      "name": "Resend",
+      "source": "resend",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://resend.com/docs/knowledge-base/mcp-server",
+      "capabilities": ["broadcasts", "audiences", "contacts", "domains", "send"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__resend`) until checked",
+        "Sending email is an irreversible write: deny the send tools by name once known, and keep sends behind human approval",
+        "The remote server takes OAuth or an API key as a bearer token; the local package resend-mcp needs RESEND_API_KEY"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "resend",
+            "transport": "http",
+            "url": "https://mcp.resend.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "token",
+            "default": false,
+            "server": "resend",
+            "transport": "http",
+            "url": "https://mcp.resend.com/mcp",
+            "headers": {"Authorization": "Bearer ${RESEND_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["RESEND_API_KEY"], "where": "Resend: API Keys (a key with sending access is a send key; create a read-only one where the workflow only reads)"},
+            "headless": true,
+            "oauth_scopes": []
+          },
+          {
+            "id": "local",
+            "default": false,
+            "server": "resend",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "resend-mcp@2.18.0"],
+            "env": {"RESEND_API_KEY": "${RESEND_API_KEY}"},
+            "auth": {"model": "env", "env": ["RESEND_API_KEY"], "where": "Resend: API Keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["RESEND_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the key reads /broadcasts for a scheduled snapshot"}
+      }
+    }
+  ]
+}

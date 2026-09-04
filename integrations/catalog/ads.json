@@ -1,0 +1,216 @@
+{
+  "id": "ads",
+  "title": "Paid media",
+  "for": "campaign spend, impressions, clicks, conversions, cost per lead across ad platforms",
+  "data_domain": "data/ads",
+  "manual": {
+    "export": "Open the campaign report in the ads platform (Google Ads: Campaigns > Download; Meta: Ads Manager > Reports > Export; LinkedIn: Campaign Manager > Export), export it as CSV for the period, and drop the file into the snapshots folder.",
+    "drop": "data/ads/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "google-ads",
+      "name": "Google Ads",
+      "source": "googleads",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/googleads/google-ads-mcp",
+      "capabilities": ["gaql-reporting", "accessible-customers", "resource-metadata"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Read-only by design: search (GAQL), list_accessible_customers, get_resource_metadata",
+        "Google's README installs from git (pipx run --spec git+...), and the PyPI release google-ads-mcp 0.0.1 dates from October 2025 while the repo kept moving, so the entry pins the git spec to commit 88f0467b9e536c562941fa52a94dd02b193c8fa4 (main on 2026-09-04); bump it on purpose in a proposal",
+        "Needs a Google Ads developer token (API Center in a manager account) plus ADC: gcloud auth application-default login for a person, or a service-account JSON at GOOGLE_APPLICATION_CREDENTIALS for an unattended run; GOOGLE_PROJECT_ID is the Cloud project with the Google Ads API enabled",
+        "An HTTP mode with an OAuth proxy exists for hosting; not wired here"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "googleads",
+            "transport": "stdio",
+            "command": "pipx",
+            "args": ["run", "--spec", "git+https://github.com/googleads/google-ads-mcp.git@88f0467b9e536c562941fa52a94dd02b193c8fa4", "google-ads-mcp"],
+            "env": {"GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}", "GOOGLE_PROJECT_ID": "${GOOGLE_PROJECT_ID}", "GOOGLE_ADS_DEVELOPER_TOKEN": "${GOOGLE_ADS_DEVELOPER_TOKEN}"},
+            "auth": {"model": "env", "env": ["GOOGLE_APPLICATION_CREDENTIALS", "GOOGLE_PROJECT_ID", "GOOGLE_ADS_DEVELOPER_TOKEN"], "where": "Google Ads: Tools > API Center for the developer token; Google Cloud console for the service account JSON and project id"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "gcloud", "install": "https://cloud.google.com/sdk/docs/install", "notes": "auth only; there is no Google Ads reporting CLI, so schedules use a script"},
+        "script": {"path": null, "env": ["GOOGLE_APPLICATION_CREDENTIALS", "GOOGLE_ADS_DEVELOPER_TOKEN", "GOOGLE_ADS_CUSTOMER_ID"], "notes": "copy scripts/seo_snapshot.py; a service account with a developer token posts GAQL to googleads.googleapis.com/v19/customers/{id}/googleAds:searchStream for the weekly spend snapshot"}
+      }
+    },
+    {
+      "id": "meta-ads",
+      "name": "Meta Ads",
+      "source": "metaads",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.facebook.com/docs/marketing-api/mcp",
+      "capabilities": ["insights", "campaign-management", "catalog", "diagnostics"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__metaads`) until checked",
+        "Open beta since April 2026; the endpoint and the 29-tool list come from third-party write-ups, the developers.facebook.com page exists but is JavaScript-rendered and could not be read, confirm the URL there",
+        "Writes need the ads_management scope granted during the OAuth flow; grant ads_read only where the workflow only reports",
+        "Community pipeboard-co/meta-ads-mcp (1,231 stars, hosted and PyPI meta-ads-mcp) is the older alternative; judge it as a script"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "metaads",
+            "transport": "http",
+            "url": "https://mcp.facebook.com/ads",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "facebook.com browser grant on first use; keep the scopes to ads_read unless writes are wanted"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["META_ACCESS_TOKEN", "META_AD_ACCOUNT_ID"], "notes": "copy scripts/seo_snapshot.py; a system-user token with ads_read (Business Settings > System users) reads graph.facebook.com/v21.0/act_{id}/insights for the weekly spend snapshot"}
+      }
+    },
+    {
+      "id": "linkedin-ads",
+      "name": "LinkedIn Ads (Campaign Manager)",
+      "source": "linkedinads",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/mharnett/mcp-linkedin-ads",
+      "capabilities": ["campaign-analytics", "demographics", "lead-gen-forms"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official LinkedIn server; the manual export from Campaign Manager (Export on the campaign or analytics view) is the default route",
+        "community server maintained by mharnett (npm mcp-linkedin-ads@1.1.3, 0 stars, read and write); judge as a script, not a vendor tool",
+        "write tool names not verified; deny the whole server (`mcp__linkedinads`) until checked",
+        "The Marketing API needs LinkedIn partner approval for the app (Advertising API product) before any token works; LINKEDIN_ADS_ACCESS_TOKEN is the OAuth token that app issues",
+        "The generic connectors (Zapier, Composio, Pipedream) also cover LinkedIn Ads reporting"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "linkedinads",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "mcp-linkedin-ads@1.1.3"],
+            "env": {"LINKEDIN_ADS_ACCESS_TOKEN": "${LINKEDIN_ADS_ACCESS_TOKEN}"},
+            "auth": {"model": "env", "env": ["LINKEDIN_ADS_ACCESS_TOKEN"], "where": "LinkedIn Developer portal: an app with the Advertising API product, then the OAuth 2.0 token tool"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["LINKEDIN_ADS_ACCESS_TOKEN", "LINKEDIN_AD_ACCOUNT_ID"], "notes": "copy scripts/seo_snapshot.py; the token reads api.linkedin.com/rest/adAnalytics for the weekly spend snapshot"}
+      }
+    },
+    {
+      "id": "microsoft-ads",
+      "name": "Microsoft Advertising (Bing Ads)",
+      "source": "microsoftads",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/mharnett/mcp-bing-ads",
+      "capabilities": ["campaigns", "keyword-performance", "reports"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official Microsoft server; the manual export from the Microsoft Advertising Reports tab is the default route",
+        "community server maintained by mharnett (npm mcp-bing-ads@1.2.0, 4 stars, read and write incl. pausing keywords); judge as a script, not a vendor tool",
+        "write tool names not verified; deny the whole server (`mcp__microsoftads`) until checked",
+        "Needs a Bing Ads API developer token plus an Entra app (client id, secret) and a refresh token from the OAuth flow; four variables in .env",
+        "Alternative community server bit-of-a-shambles/microsoft-ads-mcp-server was not verified to a pinnable package"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "microsoftads",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "mcp-bing-ads@1.2.0"],
+            "env": {"BING_ADS_DEVELOPER_TOKEN": "${BING_ADS_DEVELOPER_TOKEN}", "BING_ADS_CLIENT_ID": "${BING_ADS_CLIENT_ID}", "BING_ADS_CLIENT_SECRET": "${BING_ADS_CLIENT_SECRET}", "BING_ADS_REFRESH_TOKEN": "${BING_ADS_REFRESH_TOKEN}"},
+            "auth": {"model": "env", "env": ["BING_ADS_DEVELOPER_TOKEN", "BING_ADS_CLIENT_ID", "BING_ADS_CLIENT_SECRET", "BING_ADS_REFRESH_TOKEN"], "where": "Microsoft Advertising: Tools > Developer token; Entra app registration for the client id and secret; the refresh token from the OAuth consent flow"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["BING_ADS_DEVELOPER_TOKEN", "BING_ADS_CLIENT_ID", "BING_ADS_CLIENT_SECRET", "BING_ADS_REFRESH_TOKEN", "BING_ADS_ACCOUNT_ID"], "notes": "copy scripts/seo_snapshot.py; the Reporting API (SOAP, or the REST endpoint reporting.api.bingads.microsoft.com) returns a campaign performance report for the weekly snapshot"}
+      }
+    },
+    {
+      "id": "x-ads",
+      "name": "X Ads",
+      "source": "xads",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://x.com/XBusiness/article/2091948801238192296",
+      "capabilities": ["campaign-management", "measurement"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server until checked",
+        "Announced by X Business for X Developer Platform accounts (create, manage and measure campaigns) but the endpoint URL and auth are not published, so no .mcp.json entry until the developer docs carry them",
+        "The hosted X MCP at https://api.x.com/mcp (see social.json) covers organic data, not the Ads API"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["X_ADS_CONSUMER_KEY", "X_ADS_CONSUMER_SECRET", "X_ADS_ACCESS_TOKEN", "X_ADS_ACCESS_TOKEN_SECRET", "X_ADS_ACCOUNT_ID"], "notes": "copy scripts/seo_snapshot.py; the Ads API (ads-api.x.com/12/stats/accounts/{id}) with OAuth 1.0a user context returns campaign stats for the weekly snapshot; Ads API access is applied for separately"}
+      }
+    },
+    {
+      "id": "reddit-ads",
+      "name": "Reddit Ads",
+      "source": "redditads",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/mharnett/mcp-reddit-ads",
+      "capabilities": ["accounts", "campaigns", "reports"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official Reddit server; the manual export from Reddit Ads Manager reports is the default route",
+        "community server maintained by mharnett (npm mcp-reddit-ads@1.1.3, 1 star); judge as a script, not a vendor tool; mkerchenski/RedditAdsMcp is a read-only C# alternative without a pinnable package",
+        "write tool names not verified; deny the whole server (`mcp__redditads`) until checked",
+        "Needs a Reddit Ads API v3 app (client id and secret) and a refresh token from the OAuth flow"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "redditads",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "mcp-reddit-ads@1.1.3"],
+            "env": {"REDDIT_CLIENT_ID": "${REDDIT_CLIENT_ID}", "REDDIT_CLIENT_SECRET": "${REDDIT_CLIENT_SECRET}", "REDDIT_REFRESH_TOKEN": "${REDDIT_REFRESH_TOKEN}"},
+            "auth": {"model": "env", "env": ["REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET", "REDDIT_REFRESH_TOKEN"], "where": "ads.reddit.com > Developer applications for the client id and secret; the refresh token from the OAuth consent flow"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET", "REDDIT_REFRESH_TOKEN", "REDDIT_AD_ACCOUNT_ID"], "notes": "copy scripts/seo_snapshot.py; the Ads API v3 (ads-api.reddit.com/api/v3/ad_accounts/{id}/reports) returns campaign stats for the weekly snapshot"}
+      }
+    }
+  ]
+}

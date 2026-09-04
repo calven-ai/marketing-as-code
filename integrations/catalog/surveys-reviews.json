@@ -1,0 +1,225 @@
+{
+  "id": "surveys-reviews",
+  "title": "Surveys and reviews",
+  "for": "review sites, buyer intent from review traffic, surveys, NPS and customer voice",
+  "data_domain": "data/reviews",
+  "manual": {
+    "export": "Export reviews or survey responses as CSV from the vendor dashboard (G2 Seller Solutions, Typeform Results, SurveyMonkey Analyze).",
+    "drop": "data/reviews/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "g2",
+      "name": "G2",
+      "source": "g2",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://documentation.g2.com/docs/g2-mcp-server",
+      "capabilities": ["reviews", "buyer intent signals (0-100)", "product catalog", "categories and grids"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "The same `g2` server serves the intent category; wire it once.",
+        "Buyer intent needs a G2 plan that includes it; reviews and catalog are available more broadly.",
+        "In the Claude connectors directory (claude.com/connectors/g2)."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "g2",
+            "transport": "http",
+            "url": "https://mcp.g2.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use, with a G2 Seller Solutions login"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "typeform",
+      "name": "Typeform",
+      "source": "typeform",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://www.typeform.com/developers/get-started/mcp/",
+      "capabilities": ["forms", "responses and insights", "contacts", "automations"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__typeform`) until checked",
+        "Streamable HTTP only; EU-hosted accounts use a different host, check the developer page.",
+        "MCP access is plan-gated.",
+        "The personal-token variant is the headless route; scope the token to read when the Typeform UI allows it."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "typeform",
+            "transport": "http",
+            "url": "https://api.typeform.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "key",
+            "default": false,
+            "server": "typeform",
+            "transport": "http",
+            "url": "https://api.typeform.com/mcp",
+            "headers": {"Authorization": "Bearer ${TYPEFORM_TOKEN}"},
+            "auth": {"model": "bearer", "env": ["TYPEFORM_TOKEN"], "where": "Typeform > Settings > Personal tokens"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "surveymonkey",
+      "name": "SurveyMonkey",
+      "source": "surveymonkey",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://mcp.surveymonkey.com/mcp",
+      "capabilities": ["surveys", "responses", "analysis"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__surveymonkey`) until checked",
+        "Endpoint seen in secondary listings only; auth model and tool list were not fetched from a vendor page. Confirm both before wiring."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "surveymonkey",
+            "transport": "http",
+            "url": "https://mcp.surveymonkey.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (assumed; not verified)"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "qualtrics",
+      "name": "Qualtrics",
+      "source": "qualtrics",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://api.qualtrics.com/",
+      "capabilities": ["surveys", "responses", "contacts (one server per public API)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Qualtrics publishes one MCP server per public API at `https://<datacenter>.qualtrics.com/API/mcp/...` with an API token; the data-center host and the per-API paths are account-specific, so no entry is listed. Wire the surveys API server for the account in use.",
+        "Seen in secondary listings only."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "capterra",
+      "name": "Capterra / Gartner Digital Markets",
+      "source": "capterra",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.capterra.com/",
+      "capabilities": ["reviews (via export or scraping only)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No MCP server. G2 acquired Capterra, GetApp and Software Advice in February 2026; expect the catalog to fold into the G2 server, check G2's docs first.",
+        "Until then: export from the vendor portal, or an Apify review scraper (scraping-search)."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "trustradius",
+      "name": "TrustRadius",
+      "source": "trustradius",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.trustradius.com/",
+      "capabilities": ["reviews (via export or scraping only)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No MCP server; Apify scraper actors (already wired) or a generic connector are the routes."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "trustpilot",
+      "name": "Trustpilot",
+      "source": "trustpilot",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.trustpilot.com/",
+      "capabilities": ["reviews (via export or scraping only)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No MCP server; Apify scraper actors (already wired) or Zapier/Pipedream are the routes."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "product-hunt",
+      "name": "Product Hunt",
+      "source": "producthunt",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://api.producthunt.com/v2/docs",
+      "capabilities": ["posts", "votes and comments", "makers"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official server. Community server jaipandya/producthunt-mcp-server (API token, read) is stale; community server maintained by jaipandya; judge as a script, not a vendor tool.",
+        "The GraphQL API with a developer token works from a script without any MCP."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "delighted",
+      "name": "Delighted",
+      "source": "delighted",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://delighted.com/",
+      "capabilities": ["NPS responses (via export or a generic connector)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No MCP server; Composio and Zapier expose it, otherwise export responses as CSV."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

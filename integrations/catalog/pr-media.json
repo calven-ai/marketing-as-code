@@ -1,0 +1,81 @@
+{
+  "id": "pr-media",
+  "title": "PR and media",
+  "for": "journalist databases, press distribution, media monitoring, analyst relations",
+  "data_domain": "data/pr",
+  "manual": {
+    "export": "build the list by hand in a CSV",
+    "drop": "data/pr/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["scraping-search", "generic"],
+  "vendors": [
+    {
+      "id": "muck-rack",
+      "name": "Muck Rack",
+      "source": "muckrack",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://muckrack.com/",
+      "capabilities": ["journalist database", "media monitoring", "pitching (in the product only)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No MCP server found in vendor docs or directories as of 2026-09-04.",
+        "use scraping-search (Apify news actors, Exa/Perplexity search) or a generic connector"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "cision",
+      "name": "Cision",
+      "source": "cision",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://www.cision.com/",
+      "capabilities": ["press release distribution (PR Newswire)", "media database", "monitoring"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No MCP server found in vendor docs or directories as of 2026-09-04.",
+        "use scraping-search (Apify news actors, Exa/Perplexity search) or a generic connector"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "meltwater",
+      "name": "Meltwater",
+      "source": "meltwater",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://www.meltwater.com/",
+      "capabilities": ["media and social monitoring", "journalist database"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No MCP server found in vendor docs or directories as of 2026-09-04.",
+        "use scraping-search (Apify news actors, Exa/Perplexity search) or a generic connector"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "prowly",
+      "name": "Prowly",
+      "source": "prowly",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://prowly.com/",
+      "capabilities": ["press releases and newsroom", "media contacts", "monitoring"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No MCP server found in vendor docs or directories as of 2026-09-04.",
+        "use scraping-search (Apify news actors, Exa/Perplexity search) or a generic connector"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "id": "events",
+  "title": "Events",
+  "for": "webinars and events: registrants, attendees and recordings, joined to the funnel in data/events",
+  "data_domain": "data/events",
+  "manual": {
+    "export": "export registrants and attendees from the webinar tool as CSV (one row per person, with the event name, registration time, and attended yes/no)",
+    "drop": "data/events/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "livestorm",
+      "name": "Livestorm",
+      "source": "livestorm",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.livestorm.co/docs/model-context-protocol-mcp",
+      "capabilities": ["events", "sessions", "people (registrants and attendees)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "the vendor page says tools cover events, sessions, people and more without an enumerated list; the survey read it as read-only; if the tool list shows a create or update tool, deny the whole server (`mcp__livestorm`) until reviewed",
+        "the hosted Claude connector needs Claude.ai Team or Enterprise; the .mcp.json route does not",
+        "endpoint read on the vendor developer page today; the survey marks it as a secondary listing"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "livestorm",
+            "transport": "http",
+            "url": "https://mcp.livestorm.co/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (OAuth 2.1 with dynamic client registration)"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "zoom",
+      "name": "Zoom (Webinars and Meetings)",
+      "source": "zoom",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/zoom/mcp-registry",
+      "capabilities": ["AI summaries", "transcripts", "recordings", "create Zoom Docs", "tasks"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__zoom`) until checked",
+        "auth and admin requirements are not documented in the registry repo; verify in the Zoom App Marketplace on the day you wire it",
+        "webinar-specific tools (registrants, attendance) are not confirmed; the Workspace server is documented for summaries, transcripts and recordings",
+        "more servers on the same host: `/mcp/meeting/streamable`, `/mcp/docs/streamable`, `/mcp/chat/streamable`, `/mcp/tasks/streamable`",
+        "already a known route in integrations/adding-an-integration.md; the unattended transcript pull is its worked example (a Server-to-Server OAuth script)",
+        "not in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "zoom",
+            "transport": "http",
+            "url": "https://mcp.zoom.us/mcp/zoom/streamable",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use; a Zoom admin may need to approve the app"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {
+          "path": null,
+          "env": ["ZOOM_ACCOUNT_ID", "ZOOM_CLIENT_ID", "ZOOM_CLIENT_SECRET"],
+          "notes": "not built; a Server-to-Server OAuth script copied from scripts/pull_transcripts.py, as integrations/adding-an-integration.md describes"
+        }
+      }
+    },
+    {
+      "id": "on24",
+      "name": "ON24",
+      "source": "on24",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.on24.com/",
+      "capabilities": ["webinars", "registrants", "engagement"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server; Zapier and viaSocket only",
+        "use the manual route: export the registrant and attendee report as CSV"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "goldcast",
+      "name": "Goldcast",
+      "source": "goldcast",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.goldcast.io/",
+      "capabilities": ["events", "registrants", "engagement"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server; Zapier and viaSocket only",
+        "use the manual route: export the registrant and attendee report as CSV"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "eventbrite",
+      "name": "Eventbrite",
+      "source": "eventbrite",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.eventbrite.com/platform/",
+      "capabilities": ["events", "orders", "attendees"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server; community servers and an Improvado-hosted one exist; judge them as a script, not a vendor tool",
+        "use the manual route: export the attendee report as CSV"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "luma",
+      "name": "Luma",
+      "source": "luma",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.lu.ma/reference/getting-started-with-your-api",
+      "capabilities": ["events", "guests"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server",
+        "community servers maintained by adelaidasofia (`adelaidasofia/luma-mcp`) and the `mcp-luma` PyPI package, API key, read and write on events and guests; judge as a script, not a vendor tool",
+        "use the manual route: export the guest list as CSV"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "bizzabo",
+      "name": "Bizzabo",
+      "source": "bizzabo",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.bizzabo.com/",
+      "capabilities": ["events", "registrants"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server; Zapier and viaSocket only",
+        "use the manual route: export the registrant and attendee report as CSV"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

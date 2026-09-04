@@ -1,0 +1,349 @@
+{
+  "id": "warehouse-bi",
+  "title": "Warehouse and BI",
+  "for": "the data warehouse, transformation layer, BI dashboards, CDP and reverse ETL that hold the joined marketing data",
+  "data_domain": null,
+  "manual": {
+    "export": "Run the question in the BI tool or warehouse console and export the result as CSV.",
+    "drop": "export the query result as CSV into the matching data/<domain>/snapshots/"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "dbt",
+      "name": "dbt",
+      "source": "dbt",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/dbt-labs/dbt-mcp",
+      "capabilities": ["semantic layer metrics", "discovery: models, lineage, metadata", "SQL against the warehouse", "dbt CLI commands (build, run, test)"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": {"kind": "env", "name": "DISABLE_DBT_CLI", "value": "true"},
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__dbt`) until checked",
+        "The CLI toolset runs `dbt build`/`run` against the warehouse; set DISABLE_DBT_CLI=true and DISABLE_SQL=true to keep the server to the semantic layer and discovery.",
+        "A hosted server exists on the dbt platform (URL is per account, token plus production environment id); wire it from the account's settings page when the local package is not wanted.",
+        "Pinned to dbt-mcp 2.2.1 (PyPI, checked 2026-09-04)."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "stdio",
+            "default": true,
+            "server": "dbt",
+            "transport": "stdio",
+            "command": "uvx",
+            "args": ["dbt-mcp==2.2.1"],
+            "env": {"DBT_HOST": "${DBT_HOST}", "DBT_TOKEN": "${DBT_TOKEN}", "DBT_PROD_ENV_ID": "${DBT_PROD_ENV_ID}", "DISABLE_DBT_CLI": "true"},
+            "auth": {"model": "env", "env": ["DBT_HOST", "DBT_TOKEN", "DBT_PROD_ENV_ID"], "where": "dbt platform > Account settings > Service tokens; the production environment id from the environment page"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "dbt", "install": "pip install dbt-core plus the warehouse adapter, or the dbt platform CLI", "notes": "`dbt show` and `dbt sl query` for scripted metric pulls; runs unattended with a service token"},
+        "script": null
+      }
+    },
+    {
+      "id": "snowflake",
+      "name": "Snowflake",
+      "source": "snowflake",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-mcp",
+      "capabilities": ["SQL", "Cortex Search and Cortex Analyst", "object metadata"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__snowflake`) until checked",
+        "The Snowflake-managed MCP server (GA November 2025) is created per database and schema, so its URL is account-specific; SNOWFLAKE_MCP_URL holds it. Auth by programmatic access token or OAuth; the bearer form here follows the Snowflake REST convention, confirm on the docs.",
+        "SQL runs with the connecting role's grants; use a read-only role for marketing pulls.",
+        "A local alternative exists (snowflake-labs-mcp 1.4.2 on PyPI, `uvx snowflake-labs-mcp==1.4.2`); it needs a tools config file, so it is not listed as an entry."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "managed",
+            "default": true,
+            "server": "snowflake",
+            "transport": "http",
+            "url": "${SNOWFLAKE_MCP_URL}",
+            "headers": {"Authorization": "Bearer ${SNOWFLAKE_PAT}"},
+            "auth": {"model": "bearer", "env": ["SNOWFLAKE_MCP_URL", "SNOWFLAKE_PAT"], "where": "Snowsight > Admin > Users > Programmatic access tokens; the server URL from the MCP server object in your database"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "snow", "install": "pip install snowflake-cli", "notes": "`snow sql -q ... --format csv` for scheduled exports with a service user"},
+        "script": null
+      }
+    },
+    {
+      "id": "bigquery",
+      "name": "BigQuery",
+      "source": "bigquery",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://cloud.google.com/bigquery/docs/mcp",
+      "capabilities": ["SQL queries", "dataset and table metadata", "query explanation"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "SQL runs with the principal's IAM roles; grant BigQuery Data Viewer and Job User only, so DML cannot happen.",
+        "Google OAuth in the browser; for unattended pulls use the `bq` CLI with a service account.",
+        "Also the documented path for Dreamdata (Data Warehouse add-on) and for GA4 raw exports.",
+        "The MCP Toolbox for Databases (googleapis/genai-toolbox) is the self-hosted alternative."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "bigquery",
+            "transport": "http",
+            "url": "https://bigquery.googleapis.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "Google account grant in the browser on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "bq", "install": "part of the Google Cloud SDK (gcloud)", "notes": "`bq query --format=csv --use_legacy_sql=false '...'` with a service account for scheduled pulls"},
+        "script": null
+      }
+    },
+    {
+      "id": "looker",
+      "name": "Looker",
+      "source": "looker",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.cloud.google.com/looker/docs/mcp",
+      "capabilities": ["run Looks and explores", "LookML models and fields", "dashboards"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "The Looker-managed server is per instance, so LOOKER_BASE_URL holds the instance URL; the `/mcp` path and OAuth flow are from secondary listings, confirm on the docs page.",
+        "Reads only, within the user's Looker permissions."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "managed",
+            "default": true,
+            "server": "looker",
+            "transport": "http",
+            "url": "${LOOKER_BASE_URL}/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": ["LOOKER_BASE_URL"], "where": "browser grant on first use; LOOKER_BASE_URL is the instance URL"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "metabase",
+      "name": "Metabase",
+      "source": "metabase",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.metabase.com/docs/latest/",
+      "capabilities": ["run saved questions", "ad hoc queries", "dashboards", "create questions"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__metabase`) until checked",
+        "Built into Metabase since version 60 at `<your metabase>/api/metabase-mcp`; METABASE_URL holds the instance URL. Permissions follow the Metabase user; an API key inherits its creator's group.",
+        "The `x-api-key` header is the Metabase API convention; confirm the MCP endpoint accepts it (session cookies may be required in some versions)."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "metabase",
+            "transport": "http",
+            "url": "${METABASE_URL}/api/metabase-mcp",
+            "headers": {"x-api-key": "${METABASE_API_KEY}"},
+            "auth": {"model": "header", "env": ["METABASE_URL", "METABASE_API_KEY"], "where": "Metabase > Admin > Settings > Authentication > API keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "tableau",
+      "name": "Tableau",
+      "source": "tableau",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/tableau/tableau-mcp",
+      "capabilities": ["list data sources and fields", "query a data source (VizQL Data Service)", "workbooks and views", "Pulse metrics"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Hosted server at https://mcp.tableau.com with OAuth 2.1 (Tableau Cloud); the local package runs against Tableau Server or Cloud with a personal access token and is the headless route.",
+        "Pinned to @tableau/mcp-server 4.8.1 (npm, checked 2026-09-04)."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "tableau",
+            "transport": "http",
+            "url": "https://mcp.tableau.com",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "stdio",
+            "default": false,
+            "server": "tableau-local",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@tableau/mcp-server@4.8.1"],
+            "env": {"SERVER": "${TABLEAU_SERVER}", "SITE_NAME": "${TABLEAU_SITE_NAME}", "PAT_NAME": "${TABLEAU_PAT_NAME}", "PAT_VALUE": "${TABLEAU_PAT_VALUE}"},
+            "auth": {"model": "env", "env": ["TABLEAU_SERVER", "TABLEAU_SITE_NAME", "TABLEAU_PAT_NAME", "TABLEAU_PAT_VALUE"], "where": "Tableau > My Account Settings > Personal Access Tokens"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "power-bi",
+      "name": "Power BI",
+      "source": "powerbi",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/microsoft/powerbi-modeling-mcp",
+      "capabilities": ["DAX queries against semantic models", "semantic model modeling (local)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "The remote server is in public preview with Entra ID auth and its endpoint is tenant-specific; not listed until a person confirms it in the Fabric admin portal.",
+        "The local package (@microsoft/powerbi-modeling-mcp, 0.5.0-beta.13 on npm) is a modeling tool for Power BI Desktop, writes to semantic models, and is not a reporting route; excluded on purpose.",
+        "For marketing pulls, query the underlying warehouse instead."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "dreamdata",
+      "name": "Dreamdata",
+      "source": "dreamdata",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://dreamdata.io/blog",
+      "capabilities": ["attribution and journey data (through BigQuery)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "A Dreamdata MCP Server was announced on 1 September 2026; the documented path today is the Google BigQuery managed MCP over the Dreamdata Data Warehouse add-on. Wire `bigquery` in this file and query the Dreamdata dataset.",
+        "The Data Warehouse add-on is required."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "segment",
+      "name": "Segment",
+      "source": "segment",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://segment.com/docs/",
+      "capabilities": ["event collection (no read server)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official server as of May 2026. The community `segment-mcp` package only sends track/identify calls, which is a write, not a read; community server maintained by an individual; judge as a script, not a vendor tool.",
+        "Read Segment data from the warehouse it syncs to."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "rudderstack",
+      "name": "RudderStack",
+      "source": "rudderstack",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.rudderstack.com/docs/",
+      "capabilities": ["sources and destinations", "tracking plans", "connections", "event debugging"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__rudderstack`) until checked",
+        "Public beta; 30+ tools including configuration writes. Seen in secondary listings only."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "rudderstack",
+            "transport": "http",
+            "url": "https://mcp.rudderstack.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "hightouch",
+      "name": "Hightouch",
+      "source": "hightouch",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://hightouch.com/docs/ai-integrations/mcp",
+      "capabilities": ["audiences", "syncs", "journeys", "models"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Must be enabled by Hightouch for the workspace (not self-serve); the endpoint is issued at enablement, so no entry is listed.",
+        "The server is read/write (audiences, syncs, journeys) under workspace RBAC; ask for a read-only role before wiring."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "census",
+      "name": "Census",
+      "source": "census",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.getcensus.com/",
+      "capabilities": ["reverse ETL syncs (no server)"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Acquired by Fivetran in 2025; no MCP server found. Read the synced data in the destination tool instead."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

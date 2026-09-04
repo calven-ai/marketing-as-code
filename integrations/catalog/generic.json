@@ -1,0 +1,208 @@
+{
+  "id": "generic",
+  "title": "Generic connectors",
+  "for": "one server that reaches many apps: the long tail of tools with no vendor MCP, and one-off write actions",
+  "data_domain": null,
+  "manual": {
+    "export": "A generic connector holds no data of its own; export from the bridged tool per its own category.",
+    "drop": "no data of its own; the bridged category's manual route applies"
+  },
+  "bridges": [],
+  "vendors": [
+    {
+      "id": "zapier",
+      "name": "Zapier MCP",
+      "source": "zapier",
+      "bridges_to": "*",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://zapier.com/mcp",
+      "capabilities": ["8,000+ apps as tools", "actions picked per app in the Zapier UI", "OAuth to each app handled by Zapier"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Exposes whatever actions the connected apps allow, including sends and posts; deny the whole server (`mcp__zapier`) by default and allow named tools per workflow.",
+        "One MCP tool call costs 2 Zapier tasks from the shared pool: Free is 100 tasks a month (about 50 calls); Pro from $19.99 a month on annual billing (750 tasks).",
+        "The endpoint is issued per user and embeds a secret, so the whole URL lives in the environment (ZAPIER_MCP_URL), never in a committed file.",
+        "Best catch-all for long-tail write actions; a poor fit for bulk reads."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "hosted",
+            "default": true,
+            "server": "zapier",
+            "transport": "http",
+            "url": "${ZAPIER_MCP_URL}",
+            "headers": {},
+            "auth": {"model": "env", "env": ["ZAPIER_MCP_URL"], "where": "Zapier > MCP > your server URL (treat the URL as a key)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "composio",
+      "name": "Composio (Rube)",
+      "source": "composio",
+      "bridges_to": "*",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://rube.app/",
+      "capabilities": ["500+ apps as tools through the hosted Rube server", "OAuth to each app handled in the Composio UI", "per-app servers for developers"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Exposes whatever actions the connected apps allow, including sends and posts; deny the whole server (`mcp__composio`) by default and allow named tools per workflow.",
+        "Rube is free in beta; Composio repriced in August 2026 to $29 a month for 50K calls, overage $4 per 1K. Pricing is volatile, check before committing a workflow to it.",
+        "Developer-oriented; the Rube endpoint URL is from the product site, confirm it on first connection."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "rube",
+            "default": true,
+            "server": "composio",
+            "transport": "http",
+            "url": "https://rube.app/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use; app connections in the Composio UI"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "pipedream",
+      "name": "Pipedream MCP",
+      "source": "pipedream",
+      "bridges_to": "*",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://mcp.pipedream.com/",
+      "capabilities": ["3,000+ APIs as per-app servers", "OAuth to each app handled in Pipedream Connect"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Exposes whatever actions the connected app allows, including sends and posts; deny the whole server (`mcp__pipedream`) by default and allow named tools per workflow.",
+        "Free for personal use with 100 credits a month; Basic $29, Advanced $49, Connect $99 a month.",
+        "Servers are per app and per user under mcp.pipedream.net, and the URL carries the account binding; keep it in PIPEDREAM_MCP_URL, one entry per app you wire."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "hosted",
+            "default": true,
+            "server": "pipedream",
+            "transport": "http",
+            "url": "${PIPEDREAM_MCP_URL}",
+            "headers": {},
+            "auth": {"model": "env", "env": ["PIPEDREAM_MCP_URL"], "where": "Pipedream > MCP > the app's server URL for your account (treat the URL as a key)"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "make",
+      "name": "Make",
+      "source": "make",
+      "bridges_to": "*",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/integromat/make-mcp-server",
+      "capabilities": ["your on-demand Make scenarios exposed as tools"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "A tool is whatever the scenario does, so a scenario that sends or posts is a write; deny the whole server (`mcp__make`) by default and allow named scenarios per workflow.",
+        "Only scenarios you build appear; billed as Make operations on your plan.",
+        "The npm package is @makehq/mcp-server (the repo is integromat/make-mcp-server); pinned to 0.5.0 (checked 2026-09-04). Make also offers a cloud MCP endpoint per team, over SSE, not listed here."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "stdio",
+            "default": true,
+            "server": "make",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@makehq/mcp-server@0.5.0"],
+            "env": {"MAKE_API_KEY": "${MAKE_API_KEY}", "MAKE_ZONE": "${MAKE_ZONE}", "MAKE_TEAM": "${MAKE_TEAM}"},
+            "auth": {"model": "env", "env": ["MAKE_API_KEY", "MAKE_ZONE", "MAKE_TEAM"], "where": "Make > Profile > API access (key); MAKE_ZONE is the host such as eu1.make.com; MAKE_TEAM the team id"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "n8n",
+      "name": "n8n",
+      "source": "n8n",
+      "bridges_to": "*",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-langchain.mcptrigger/",
+      "capabilities": ["your n8n workflows exposed as tools through the MCP Server Trigger node"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "A tool is whatever the workflow does; deny the whole server (`mcp__n8n`) by default and allow named tools per workflow.",
+        "Self-hosted or n8n Cloud plan; the endpoint is per instance and per trigger, so N8N_MCP_URL holds it and the trigger's bearer credential goes in N8N_MCP_TOKEN.",
+        "n8n's own MCP for building workflows, and the community `n8n-mcp` npm package, are development tools, not this route."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "trigger",
+            "default": true,
+            "server": "n8n",
+            "transport": "http",
+            "url": "${N8N_MCP_URL}",
+            "headers": {"Authorization": "Bearer ${N8N_MCP_TOKEN}"},
+            "auth": {"model": "bearer", "env": ["N8N_MCP_URL", "N8N_MCP_TOKEN"], "where": "n8n > the MCP Server Trigger node > Production URL and its Bearer credential"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "embedded-ipaas",
+      "name": "Merge.dev, Nango, Paragon ActionKit, Unified.to",
+      "source": "embedded",
+      "bridges_to": "*",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.merge.dev/",
+      "capabilities": ["unified integration APIs with MCP fronts, priced per connected account"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Exposes whatever the connected app allows; deny by default if one is ever wired.",
+        "Priced per connected account, $50 to $750 a month at entry; built for SaaS vendors embedding integrations, overkill for one marketing team. Listed so the option is known, not recommended; no entry is given."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}
