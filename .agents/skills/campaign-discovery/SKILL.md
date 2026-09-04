@@ -1,9 +1,14 @@
 ---
 name: campaign-discovery
 description: Run discovery for a campaign idea given in one sentence. Composes the competitive angle, keyword volumes and current ranks, AI answer-engine prompt coverage, and an inventory of existing content into one report in reports/adhoc/. Use when asked to "explore a campaign", "run discovery on", "what would it take to campaign on X", or before a new-project brief is written.
+license: MIT
 metadata:
   kind: workflow
-  needs: DataForSEO MCP for the data parts; works partially without
+  area: paid
+  needs: []
+  optional: [seo-data, ai-visibility]
+  writes: repo
+  runs: person
 ---
 
 # Campaign discovery
@@ -12,11 +17,13 @@ One sentence in ("a campaign positioning us as the AI-native alternative
 for marketing ops teams"), one discovery report out. You compose the
 specialist skills; you do not decide whether the campaign happens.
 
-Needs: `strategy/` filled (positioning, messaging, `competitive/`); the
-DataForSEO MCP for the keyword and AI answer-engine parts (through
-`seo-analyst` and `brand-monitor`). Without DataForSEO, run the parts that
-work offline and mark the rest as gaps with the export the human could
-provide.
+Needs: `strategy/` filled (positioning, messaging, `competitive/`). The
+keyword part needs a wired `seo-data` integration and the answer-engine
+part a wired `ai-visibility` one; which vendor fills each is the Wired
+table in `integrations/README.md`, and `seo-analyst` and `brand-monitor`
+resolve it. Both are optional: without them, run the parts that work
+offline and mark the rest as gaps, naming the export a person could drop
+into `data/seo/snapshots/YYYY-MM-DD-<vendor>-<what>.csv`.
 
 ## Procedure
 
@@ -36,10 +43,9 @@ provide.
 4. **AI answer-engine coverage.** Ask `brand-monitor` to run the prompts
    in `data/seo/prompts.csv` that touch this idea (and to propose up to
    three new prompts for it). Report who is cited today and whether we are.
-5. **Content inventory.** Grep `content/*/draft.md` frontmatter for
-   `channel:` and `status:`, and read the titles. List what already exists
-   that this campaign could reuse, refresh, or must not duplicate, grouped
-   by channel with status and owner.
+5. **Content inventory.** Run `content-inventory` and take its report:
+   what already exists that this campaign could reuse, refresh, or must
+   not duplicate, grouped by channel with status and owner.
 6. **Write the report** to
    `reports/adhoc/YYYY-MM-DD-<slug>-discovery.md` from
    `reports/_templates/report.md`, with these sections after the answer:

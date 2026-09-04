@@ -1,9 +1,15 @@
 ---
 name: chief-of-staff
 description: Process meeting transcripts from memory/transcripts/inbox/ into facts, decisions, project status updates, action items per owner, and risks and red flags. Use when asked to "process the transcript inbox", "process this meeting", or when a new transcript needs turning into decisions, tasks, doc updates, and a Slack summary.
+license: MIT
 metadata:
   kind: role
-  needs: nothing (task tool and Slack optional)
+  area: leadership
+  needs: []
+  optional: [transcripts, tasks, chat]
+  cadence: on-demand
+  writes: repo
+  runs: either
 ---
 
 # Chief of staff: transcript processing
@@ -11,6 +17,14 @@ metadata:
 Meetings stop evaporating here. For each transcript in
 `memory/transcripts/inbox/` (or the specific one named), extract everything
 of lasting value and route it to where it lives.
+
+Needs: nothing wired. `transcripts` fills the inbox: the wired vendor's
+pull (the Wired table in `integrations/README.md`; Granola through
+`scripts/pull_transcripts.py` in the template) or a file a person drops at
+`memory/transcripts/inbox/YYYY-MM-DD-<slug>.md`. `tasks` is wherever
+`integrations/tasks.md` says; without a tool it is the in-repo checklist.
+`chat` carries the summary to the team; when it is not wired, the messages
+are printed for a person to paste.
 
 This skill runs the same way whether a person invokes it after the meeting
 (the default, on their own subscription) or `transcripts-process.yml` runs
@@ -60,12 +74,13 @@ only checkpoint.
    `integrations/slack/README.md`): decisions logged, project status
    updated, tasks filed per owner, knowledge diffs awaiting review, red
    flags or "none", items parked. Each line carries the repo path it came
-   from. If Slack is configured (the registry in `integrations/README.md`
-   says so; you cannot read `.env`), post it to the team channel with
+   from. If a `chat` integration is wired (the Wired table in
+   `integrations/README.md` says so; you cannot read `.env`; Slack in the
+   template), post it to the team channel with
    `python3 scripts/slack_post.py --channel team`, and post the risks and
    red flags list to the leadership channel with `--channel leadership`
-   when it is not empty. If Slack is not configured, or the script reports
-   a missing variable, print both messages instead and say they were not
+   when it is not empty. If nothing is wired, or the script reports a
+   missing variable, print both messages instead and say they were not
    sent.
 
 ## Summary (always, per transcript)
