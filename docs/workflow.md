@@ -48,6 +48,12 @@ When in doubt the gate decides, and it errs toward review. On GitHub Team
 or Pro the checks are enforced; on Free they advise
 ([github-settings.md](github-settings.md)).
 
+One maintainer? GitHub never lets an author approve their own proposal,
+so set `review.self_merge` to `true` in `docs/schema.json`. The gate then
+passes a needs-review proposal and your merge is the approval. Nothing
+merges on its own, and you still read the diff. Set it back to `false`
+the day a second person joins.
+
 ## Review rhythm
 
 Treat PR review like inbox: daily, briefly. A stalled PR is usually a

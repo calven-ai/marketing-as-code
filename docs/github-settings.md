@@ -28,7 +28,9 @@ settings any time and says what drifted.
 | Ruleset `main` | A proposal is the only way onto the approved copy: pull request required, code-owner review for machinery paths, the `doctor` and `review-gate` checks green, no deleting or force-pushing. Admins can bypass in an emergency |
 
 `.github/CODEOWNERS` names who reviews each area. Replace the placeholder
-with real handles; `/setup` does it during onboarding.
+with real handles; `/setup` does it during onboarding. A repository with
+one maintainer sets `review.self_merge` in `docs/schema.json` instead, so
+the gate does not wait for a second person ([workflow.md](workflow.md)).
 
 ## How a proposal lands
 
