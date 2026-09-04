@@ -14,6 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lint  # noqa: E402
+import review_gate  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMA = json.loads((ROOT / "docs" / "schema.json").read_text(encoding="utf-8"))
@@ -384,3 +385,16 @@ class TestClassify(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestReviewGate(unittest.TestCase):
+    def test_needs_review_verdict(self):
+        v = review_gate.needs_review_verdict
+        team = {"review": {"self_merge": False}}
+        solo = {"review": {"self_merge": True}}
+        self.assertEqual("success", v(team, "ana", ["ben"], [])[0])
+        self.assertEqual("action_required", v(team, "ana", [], [])[0])
+        self.assertIn("@ben", v(team, "ana", [], ["@ben"])[1])
+        self.assertEqual("success", v(solo, "ana", [], [])[0])
+        self.assertEqual("action_required", v({}, "ana", [], [])[0])  # absent means a team
+        self.assertTrue(review_gate.self_merge_allowed(SCHEMA) in (True, False))

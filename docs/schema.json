@@ -10,6 +10,10 @@
     "_doc": "private: true silences the PII warning (data/README.md says private repos may hold names; log that decision). /setup sets it.",
     "private": false
   },
+  "review": {
+    "_doc": "self_merge: true means the author's own merge counts as the approval on a needs-review proposal, for a repository with one maintainer. The gate still classifies and labels, the health check must still be green, and a person still reads the diff and clicks merge. Set it to false the day a second person joins; from then on someone other than the author approves (docs/workflow.md). The gate runs from main, so a change here takes effect once it lands there.",
+    "self_merge": true
+  },
   "required_files": [
     "AGENTS.md",
     "CLAUDE.md",
