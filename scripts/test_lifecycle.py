@@ -356,7 +356,7 @@ class TestDoctorMachine(LifecycleCase):
         (self.tmp / "gitconfig").write_text(f"[url \"{self.tmp / 'origin.git'}\"]\n\tinsteadOf = {REPO_URL}\n")
         notes, fixed = doctor.local_setup(self.work, fix=True)
         self.assertEqual([], notes)
-        self.assertEqual(2, len(fixed), fixed)
+        self.assertEqual(3, len(fixed), fixed)  # name and email, the hook, the credential helper
         self.assertEqual("ana", git(self.work, "config", "user.name"))
         self.assertEqual("1+ana@users.noreply.github.com", git(self.work, "config", "user.email"))
         self.assertEqual("scripts/hooks", git(self.work, "config", "core.hooksPath"))
