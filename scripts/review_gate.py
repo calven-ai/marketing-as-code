@@ -6,7 +6,9 @@ never-bookkeeping list in scripts/lint.py) or needs-review, applies the
 safe fixes as a Tidy commit, labels it, publishes the `review-gate` check
 on its head commit, and merges a bookkeeping proposal itself once the
 health check succeeded on that exact commit. A needs-review proposal
-passes only when someone other than the author has approved it.
+passes only when someone other than the author has approved it, unless
+docs/schema.json sets review.self_merge (one maintainer): then the
+author's own merge is the approval.
 
 Usage, from a checkout of main (gate.yml calls it):
     python3 scripts/review_gate.py --pr 12 --head-sha <sha> --doctor success
@@ -84,6 +86,27 @@ def approvals(pr):
     return author, approved
 
 
+def self_merge_allowed(schema):
+    """review.self_merge in docs/schema.json: the author's merge counts as the approval."""
+    return bool((schema.get("review") or {}).get("self_merge"))
+
+
+def needs_review_verdict(schema, author, approved, owners):
+    """What the gate publishes for a needs-review proposal: (conclusion, title, summary).
+    Approved by someone else: passes. Nobody yet: passes only under self_merge."""
+    if approved:
+        return ("success", f"Approved by {', '.join(approved)}",
+                "A person who is not the author read the diff and approved it; this proposal may land.")
+    if self_merge_allowed(schema):
+        return ("success", "Needs review: a person reads the diff, then merges",
+                "This repository has one maintainer (review.self_merge in docs/schema.json), so the author's "
+                "own merge is the approval. Nothing merges on its own: read the diff, then merge.")
+    ask = ", ".join(owners) if owners else "a teammate who is not the author"
+    return ("action_required", f"Waiting for approval from {ask}",
+            f"This proposal needs a person to read the diff and approve it (the author, {author or 'unknown'}, "
+            "cannot approve their own). Nothing is wrong with the files.")
+
+
 def publish(repo, sha, conclusion, title, summary, url=""):
     """One completed `review-gate` check run on the commit; the ruleset requires it."""
     args = ["api", "-X", "POST", f"repos/{repo}/check-runs", "-f", f"name={CHECK}", "-f", f"head_sha={sha}",
@@ -156,6 +179,8 @@ def main(argv=None):
     if args.dry_run:
         if kind == "bookkeeping":
             print("dry run: would merge it once the health check is green on this commit.")
+        elif self_merge_allowed(ctx.schema):
+            print("dry run: would pass the review-gate check (review.self_merge is on); a person reads the diff and merges.")
         else:
             print("dry run: would wait for an approval from "
                   f"{', '.join(codeowners_for(paths)) or 'a teammate who is not the author'}.")
@@ -187,16 +212,9 @@ def main(argv=None):
         return 0
 
     author, approved = approvals(args.pr)
-    if approved:
-        publish(repo, head_sha, "success", f"Approved by {', '.join(approved)}",
-                "A person who is not the author read the diff and approved it; this proposal may land.", view["url"])
-        return 0
-    owners = codeowners_for(paths)
-    ask = ", ".join(owners) if owners else "a teammate who is not the author"
-    publish(repo, head_sha, "action_required", f"Waiting for approval from {ask}",
-            f"This proposal needs a person to read the diff and approve it (the author, {author or 'unknown'}, "
-            "cannot approve their own). Nothing is wrong with the files.", view["url"])
-    return 1
+    conclusion, title, summary = needs_review_verdict(ctx.schema, author, approved, codeowners_for(paths))
+    publish(repo, head_sha, conclusion, title, summary, view["url"])
+    return 0 if conclusion == "success" else 1
 
 
 if __name__ == "__main__":
