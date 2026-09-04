@@ -26,6 +26,9 @@ projects/
   repo paths into `content/`. Data a project produces goes to `data/`.
   Content and data outlive the project, so they live with their owner and
   the folder archives without loss.
+- `status.md` is dated entries, newest first, each opening with one line
+  `State: on track | at risk | blocked | done` (any capitalization). The
+  check refuses other values.
 - **Tasks live in the team's task tool**, filed per
   [`integrations/tasks.md`](../integrations/tasks.md). The brief links to the
   project there. Until a task tool is connected, keep a checklist in

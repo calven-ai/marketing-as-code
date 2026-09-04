@@ -140,11 +140,25 @@ class TestContent(LintCase):
         levels = {f.level for f in self.findings("content-published")}
         self.assertEqual({lint.ERROR, lint.WARNING}, levels)
 
-    def test_placeholder_past_brief(self):
+    def test_template_placeholder_past_brief_is_error(self):
         write(self.root, "content/2026-09-piece/brief.md", "# Brief\n")
-        write(self.root, "content/2026-09-piece/draft.md", draft("in-review").replace("Body.", "[The draft goes here]"))
+        write(self.root, "content/2026-09-piece/draft.md",
+              draft("in-review").replace("Body.", "[The draft. Written in the voice of brand/voice.md]"))
         self.assertTrue(self.findings("content-placeholder", lint.ERROR))
-        write(self.root, "content/2026-09-piece/draft.md", draft("brief").replace("Body.", "[The draft goes here]"))
+        write(self.root, "content/2026-09-piece/draft.md", draft("in-review").replace("# Title", "# [Title]"))
+        self.assertTrue(self.findings("content-placeholder", lint.ERROR))
+        write(self.root, "content/2026-09-piece/draft.md", draft("brief").replace("Body.", "[The draft. Text]"))
+        self.assertFalse(self.findings("content-placeholder"))
+
+    def test_bracketed_prose_only_warns(self):
+        write(self.root, "content/2026-09-piece/brief.md", "# Brief\n")
+        write(self.root, "content/2026-09-piece/draft.md", draft("in-review").replace("Body.", "Body. [Editor's note]"))
+        self.assertEqual([lint.WARNING], [f.level for f in self.findings("content-placeholder")])
+
+    def test_reference_links_and_colon_brackets_pass(self):
+        write(self.root, "content/2026-09-piece/brief.md", "# Brief\n")
+        write(self.root, "content/2026-09-piece/draft.md", draft("in-review").replace(
+            "Body.", "See [The report][ref] and [Source: Gartner] and [Link](https://example.com).\n\n[ref]: https://example.com"))
         self.assertFalse(self.findings("content-placeholder"))
 
     def test_project_must_exist(self):
@@ -195,6 +209,17 @@ class TestProjects(LintCase):
         text = (self.root / "projects/launch/status.md").read_text()
         self.assertLess(text.index("2026-02-01"), text.index("2026-01-01"))
 
+    def test_status_state_is_case_insensitive(self):
+        write(self.root, "projects/launch/brief.md", "# Launch\n")
+        write(self.root, "projects/launch/status.md", "# Status\n\n## 2026-01-01\n\n- **State:** On track\n")
+        self.assertFalse(self.findings("project-status"))
+
+    def test_readme_state_drift(self):
+        write(self.root, "projects/README.md", "# projects\n\nState: on track | done\n")
+        self.assertTrue(self.findings("schema-prose", lint.WARNING))
+        write(self.root, "projects/README.md", "# projects\n\nState: " + " | ".join(SCHEMA["project_status"]["states"]) + "\n")
+        self.assertFalse(self.findings("schema-prose"))
+
 
 class TestDecisionLog(LintCase):
     def test_format_and_order(self):
@@ -221,6 +246,10 @@ class TestTranscripts(LintCase):
               "---\ntitle: Sync\ndate: 2026-09-03\nsource: granola\n---\n")
         self.assertTrue(self.findings("transcript-contract", lint.ERROR))
 
+    def test_inbox_readme_is_not_a_transcript(self):
+        write(self.root, "memory/transcripts/inbox/README.md", "# Inbox\n\nDrop transcripts here.\n")
+        self.assertFalse(self.findings("transcript-naming") + self.findings("frontmatter"))
+
 
 class TestData(LintCase):
     def test_snapshot_naming_and_columns(self):
@@ -245,6 +274,24 @@ class TestReports(LintCase):
         messages = [f.message for f in self.findings("report-data")]
         self.assertTrue(any("Data used" in m for m in messages))
         self.assertTrue(any("does not exist" in m for m in messages))
+
+    def test_folder_readmes_are_not_reports(self):
+        write(self.root, "reports/qmr/README.md", "# qmr\n")
+        write(self.root, "reports/recurring/seo/README.md", "# seo\n")
+        self.assertFalse(self.findings("report-naming") + self.findings("report-data"))
+
+    def test_qmr_status_vocabulary(self):
+        write(self.root, "reports/qmr/2026-q3/report.md", "# QMR\n\n- **Status:** Final\n\n## Data used\n")
+        self.assertFalse(self.findings("report-status"))
+        write(self.root, "reports/qmr/2026-q3/report.md", "# QMR\n\n- **Status:** done\n\n## Data used\n")
+        self.assertTrue(self.findings("report-status", lint.ERROR))
+
+    def test_dashboard_with_example_numbers(self):
+        write(self.root, "reports/_templates/dashboard.html", '<html data-example="replace"><title>[Dashboard title]</title>')
+        write(self.root, "reports/qmr/2026-q3/dashboard.html", '<html data-example="replace"><title>Q3</title>')
+        self.assertTrue(self.findings("report-example", lint.ERROR))
+        write(self.root, "reports/qmr/2026-q3/dashboard.html", "<html><title>Q3</title>")
+        self.assertFalse(self.findings("report-example"))
 
 
 class TestRepoHygiene(LintCase):
@@ -346,6 +393,19 @@ class TestSkillsAndDocs(LintCase):
         self.assertIn("| Agent | What it does | Needs |", (self.root / "agents/README.md").read_text())
 
 
+class TestScriptsIndex(LintCase):
+    def test_scripts_block_lists_shell_hooks_and_tests(self):
+        write(self.root, "scripts/doctor.py", '"""Health check.\n\nMore."""\n')
+        write(self.root, "scripts/test_lint.py", '"""Tests for lint."""\n')
+        write(self.root, "scripts/with_env.sh", "#!/bin/sh\n# Start a command\n# with .env loaded.\n#\n# Usage.\n")
+        write(self.root, "scripts/hooks/pre-push", "#!/bin/sh\n# Refuses a push to main.\n\nexit 0\n")
+        block = lint.render_block(self.ctx(), "scripts")
+        self.assertIn("| [doctor.py](doctor.py) | Health check. |", block)
+        self.assertIn("| [test_lint.py](test_lint.py) | Tests for lint. |", block)
+        self.assertIn("| [with_env.sh](with_env.sh) | Start a command with .env loaded. |", block)
+        self.assertIn("| [hooks/pre-push](hooks/pre-push) | Refuses a push to main. |", block)
+
+
 class TestClassify(unittest.TestCase):
     def test_bookkeeping_globs(self):
         globs = SCHEMA["bookkeeping"]["globs"]
@@ -383,10 +443,6 @@ class TestClassify(unittest.TestCase):
         self.assertTrue(lint.match_glob("memory/transcripts/inbox/x.md", "memory/transcripts/**"))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestReviewGate(unittest.TestCase):
     def test_needs_review_verdict(self):
         v = review_gate.needs_review_verdict
@@ -403,3 +459,7 @@ class TestReviewGate(unittest.TestCase):
         self.assertTrue(review_gate.tidy_allowed(["memory/decision-log.md", "projects/x/status.md"]))
         self.assertFalse(review_gate.tidy_allowed(["scripts/lint.py", "scripts/README.md"]))
         self.assertFalse(review_gate.tidy_allowed(["docs/schema.json"]))
+
+
+if __name__ == "__main__":
+    unittest.main()

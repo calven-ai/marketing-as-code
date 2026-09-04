@@ -37,6 +37,7 @@ This steers the prototype builder and any generated visuals.]
 
 ## Templates
 
-`templates/` holds reusable design files (OG-image background, social
-templates). `scripts/og_image.py` (planned) composes article titles over
-`templates/og-background.png` using the colors and fonts above.
+`templates/` holds reusable design files: an OG-image background, social
+frames. A script that composes article titles over that background in the
+colors and fonts above is a job for your coding agent, once the background
+exists.

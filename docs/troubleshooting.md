@@ -15,7 +15,8 @@ network and try again. Your work is safe on this computer.
 
 **"GitHub CLI is not installed."** The agent talks to GitHub through the
 GitHub CLI. Download it from cli.github.com (on a Mac, `brew install gh`
-works too), then say `/doctor` again. Without it, `/propose` still saves
+works too; on Linux, your package manager, `apt install gh`), then say
+`/doctor` again. Without it, `/propose` still saves
 and pushes your work and prints a link to open the proposal yourself.
 
 **"Not logged in to GitHub."** In your own terminal, or the desktop app's
@@ -31,7 +32,8 @@ once, or say `/doctor` and let it do that.
 
 **git or Python is missing.** On a Mac, run `xcode-select --install` and
 accept the prompt; it installs both. On Windows, install Git for Windows
-and Python from python.org, ticking "add to PATH".
+and Python from python.org, ticking "add to PATH". On Linux, both come
+from your package manager: `apt install git python3`.
 
 ## Proposing
 

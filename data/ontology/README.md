@@ -14,3 +14,9 @@ If a definition is still a template placeholder, agents **ask the team**
 instead of assuming an industry-standard meaning. "MQL" means something
 different in every company. That is why this folder exists. `/setup` fills
 these in from an interview.
+
+Two axes, easy to mix up. The stages in `funnel.md` are lifecycle stages:
+where a record is (a signup, an MQL, a customer). The stages in
+`strategy/messaging.md` are buying stages: what a person is doing
+(awareness, consideration, decision). `data/seo/prompts.csv` uses the
+buying stages.
