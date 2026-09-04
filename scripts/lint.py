@@ -100,7 +100,7 @@ def tracked_files(root):
     try:
         out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others",
                               "--exclude-standard"], capture_output=True, check=True).stdout
-        files = [f for f in out.decode("utf-8", "replace").split("\0") if f]
+        files = {f for f in out.decode("utf-8", "replace").split("\0") if f}  # a set: a conflicted file lists thrice
         return sorted(f for f in files if (root / f).is_file() or (root / f).is_symlink())
     except (subprocess.CalledProcessError, FileNotFoundError):
         files = []

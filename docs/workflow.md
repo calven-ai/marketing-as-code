@@ -1,8 +1,8 @@
 # The review workflow: how work ships
 
 One ritual keeps a human in charge of everything user-visible. Written for
-GitHub Desktop users, no terminal required. New to GitHub? Start with
-[new-to-github.md](new-to-github.md).
+GitHub Desktop users: one command, once, then none. New to GitHub? Start
+with [new-to-github.md](new-to-github.md).
 
 ## The shape of every change
 
@@ -10,6 +10,10 @@ Five words: **Sync. Work. Propose. Review. Merge.** Doctor is the repair
 word beside them. Say the word to your coding agent; it runs the
 machinery. GitHub Desktop users click through the same loop
 ([new-to-github.md](new-to-github.md)).
+
+<p align="center">
+  <img src="assets/lifecycle.svg" alt="The lifecycle as pixel-art panels: Sync (get the latest), Work (ask the agent), Propose (open the proposal), Review (read the diff), Merge (click merge), and a red Doctor panel below: the repair word when something is red" width="720">
+</p>
 
 1. **Sync.** Say `/sync`. The agent brings the latest approved copy into
    your checkout and tells you what is waiting on you.
@@ -54,6 +58,9 @@ cannot change the rules it is judged by) sorts it into one of two kinds:
   the diff and approves. Anything touching the machinery (`.github/`,
   `scripts/`, `docs/schema.json`, the agent settings, the skills, the
   integrations) is needs-review no matter what else is in the proposal.
+  A proposal that changes the rules themselves (`scripts/lint.py`,
+  `docs/schema.json`) gets no Tidy commit from the gate: main's fixes
+  would fight the proposal's own.
 
 When in doubt the gate decides, and it errs toward review. On GitHub Team
 or Pro the checks are enforced; on Free they advise

@@ -1,8 +1,9 @@
 # New to GitHub? Start here
 
-You don't need a terminal to run your marketing from this repo. You need a
-GitHub account, one desktop app, and a coding agent that does the technical
-parts. This guide gets you there. Not sure the repo is for your team at
+You do not need to live in a terminal to run your marketing from this repo.
+You need a GitHub account, one desktop app, a coding agent that does the
+technical parts, and one command, once, to log in to GitHub. Your agent
+tells you when. This guide gets you there. Not sure the repo is for your team at
 all? Read [is-this-for-you.md](is-this-for-you.md) first.
 
 ## What a repository is
@@ -20,15 +21,19 @@ Everything in this repo is plain text. That is what lets AI agents read your
 positioning and write a draft in your voice. A deck locked in a drive can't
 do that.
 
-## The five words you will meet
+## The words you will meet
 
 - **Repo.** The shared folder. This one.
 - **Commit.** One saved change, with a note.
 - **Branch.** A copy of the repo where you make changes without touching the
   live version.
-- **Pull request.** A proposal to merge a branch into the live version. This
-  is where review happens.
-- **Issue.** A note to the team about something to do or fix.
+- **Pull request.** A request to merge a branch into the live version. This
+  repo calls it a proposal.
+- **Diff.** The changed lines, old beside new. Reading the diff is the
+  review.
+- **Merge.** Clicking Merge on a proposal. Merging is the approval.
+- **Check.** The automatic test that runs on every proposal and says what
+  is wrong in plain words.
 
 You can ignore everything else for now.
 
@@ -58,11 +63,15 @@ change in this repo, by a person or an agent, goes through it.
 
 ## Let the agent do the technical parts
 
-Install [Claude Code](https://claude.com/claude-code) in the desktop app
-and open your repo folder. One-time setup: install the
-[GitHub CLI](https://cli.github.com) and run `gh auth login --web` in a
-terminal (it shows a code and opens your browser). Or say `/doctor` and
-it walks you through it.
+One-time setup, in this order:
+
+1. Install [Claude Code](https://claude.com/claude-code), the desktop app
+   is fine, and open your repo folder in it.
+2. Install the [GitHub CLI](https://cli.github.com). It is how the agent
+   talks to GitHub.
+3. Say `/doctor`. It names the one command to type, `gh auth login --web`,
+   and where to type it. A code appears, a browser opens, you paste the
+   code. Say `/doctor` again and it tells you that you are ready.
 
 Then the whole loop is three words:
 
@@ -74,7 +83,7 @@ Then the whole loop is three words:
    link to the proposal. Open it, read the diff, click Merge. Bookkeeping
    proposals merge themselves.
 
-You never type a command. When the agent needs something technical, like
+After that you never type a command. When the agent needs something technical, like
 connecting your CRM or storing an API key, it tells you exactly what to
 do and where. If it asks for a key value in chat, that is a red flag. Keys
 go in a file the agent never reads ([secrets.md](secrets.md)).

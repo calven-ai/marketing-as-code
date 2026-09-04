@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/hero.svg" alt="A pixel-art marketer at a terminal: they ask an SEO agent to find keywords they can rank for, it calls DataForSEO and checks SERP ranks, reports 12 gaps, and queues three content briefs" width="720">
+  <img src="docs/assets/hero.svg" alt="A pixel-art marketer at a terminal runs two agents back to back: an SEO agent finds 12 keyword gaps and queues three content briefs, then a memory agent processes the team meeting and logs 6 decisions and 9 tasks" width="720">
 </p>
 
 <h1 align="center">Marketing as Code</h1>
@@ -16,11 +16,11 @@
 
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
+  <a href="#what-this-is-and-what-it-is-not">What this is</a> ·
   <a href="docs/is-this-for-you.md">Is this for you?</a> ·
+  <a href="#which-coding-agent">Which agent?</a> ·
   <a href="#a-blueprint-not-a-product">Make it yours</a> ·
-  <a href="#how-this-repo-is-organized">Structure</a> ·
-  <a href="docs/new-to-github.md">New to GitHub?</a> ·
-  <a href="#project-status">Status</a>
+  <a href="docs/new-to-github.md">New to GitHub?</a>
 </p>
 
 ---
@@ -38,9 +38,64 @@ code: strategy, messaging, briefs, decisions and knowledge as plain text, in
 one place, where agents read all of it and write into it. The repo is the
 floor. The agents are the point.
 
-This repository is that floor, pre-built. Fourteen agents and skills. Five
-integrations wired. No server. Start from it, make it yours, and run your
-marketing from here.
+This repository is that floor, pre-built. A roster of agents and skills
+([agents/README.md](agents/README.md)). Five integrations wired. No server.
+Start from it, make it yours, and run your marketing from here.
+
+## What this is, and what it is not
+
+This is a Git repository with a folder structure, templates, a set of agent
+and skill definitions, five wired integrations and a review workflow, for a
+B2B marketing team that works with a coding agent. You copy it, answer the
+setup interview, and your marketing lives here as plain text that agents
+read and write and a person approves.
+
+It is not:
+
+- **A product or a service.** Nothing to sign up for, no server, no account
+  with anyone. Your copy is yours, on your GitHub.
+- **A CMS or a website.** Published content lives here as text. The site
+  that renders it is a separate repo
+  ([docs/architecture.md](docs/architecture.md#the-website-a-standalone-sibling-repo-deliberately-not-in-here)).
+- **Marketing automation.** Agents draft, analyze and propose. A person
+  publishes, sends and merges. Nothing goes out on its own.
+- **A data warehouse.** `data/` holds dated snapshots, not your event stream.
+- **A replacement for your task tool, CRM or analytics.** It talks to them
+  ([integrations/README.md](integrations/README.md)).
+
+## What you need
+
+- A GitHub account and your own private copy of this repo. GitHub Free works
+  for a careful team of two; a private repo whose rules are enforced rather
+  than suggested needs GitHub Team or Pro
+  ([docs/github-settings.md](docs/github-settings.md)).
+- A coding agent per person. [Claude Code](https://claude.com/claude-code)
+  is what this repo is tuned for; Cursor and Codex read the same files
+  ([the table below](#which-coding-agent)).
+- On each computer: [GitHub Desktop](https://desktop.github.com), Python 3.9
+  or newer, and the [GitHub CLI](https://cli.github.com) for one login
+  command, once. Node.js only if you turn on the DataForSEO server.
+- One person who will read a diff and click Merge. This is the real
+  requirement.
+- Keys only for the integrations you turn on. The setup interview, content,
+  review, projects, the decision log, transcripts and the quarterly review
+  work with none.
+
+## What it costs
+
+The repo is free (MIT). What you pay for around it, for a team of about
+five:
+
+- **GitHub.** Free on a public repo. A private repo with enforced rules is a
+  per-seat plan, the smallest line item.
+- **Coding-agent seats.** One per active person. The largest line item.
+- **Data, pay as you go.** DataForSEO bills per request, Apify per run. Small
+  at this size, and only on the days you run those skills.
+- **Optional.** An API key for the unattended agent in GitHub Actions,
+  billed per run.
+
+Expect the agent seats to dominate and everything else to be a rounding
+error.
 
 ## What you get
 
@@ -48,7 +103,7 @@ marketing from here.
   strategy, brand, content, projects, data, reports, memory, agents,
   playgrounds. Every folder explains itself and ships templates instead of
   blank pages. The reasoning is in [docs/architecture.md](docs/architecture.md).
-- **A default agent set.** Fourteen agents and skills for onboarding, content,
+- **A default agent set.** Agents and skills for onboarding, content,
   project scaffolding, review, meeting transcripts, the quarterly marketing
   review, keyword and ranking analysis, AI answer-engine tracking, account
   research and campaign discovery. Each is a plain text file you can read
@@ -78,27 +133,56 @@ this repo.
 
 You are who this repo was built for. You don't need to be a developer or
 live in a terminal. [docs/new-to-github.md](docs/new-to-github.md) explains
-what a repository is in plain language and walks the no-terminal path: the
-GitHub website, GitHub Desktop, and a coding agent that does the technical
-parts for you.
+what a repository is in plain language and walks the path with one command,
+once: the GitHub website, GitHub Desktop, and a coding agent that does the
+technical parts for you.
 
 ## Quick start
 
-1. **Get the repo.** Click "Use this template" (or fork it) so you have your
-   own private copy.
+1. **Get your own copy.** On this page, click "Use this template", then
+   "Create a new repository", and make it private. Do not fork: a fork of a
+   public repository cannot be made private. Clone your copy with
+   [GitHub Desktop](https://desktop.github.com).
 2. **Open it with a coding agent.** [Claude Code](https://claude.com/claude-code)
    is what this repo is tuned for ([CLAUDE.md](CLAUDE.md)), in the terminal
-   or the desktop app. Cursor, Codex and any AGENTS.md-aware tool work too
-   ([AGENTS.md](AGENTS.md)).
-3. **Run the setup interview.** Ask the agent to set up the repo for your
-   team. It interviews you, fills the strategy and voice templates from your
-   answers, and connects only the integrations you use.
-4. **Start with one workflow.** Publish one piece of content, process one
-   meeting transcript, or run one report. Let the repo prove itself before
-   you move everything in.
-5. **Add your first integration.** Tell the agent which tool your team uses
-   for that workflow. It wires the connection by the rules in
-   [integrations/adding-an-integration.md](integrations/adding-an-integration.md).
+   or the desktop app; Cursor and Codex read the same files
+   ([which agent?](#which-coding-agent)). When it asks about three project
+   MCP servers, say No to all three for now.
+3. **Say `/doctor`.** It names the one thing to set up on this computer, a
+   GitHub login, once, and tells you when you are ready.
+4. **Say `/setup`.** The interview fills the strategy, voice and metric
+   templates from your answers and connects only the tools you use. Four
+   rounds are enough for day one.
+5. **Do one real piece of work.** `/new-content` drafts a piece in your
+   voice, `/review` checks it against your strategy, `/propose` opens the
+   proposal, and you read the diff and click Merge. Or drop a transcript in
+   `memory/transcripts/inbox/` and say `/chief-of-staff`.
+6. **Next morning, say `/sync`.** It brings in what was approved and says
+   what is waiting on you. Then the first integration: tell the agent "We
+   use Zoom for meetings. Automate reading the transcripts into the inbox."
+   and `/add-integration` builds it by
+   [the guide](integrations/adding-an-integration.md).
+
+That loop is the whole ritual ([docs/workflow.md](docs/workflow.md)):
+
+<p align="center">
+  <img src="docs/assets/lifecycle.svg" alt="The lifecycle as pixel-art panels under a sign reading ONE LOOP: Sync (get the latest), Work (ask the agent), Propose (open the proposal), Review (read the diff), Merge (click merge), and a red Doctor panel below: the repair word when something is red" width="720">
+</p>
+
+## Which coding agent
+
+| | Claude Code | Cursor | Codex |
+| --- | --- | --- | --- |
+| Reads `AGENTS.md` | yes | yes | yes |
+| Finds the skills | through `.claude/skills/`, symlinks kept by `scripts/sync_skills.py` | `.agents/skills/` directly | `.agents/skills/` directly |
+| Runs one | `/setup`, or ask in plain English | picks by description; ask in plain English | `$setup`, or ask in plain English |
+| MCP servers | `.mcp.json` | `.cursor/mcp.json` | TOML pasted from [the guide](integrations/adding-an-integration.md#configuring-an-mcp-server-per-coding-agent) |
+| Guardrails for keys | `.claude/settings.json` stops the agent reading `.env` | the skills' own rules only | the skills' own rules only |
+
+Whichever you use, keys are per person and never shared
+([docs/secrets.md](docs/secrets.md)). The lifecycle words (`/sync`,
+`/propose`, `/doctor`) are slash commands in Claude Code; in Cursor or
+Codex, say the word.
 
 ## A blueprint, not a product
 
