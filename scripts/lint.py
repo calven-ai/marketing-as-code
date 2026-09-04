@@ -709,11 +709,12 @@ def check_pii(ctx):
 
 
 def check_mcp_configs(ctx):
-    """MCP configs parse, agree on server names, hold placeholders, and every variable is registered."""
+    """MCP configs parse, agree on server names, hold placeholders, pin packages, and every variable is registered."""
     out = []
     m = ctx.schema["mcp"]
     placeholder = re.compile(m["placeholder"])
     secret = re.compile(r"(sk-[A-Za-z0-9_-]{8,}|xox[abp]-[A-Za-z0-9-]{8,}|Bearer\s+(?!\$\{)[A-Za-z0-9._-]{12,})")
+    pinned = set(ctx.schema.get("catalog", {}).get("pinned_commands", []))
     names, variables = {}, set()
     for rel in m["files"]:
         if not ctx.exists(rel):
@@ -730,6 +731,23 @@ def check_mcp_configs(ctx):
         for hit in secret.findall(text):
             out.append(Finding(ERROR, rel, "looks like it holds a credential value; use a ${VAR} placeholder",
                                "mcp", line=line_of(text, hit if isinstance(hit, str) else hit[0])))
+        cursor = rel.startswith(".cursor/")
+        for name, entry in servers.items():
+            if not isinstance(entry, dict):
+                continue
+            where = line_of(text, f'"{name}"')
+            cmd = entry.get("command")
+            if cmd in pinned and not _pinned(entry.get("args", [])):
+                out.append(Finding(ERROR, rel, f"`{name}` runs `{cmd}` without a pinned version: `{cmd} -y name@1.2.3`, "
+                                   "never `name` alone (integrations/adding-an-integration.md)", "mcp", line=where))
+            if cursor and "type" in entry:
+                out.append(Finding(WARNING, rel, f"`{name}`: Cursor entries carry no `type` key", "mcp", line=where))
+            if not cursor and entry.get("url") and entry.get("type") not in ("http", "sse", "ws"):
+                out.append(Finding(ERROR, rel, f"`{name}` has a `url` but no `\"type\": \"http\"`; Claude Code would "
+                                   "treat it as stdio and skip it", "mcp", line=where))
+        if cursor:
+            for hit in re.findall(r"\$\{(?!env:)[A-Z][A-Z0-9_]*\}", text):
+                out.append(Finding(ERROR, rel, f"Cursor reads `${{env:VAR}}`, not `{hit}`", "mcp", line=line_of(text, hit)))
     if len(names) == len(m["files"]):
         a, b = (names[r] for r in m["files"])
         if a != b:
@@ -737,6 +755,7 @@ def check_mcp_configs(ctx):
                                f"{m['files'][1]}; edit both together", "mcp"))
     example = ctx.path(".env.example").read_text(encoding="utf-8") if ctx.exists(".env.example") else ""
     registry = ctx.text(m["env_registry"]) if ctx.exists(m["env_registry"]) else ""
+    secrets_doc = ctx.text("docs/secrets.md") if "docs/secrets.md" in ctx.files else None
     for var in sorted(variables):
         if not re.search(rf"^{var}=", example, re.M):
             out.append(Finding(ERROR, ".env.example", f"`{var}` is used by an MCP config but not listed here",
@@ -744,7 +763,15 @@ def check_mcp_configs(ctx):
         if f"`{var}`" not in registry:
             out.append(Finding(WARNING, m["env_registry"], f"`{var}` is used by an MCP config but not in the "
                                "registry's Env vars column", "mcp-env"))
+        if secrets_doc is not None and f"`{var}`" not in secrets_doc:
+            out.append(Finding(WARNING, "docs/secrets.md", f"`{var}` is used by an MCP config but has no row in "
+                               "Who holds which key", "mcp-env"))
     return out
+
+
+def _pinned(args):
+    """True when some argument carries a version (`name@1.2.3` for npm, `name==1.2.3` for Python)."""
+    return any(re.search(r"(@|==)\d", str(a)) for a in (args or []))
 
 
 def check_settings(ctx):
@@ -785,22 +812,407 @@ def _fix_settings(ctx, rel, spec):
     ctx.forget(rel)
 
 
+SKILL_GLOB = ".agents/skills/*/SKILL.md"
+
+
+def skill_meta(ctx, rel):
+    """A skill's metadata dict ({} when absent or malformed) and its lists of needed and optional category ids."""
+    fm = ctx.fm(rel) or {}
+    meta = fm.get("metadata") if isinstance(fm.get("metadata"), dict) else {}
+    needs = meta.get("needs") if isinstance(meta.get("needs"), list) else []
+    optional = meta.get("optional") if isinstance(meta.get("optional"), list) else []
+    return meta, needs, optional
+
+
 def check_skills(ctx):
-    """Each skill's name matches its folder and it carries description and metadata."""
+    """Each skill's name matches its folder, it carries a description, and its metadata says what docs/schema.json allows."""
     out = []
     name_re = re.compile(ctx.schema["naming"]["skill_name"])
-    for rel in ctx.glob(".agents/skills/*/SKILL.md"):
+    spec = ctx.schema.get("skills", {})
+    areas = [a[0] for a in spec.get("areas", [])]
+    kinds = spec.get("kinds", ["role", "workflow"])
+    catalog = ctx.schema.get("catalog", {})
+    categories = catalog.get("categories", [])
+    bridge_only = catalog.get("bridge_only", [])
+    known_keys = set(spec.get("metadata_keys", []))
+    for rel in ctx.glob(SKILL_GLOB):
         folder = rel.split("/")[2]
         fm = ctx.fm(rel) or {}
+        text = ctx.text(rel)
         if fm.get("name") != folder or not name_re.match(folder):
             out.append(Finding(ERROR, rel, f"`name:` must equal the folder name `{folder}` (lowercase, hyphens)",
-                               "skill", line=line_of(ctx.text(rel), "name:")))
+                               "skill", line=line_of(text, "name:")))
         if not fm.get("description"):
             out.append(Finding(ERROR, rel, "`description:` is empty; agents route on it", "skill", line=1))
         meta = fm.get("metadata")
-        if not isinstance(meta, dict) or meta.get("kind") not in ("role", "workflow") or not meta.get("needs"):
-            out.append(Finding(WARNING, rel, "add `metadata:` with `kind: role|workflow` and `needs: ...`; "
-                               "the roster in agents/README.md is generated from them", "skill", line=1))
+        line = line_of(text, "metadata:") or 1
+        if not isinstance(meta, dict):
+            out.append(Finding(ERROR, rel, "add `metadata:` with `kind`, `area` and `needs`; the roster in "
+                               "agents/README.md is generated from them (docs/skill-authoring.md)", "skill", line=line))
+            continue
+
+        def bad(msg, level=ERROR, rel=rel, line=line):
+            out.append(Finding(level, rel, msg, "skill", line=line))
+
+        if meta.get("kind") not in kinds:
+            bad(f"`metadata.kind` must be one of {', '.join(kinds)}")
+        if areas and meta.get("area") not in areas:
+            bad(f"`metadata.area` must be one of {', '.join(areas)}")
+        if "needs" not in meta:
+            bad("`metadata.needs` is missing; write `needs: []` when the skill needs no integration")
+        for key in ("needs", "optional"):
+            if key not in meta:
+                continue
+            value = meta[key]
+            if not isinstance(value, list):
+                bad(f"`metadata.{key}` must be an inline list of category ids like `[crm, web-analytics]`, or `[]`")
+                continue
+            for cid in value:
+                if categories and cid not in categories:
+                    bad(f"`metadata.{key}` names `{cid}`, which is not a category in docs/schema.json")
+                elif cid in bridge_only:
+                    bad(f"`{cid}` is a bridge category, never a need; name the category it stands in for")
+        if meta.get("kind") == "role":
+            cadence = meta.get("cadence")
+            if not cadence:
+                bad("a role states its `cadence` (weekly, monthly, ...)", WARNING)
+            elif spec.get("cadence") and cadence not in spec["cadence"]:
+                bad(f"`metadata.cadence` must be one of {', '.join(spec['cadence'])}")
+        for key in ("writes", "runs"):
+            allowed = spec.get(key)
+            if key in meta and allowed and meta[key] not in allowed:
+                bad(f"`metadata.{key}` must be one of {', '.join(allowed)}")
+        if meta.get("writes") == "external" and meta.get("runs") == "either":
+            bad("a skill that writes to external systems never runs unattended: set `runs: person` (AGENTS.md rule 3)")
+        for key in meta:
+            if known_keys and key not in known_keys:
+                bad(f"unknown metadata key `{key}` (typo?)", WARNING)
+    return out
+
+
+# ------------------------------------------------------------ catalog --
+
+def load_catalog(ctx):
+    """{category id: parsed JSON} for integrations/catalog/*.json, plus (path, error) for files that do not parse."""
+    folder = ctx.schema.get("catalog", {}).get("dir", "integrations/catalog")
+    entries, errors = {}, []
+    for rel in ctx.glob(f"{folder}/*.json"):
+        try:
+            data = json.loads(ctx.text(rel))
+        except json.JSONDecodeError as err:
+            errors.append((rel, f"not valid JSON: {err}"))
+            continue
+        if not isinstance(data, dict):
+            errors.append((rel, "the top level must be an object"))
+            continue
+        entries[Path(rel).stem] = data
+    return entries, errors
+
+
+def load_wired(ctx):
+    """(path, parsed integrations/wired.json or None, error or None)."""
+    rel = ctx.schema.get("catalog", {}).get("wired", "integrations/wired.json")
+    if rel not in ctx.files:
+        return rel, None, None
+    try:
+        data = json.loads(ctx.text(rel))
+    except json.JSONDecodeError as err:
+        return rel, None, f"not valid JSON: {err}"
+    return rel, data if isinstance(data, dict) else {}, None
+
+
+def catalog_vendor(entries, category, vendor_id):
+    for v in (entries.get(category) or {}).get("vendors") or []:
+        if isinstance(v, dict) and v.get("id") == vendor_id:
+            return v
+    return None
+
+
+def mcp_variant(vendor, variant_id=None):
+    """The named `routes.mcp` entry of a vendor, or its default when no id is given."""
+    variants = [m for m in ((vendor or {}).get("routes") or {}).get("mcp") or [] if isinstance(m, dict)]
+    if variant_id is not None:
+        return next((m for m in variants if m.get("id") == variant_id), None)
+    return next((m for m in variants if m.get("default")), variants[0] if variants else None)
+
+
+def check_catalog(ctx):
+    """integrations/catalog/*.json: valid, complete, pinned, placeholders declared, checked recently."""
+    out = []
+    spec = ctx.schema.get("catalog")
+    if not spec:
+        return out
+    folder = spec.get("dir", "integrations/catalog")
+    categories = spec.get("categories", [])
+    verified = spec.get("verified", [])
+    source_re = re.compile(spec.get("source_token", "^[a-z0-9]+$"))
+    id_re = re.compile(ctx.schema["naming"]["skill_name"])
+    placeholder = re.compile(ctx.schema["mcp"]["placeholder"])
+    pinned = set(spec.get("pinned_commands", []))
+    stale = spec.get("stale_after_days", 180)
+    today = date.today()
+    entries, errors = load_catalog(ctx)
+    for rel, msg in errors:
+        out.append(Finding(ERROR, rel, msg, "catalog"))
+    for cid, data in sorted(entries.items()):
+        rel = f"{folder}/{cid}.json"
+
+        def bad(msg, level=ERROR, rel=rel):
+            out.append(Finding(level, rel, msg, "catalog"))
+
+        if data.get("id") != cid or cid not in categories:
+            bad(f"`id` must equal the file name `{cid}` and be one of the categories in docs/schema.json")
+        manual = data.get("manual")
+        if not isinstance(manual, dict) or not manual.get("export") or not manual.get("drop"):
+            bad("`manual` needs `export` and `drop`: every category keeps a by-hand route")
+        for b in data.get("bridges") or []:
+            if b not in categories:
+                bad(f"`bridges` names an unknown category `{b}`")
+        domain = data.get("data_domain")
+        if domain and not ctx.path(str(domain)).is_dir():
+            bad(f"`data_domain: {domain}` is not a folder", WARNING)
+        vendors = data.get("vendors")
+        if not isinstance(vendors, list):
+            bad("`vendors` must be a list")
+            continue
+        if not vendors and not data.get("bridges"):
+            bad("no vendors and no bridges; a category needs a route besides the manual one", WARNING)
+        seen = set()
+        for v in vendors:
+            if not isinstance(v, dict):
+                bad("a vendor entry is not an object")
+                continue
+            vid = str(v.get("id", ""))
+            where = f"vendor `{vid or '?'}`"
+            if not id_re.match(vid) or vid in seen:
+                bad(f"{where}: `id` is missing, malformed or duplicated")
+            seen.add(vid)
+            for key in ("name", "source", "verified", "checked", "source_url", "routes"):
+                if key not in v:
+                    bad(f"{where}: missing `{key}`")
+            if not source_re.match(str(v.get("source", ""))):
+                bad(f"{where}: `source` must match {source_re.pattern} (the snapshot source token, data/README.md)")
+            if v.get("verified") not in verified:
+                bad(f"{where}: `verified` must be one of {', '.join(verified)}")
+            checked = str(v.get("checked", ""))
+            if not is_iso_date(checked):
+                bad(f"{where}: `checked` must be a YYYY-MM-DD date")
+            elif (today - date.fromisoformat(checked)).days > stale:
+                bad(f"{where}: checked {checked}, more than {stale} days ago; re-verify against `source_url` "
+                    "and update `checked`", WARNING)
+            switch = v.get("read_only_switch")
+            if switch is not None and (not isinstance(switch, dict) or switch.get("kind") not in
+                                       ("env", "arg", "url", "header") or "name" not in switch or "value" not in switch):
+                bad(f"{where}: `read_only_switch` must be null or {{kind: env|arg|url|header, name, value}}")
+            routes = v.get("routes") if isinstance(v.get("routes"), dict) else {}
+            mcp = routes.get("mcp")
+            if not isinstance(mcp, list):
+                bad(f"{where}: `routes.mcp` must be a list (empty when there is no server)")
+                mcp = []
+            defaults = [x for x in mcp if isinstance(x, dict) and x.get("default")]
+            if mcp and len(defaults) != 1:
+                bad(f"{where}: exactly one `routes.mcp` entry must carry `default: true`")
+            for x in mcp:
+                if not isinstance(x, dict):
+                    bad(f"{where}: a `routes.mcp` entry is not an object")
+                    continue
+                mw = f"{where} variant `{x.get('id', '?')}`"
+                if not id_re.match(str(x.get("server", ""))):
+                    bad(f"{mw}: `server` is missing or malformed (lowercase, hyphens)")
+                transport = x.get("transport")
+                if transport == "http":
+                    if not str(x.get("url", "")).startswith(("http", "${")):
+                        bad(f"{mw}: http transport needs a `url` (a literal, or a `${{VAR}}` placeholder for a "
+                            "per-account endpoint)")
+                elif transport == "stdio":
+                    if not x.get("command") or not isinstance(x.get("args"), list):
+                        bad(f"{mw}: stdio transport needs `command` and `args`")
+                    elif x["command"] in pinned and not _pinned(x["args"]):
+                        bad(f"{mw}: `{x['command']}` package is not pinned to a version "
+                            "(integrations/adding-an-integration.md)")
+                else:
+                    bad(f"{mw}: `transport` must be http or stdio")
+                auth = x.get("auth") if isinstance(x.get("auth"), dict) else {}
+                model = auth.get("model")
+                if model not in ("oauth", "bearer", "header", "basic", "env", "none"):
+                    bad(f"{mw}: `auth.model` must be oauth, bearer, header, basic, env or none")
+                declared = set(auth.get("env") or [])
+                used = set(placeholder.findall(json.dumps(x)))
+                if declared != used:
+                    bad(f"{mw}: `auth.env` {sorted(declared)} must list exactly the placeholders the entry uses "
+                        f"{sorted(used)}")
+                if "headless" not in x:
+                    bad(f"{mw}: missing `headless`")
+                elif model == "oauth" and x.get("headless"):
+                    bad(f"{mw}: an OAuth server cannot run headless; set `headless: false`")
+            script = routes.get("script")
+            if isinstance(script, dict) and script.get("path") and not ctx.exists(str(script["path"])):
+                bad(f"{where}: `routes.script.path` {script['path']} does not exist")
+    return out
+
+
+def check_wired(ctx):
+    """integrations/wired.json binds categories to catalog vendors; .mcp.json and the deny rules agree with it."""
+    out = []
+    spec = ctx.schema.get("catalog")
+    if not spec:
+        return out
+    rel, data, err = load_wired(ctx)
+    if data is None:
+        if err:
+            out.append(Finding(ERROR, rel, err, "wired"))
+        return out
+    entries, _ = load_catalog(ctx)
+    categories = spec.get("categories", [])
+    wired = data.get("wired") if isinstance(data.get("wired"), dict) else {}
+    custom = data.get("custom_servers") if isinstance(data.get("custom_servers"), dict) else {}
+    servers = {}
+    if ctx.exists(".mcp.json"):
+        try:
+            servers = json.loads(ctx.text(".mcp.json")).get("mcpServers", {})
+        except json.JSONDecodeError:
+            servers = {}
+    settings_rel = ctx.schema.get("settings", {}).get("file", ".claude/settings.json")
+    deny = []
+    if ctx.exists(settings_rel):
+        try:
+            deny = json.loads(ctx.text(settings_rel)).get("permissions", {}).get("deny", [])
+        except json.JSONDecodeError:
+            deny = []
+    bound, missing_rules = set(), []
+    for cid, entry in sorted(wired.items()):
+        if cid not in categories:
+            out.append(Finding(ERROR, rel, f"`{cid}` is not a category in docs/schema.json", "wired"))
+            continue
+        if not isinstance(entry, dict):
+            out.append(Finding(ERROR, rel, f"`{cid}` must be an object", "wired"))
+            continue
+        vid = entry.get("vendor")
+        if vid is None:
+            continue
+        vendor = catalog_vendor(entries, cid, vid)
+        if vendor is None:
+            out.append(Finding(ERROR, rel, f"`{cid}` is wired to `{vid}`, which is not in "
+                               f"{spec.get('dir', 'integrations/catalog')}/{cid}.json", "wired"))
+            continue
+        routes = entry.get("routes") or []
+        if "mcp" not in routes:
+            continue
+        variant = mcp_variant(vendor, entry.get("variant"))
+        if variant is None:
+            out.append(Finding(ERROR, rel, f"`{cid}`: variant `{entry.get('variant')}` is not a `routes.mcp` entry "
+                               f"of `{vid}`", "wired"))
+            continue
+        server = str(variant.get("server", ""))
+        bound.add(server)
+        if server not in servers:
+            out.append(Finding(ERROR, rel, f"`{cid}` is wired to `{vid}` but `{server}` is not in .mcp.json; run "
+                               f"python3 scripts/wire_integration.py {vid}", "wired"))
+        writes = entry.get("writes")
+        if vendor.get("writes") and writes not in ("denied", "allowed"):
+            out.append(Finding(WARNING, rel, f"`{cid}`: `{vid}` has write tools; say `writes: denied` or "
+                               "`writes: allowed`", "wired"))
+        if writes == "denied":
+            rules = [f"mcp__{server}__{t}" for t in vendor.get("write_tools") or []] or [f"mcp__{server}"]
+            missing_rules += [r for r in rules if r not in deny]
+    for server in sorted(servers):
+        if server not in bound and server not in custom:
+            out.append(Finding(WARNING, ".mcp.json", f"server `{server}` is not bound in {rel}; wire it with "
+                               "scripts/wire_integration.py, or list it under custom_servers with a reason", "wired"))
+    if missing_rules:
+        out.append(Finding(ERROR, settings_rel, f"{rel} says writes are denied but permissions.deny lacks "
+                           + ", ".join(f"`{r}`" for r in missing_rules), "wired",
+                           fix=lambda: _add_deny_rules(ctx, settings_rel, missing_rules)))
+    return out
+
+
+def _add_deny_rules(ctx, rel, rules):
+    data = json.loads(ctx.text(rel)) if ctx.exists(rel) else {}
+    deny = data.setdefault("permissions", {}).setdefault("deny", [])
+    for rule in rules:
+        if rule not in deny:
+            deny.append(rule)
+    ctx.path(rel).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    ctx.forget(rel)
+
+
+def check_catalog_coverage(ctx):
+    """Every category is needed by some skill, and every category a skill needs has a catalog file."""
+    out = []
+    spec = ctx.schema.get("catalog")
+    if not spec:
+        return out
+    folder = spec.get("dir", "integrations/catalog")
+    categories = spec.get("categories", [])
+    bridge_only = set(spec.get("bridge_only", []))
+    entries, _ = load_catalog(ctx)
+    used = set()
+    for rel in ctx.glob(SKILL_GLOB):
+        _, needs, optional = skill_meta(ctx, rel)
+        for cid in needs + optional:
+            used.add(cid)
+            if cid in categories and cid not in entries:
+                out.append(Finding(ERROR, rel, f"needs `{cid}` but {folder}/{cid}.json does not exist", "catalog-coverage"))
+    for cid in categories:
+        if cid in entries and cid not in used and cid not in bridge_only:
+            out.append(Finding(WARNING, f"{folder}/{cid}.json", "no skill lists this category under needs or optional; "
+                               "add the skill that uses it, or delete the file", "catalog-coverage"))
+    return out
+
+
+def check_role_workflows(ctx):
+    """A role-<skill>.yml caller runs a repo-only skill whose every category is wired to run headless."""
+    out = []
+    _, data, _ = load_wired(ctx)
+    wired = (data or {}).get("wired") or {}
+    entries, _ = load_catalog(ctx)
+    for wf in ctx.glob(".github/workflows/role-*.yml"):
+        if Path(wf).name == "role-run.yml":
+            continue
+        text = ctx.text(wf)
+        m = re.search(r"^\s+skill:\s*['\"]?([a-z0-9-]+)", text, re.M)
+        if not m:
+            out.append(Finding(ERROR, wf, "no `skill:` input; a role caller names the skill it runs", "role-workflow"))
+            continue
+        name = m.group(1)
+        rel = f".agents/skills/{name}/SKILL.md"
+        if rel not in ctx.files:
+            out.append(Finding(ERROR, wf, f"skill `{name}` does not exist", "role-workflow"))
+            continue
+        meta, needs, _ = skill_meta(ctx, rel)
+        if meta.get("writes", "repo") != "repo":
+            out.append(Finding(ERROR, wf, f"runs `{name}` unattended, but it writes to external systems "
+                               "(AGENTS.md rule 3)", "role-workflow"))
+        for cid in needs:
+            entry = wired.get(cid) if isinstance(wired.get(cid), dict) else {}
+            headless = "script" in (entry.get("routes") or [])
+            variant = mcp_variant(catalog_vendor(entries, cid, entry.get("vendor")), entry.get("variant"))
+            if variant and variant.get("headless") and "mcp" in (entry.get("routes") or []):
+                headless = True
+            if not headless:
+                out.append(Finding(ERROR, wf, f"runs `{name}` unattended, but `{cid}` is not wired to a key-based "
+                                   "server or a script (docs/operating-model.md)", "role-workflow"))
+    return out
+
+
+THIRD_PARTY_HEADER = re.compile(r"^<!--\s*source:\s*(\S+)\s*\|\s*license:\s*([^|]+?)\s*\|\s*fetched:\s*(\d{4}-\d{2}-\d{2})\s*-->")
+
+
+def check_third_party(ctx):
+    """Reused reference material names its source on line one and in THIRD_PARTY.md; the skill carries license:."""
+    out = []
+    registry = ctx.text("THIRD_PARTY.md") if "THIRD_PARTY.md" in ctx.files else None
+    for rel in ctx.glob(".agents/skills/*/references/*.md"):
+        m = THIRD_PARTY_HEADER.match(ctx.text(rel).split("\n", 1)[0])
+        if not m:
+            continue
+        url = m.group(1)
+        if registry is None or url not in registry:
+            out.append(Finding(ERROR, rel, f"reuses material from {url}; add its row to THIRD_PARTY.md", "third-party", line=1))
+        skill = ".agents/skills/" + rel.split("/")[2] + "/SKILL.md"
+        if skill in ctx.files and not (ctx.fm(skill) or {}).get("license"):
+            out.append(Finding(WARNING, skill, "carries third-party references but no `license:` in its frontmatter",
+                               "third-party", line=1))
     return out
 
 
@@ -888,19 +1300,8 @@ def check_generated_blocks(ctx):
 
 
 def render_block(ctx, block):
-    if block in ("skills-roles", "skills-workflows"):
-        kind = "role" if block == "skills-roles" else "workflow"
-        head = "Agent" if kind == "role" else "Skill"
-        rows = [f"| {head} | What it does | Needs |", "| --- | --- | --- |"]
-        for rel in ctx.glob(".agents/skills/*/SKILL.md"):
-            fm = ctx.fm(rel) or {}
-            meta = fm.get("metadata") if isinstance(fm.get("metadata"), dict) else {}
-            if meta.get("kind", "workflow") != kind:
-                continue
-            name = rel.split("/")[2]
-            what = re.split(r"\.\s+Use\b", str(fm.get("description", "")), maxsplit=1)[0].rstrip(".")
-            rows.append(f"| [{name}](../.agents/skills/{name}/SKILL.md) | {cell(what)} | {cell(meta.get('needs', 'nothing'))} |")
-        return "\n".join(rows)
+    if block.startswith("skills-"):
+        return _render_skills(ctx, block[len("skills-"):])
     if block == "scripts":
         rows = ["| Script | What it does |", "| --- | --- |"]
         files = sorted(ctx.glob("scripts/*.py") + ctx.glob("scripts/*.sh") + ctx.glob("scripts/hooks/*"))
@@ -908,7 +1309,193 @@ def render_block(ctx, block):
             name = rel[len("scripts/"):]
             rows.append(f"| [{name}]({name}) | {cell(script_summary(ctx.text(rel)))} |")
         return "\n".join(rows)
+    if block == "wired":
+        return _render_wired(ctx)
+    if block == "categories":
+        return _render_categories(ctx)
+    if block == "catalog":
+        return _render_catalog(ctx)
     raise ValueError(block)
+
+
+def _needs_cell(needs, optional, base):
+    link = lambda c: f"[{c}]({base}#{c})"  # noqa: E731
+    text = ", ".join(link(c) for c in needs) if needs else "nothing"
+    if optional:
+        text += " (optional: " + ", ".join(link(c) for c in optional) + ")"
+    return text
+
+
+def _render_skills(ctx, area):
+    """One roster table per area: roles first, then workflows, alphabetical within each."""
+    areas = [a[0] for a in ctx.schema.get("skills", {}).get("areas", [])]
+    if area not in areas:
+        raise ValueError(f"skills-{area}")
+    rows = ["| Skill | Kind | What it does | Needs |", "| --- | --- | --- | --- |"]
+    items = []
+    for rel in ctx.glob(SKILL_GLOB):
+        fm = ctx.fm(rel) or {}
+        meta, needs, optional = skill_meta(ctx, rel)
+        if meta.get("area") != area:
+            continue
+        name = rel.split("/")[2]
+        kind = meta.get("kind", "workflow")
+        kind_cell = f"role ({meta['cadence']})" if kind == "role" and meta.get("cadence") else kind
+        what = re.split(r"\.\s+Use\b", str(fm.get("description", "")), maxsplit=1)[0].rstrip(".")
+        items.append((0 if kind == "role" else 1, name, kind_cell, what,
+                      _needs_cell(needs, optional, "../integrations/catalog/README.md")))
+    for _, name, kind_cell, what, needs in sorted(items):
+        rows.append(f"| [{name}](../.agents/skills/{name}/SKILL.md) | {kind_cell} | {cell(what)} | {needs} |")
+    return "\n".join(rows)
+
+
+def _catalog_order(ctx, entries):
+    listed = ctx.schema.get("catalog", {}).get("categories", [])
+    return [c for c in listed if c in entries] + sorted(c for c in entries if c not in listed)
+
+
+def _render_wired(ctx):
+    """The Wired table in integrations/README.md, from integrations/wired.json joined with the catalog."""
+    entries, _ = load_catalog(ctx)
+    _, data, _ = load_wired(ctx)
+    wired = (data or {}).get("wired") or {}
+    rows = ["| Category | Vendor | Route | Auth | Env vars (in `.env`) | Writes | Since |",
+            "| --- | --- | --- | --- | --- | --- | --- |"]
+    for cid in _catalog_order(ctx, {**entries, **wired}):
+        entry = wired.get(cid)
+        if not isinstance(entry, dict):
+            continue
+        cat = f"[{cid}](catalog/README.md#{cid})"
+        vid = entry.get("vendor")
+        if vid is None:
+            rows.append(f"| {cat} | none | manual: {cell(entry.get('note', 'see the catalog'))} | | none | | |")
+            continue
+        vendor = catalog_vendor(entries, cid, vid) or {}
+        routes = entry.get("routes") or []
+        variant = mcp_variant(vendor, entry.get("variant")) if "mcp" in routes else None
+        vroutes = vendor.get("routes") or {}
+        script = vroutes.get("script") if isinstance(vroutes.get("script"), dict) else {}
+        cli = vroutes.get("cli") if isinstance(vroutes.get("cli"), dict) else {}
+        parts, env, auth = [], [], []
+        if variant:
+            parts.append(f"MCP `{variant.get('server')}` ({variant.get('transport')}) in `.mcp.json`")
+            a = variant.get("auth") if isinstance(variant.get("auth"), dict) else {}
+            auth.append(a.get("model", "?") + (f": {a['where']}" if a.get("where") else ""))
+            env += a.get("env") or []
+        if "script" in routes and script.get("path"):
+            parts.append(f"`{script['path']}`" + (f" ({script['notes']})" if script.get("notes") else ""))
+            env += script.get("env") or []
+            if not variant:
+                auth.append("key in the environment")
+        if "cli" in routes and cli.get("tool"):
+            parts.append(f"CLI `{cli['tool']}`")
+        if "manual" in routes:
+            parts.append("manual export")
+        env_cell = ", ".join(f"`{v}`" for v in sorted(set(env))) or "none"
+        rows.append(f"| {cat} | {cell(vendor.get('name', vid))} | {cell('; '.join(parts) or 'see the catalog')} | "
+                    f"{cell('; '.join(auth) or 'none')} | {env_cell} | {cell(entry.get('writes', 'n/a'))} | "
+                    f"{cell(entry.get('since', ''))} |")
+    return "\n".join(rows)
+
+
+def _render_categories(ctx):
+    """The category index in integrations/README.md: what each is for, what is wired, who needs it."""
+    entries, _ = load_catalog(ctx)
+    _, data, _ = load_wired(ctx)
+    wired = (data or {}).get("wired") or {}
+    needed, optional = {}, {}
+    for rel in ctx.glob(SKILL_GLOB):
+        name = rel.split("/")[2]
+        _, needs, opt = skill_meta(ctx, rel)
+        for cid in needs:
+            needed.setdefault(cid, []).append(name)
+        for cid in opt:
+            optional.setdefault(cid, []).append(name)
+    rows = ["| Category | For | Wired | In the catalog | Needed by |", "| --- | --- | --- | --- | --- |"]
+    for cid in _catalog_order(ctx, entries):
+        d = entries[cid]
+        entry = wired.get(cid) if isinstance(wired.get(cid), dict) else None
+        if entry is None:
+            status = "not wired"
+        elif entry.get("vendor") is None:
+            status = "manual"
+        else:
+            status = (catalog_vendor(entries, cid, entry["vendor"]) or {}).get("name", entry["vendor"])
+        names = [v.get("name", v.get("id", "?")) for v in d.get("vendors") or [] if isinstance(v, dict)]
+        bridges = d.get("bridges") or []
+        vendors = ", ".join(names) or "none official"
+        if bridges:
+            vendors += f" (falls back to {', '.join(bridges)})"
+        skills = ", ".join(f"[{n}](../.agents/skills/{n}/SKILL.md)" for n in sorted(needed.get(cid, [])))
+        extra = len(optional.get(cid, []))
+        if extra:
+            skills += (" " if skills else "") + f"(+{extra} optional)"
+        rows.append(f"| [{cid}](catalog/README.md#{cid}) | {cell(d.get('for', ''))} | {cell(status)} | "
+                    f"{cell(vendors)} | {skills or 'nobody yet'} |")
+    return "\n".join(rows)
+
+
+def _render_catalog(ctx):
+    """integrations/catalog/README.md: every category and every vendor route the catalog knows."""
+    entries, _ = load_catalog(ctx)
+    out = []
+    for cid in _catalog_order(ctx, entries):
+        d = entries[cid]
+        out.append(f"### {cid}")
+        out.append("")
+        line = f"**{d.get('title', cid)}**: {d.get('for', '')}."
+        if d.get("data_domain"):
+            line += f" Data lands in `{str(d['data_domain']).rstrip('/')}/`."
+        out.append(line)
+        manual = d.get("manual") if isinstance(d.get("manual"), dict) else {}
+        if manual:
+            out.append(f"By hand: {manual.get('export', '')} Drop: `{manual.get('drop', '')}`.")
+        if d.get("bridges"):
+            out.append("Falls back to: " + ", ".join(d["bridges"]) + ".")
+        out.append("")
+        out.append("| Vendor | Mechanism | Auth | Writes | Headless | Verified | Checked |")
+        out.append("| --- | --- | --- | --- | --- | --- | --- |")
+        for v in d.get("vendors") or []:
+            if not isinstance(v, dict):
+                continue
+            routes = v.get("routes") if isinstance(v.get("routes"), dict) else {}
+            variant = mcp_variant(v)
+            parts, auth, env = [], "manual export", []
+            if variant:
+                if variant.get("transport") == "stdio":
+                    parts.append(f"stdio `{variant.get('server')}`: {variant.get('command')} "
+                                 + " ".join(str(a) for a in variant.get("args") or []))
+                else:
+                    parts.append(f"http `{variant.get('server')}`: {variant.get('url', '')}")
+                a = variant.get("auth") if isinstance(variant.get("auth"), dict) else {}
+                auth = a.get("model", "?")
+                env = a.get("env") or []
+                if len(routes.get("mcp") or []) > 1:
+                    parts[-1] += f" (+{len(routes['mcp']) - 1} variant{'s' if len(routes['mcp']) > 2 else ''})"
+            cli = routes.get("cli") if isinstance(routes.get("cli"), dict) else {}
+            if cli.get("tool"):
+                parts.append(f"CLI `{cli['tool']}`")
+            script = routes.get("script") if isinstance(routes.get("script"), dict) else {}
+            if script.get("path"):
+                parts.append(f"script `{script['path']}`")
+                env += script.get("env") or []
+                if not variant:
+                    auth = "key in the environment"
+            if env:
+                auth += ": " + ", ".join(f"`{e}`" for e in sorted(set(env)))
+            if v.get("writes"):
+                tools = v.get("write_tools") or []
+                writes = f"yes, {len(tools)} tools recorded" if tools else "yes, tools unrecorded"
+                if v.get("read_only_switch"):
+                    writes += "; read-only switch"
+            else:
+                writes = "no"
+            headless = "yes" if variant and variant.get("headless") else ("script" if script.get("path") else "no")
+            out.append(f"| {cell(v.get('name', v.get('id', '?')))} | {cell('; '.join(parts) or 'none')} | "
+                       f"{cell(auth)} | {writes} | {headless} | {cell(v.get('verified', '?'))} | "
+                       f"{cell(v.get('checked', ''))} |")
+        out.append("")
+    return "\n".join(out).strip()
 
 
 def script_summary(text):
@@ -1061,6 +1648,11 @@ CHECKS = [
     (check_required, "repo"),
     (check_mcp_configs, "repo"),
     (check_settings, "repo"),
+    (check_catalog, "repo"),
+    (check_wired, "repo"),
+    (check_catalog_coverage, "repo"),
+    (check_role_workflows, "repo"),
+    (check_third_party, "repo"),
     (check_generated_blocks, "repo"),
     (check_docs_index, "repo"),
     (check_skill_links, "repo"),
