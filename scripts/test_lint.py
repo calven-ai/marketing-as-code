@@ -398,3 +398,8 @@ class TestReviewGate(unittest.TestCase):
         self.assertEqual("success", v(solo, "ana", [], [])[0])
         self.assertEqual("action_required", v({}, "ana", [], [])[0])  # absent means a team
         self.assertTrue(review_gate.self_merge_allowed(SCHEMA) in (True, False))
+
+    def test_rule_changing_proposals_are_not_tidied(self):
+        self.assertTrue(review_gate.tidy_allowed(["memory/decision-log.md", "projects/x/status.md"]))
+        self.assertFalse(review_gate.tidy_allowed(["scripts/lint.py", "scripts/README.md"]))
+        self.assertFalse(review_gate.tidy_allowed(["docs/schema.json"]))

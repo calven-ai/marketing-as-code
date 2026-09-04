@@ -58,6 +58,9 @@ cannot change the rules it is judged by) sorts it into one of two kinds:
   the diff and approves. Anything touching the machinery (`.github/`,
   `scripts/`, `docs/schema.json`, the agent settings, the skills, the
   integrations) is needs-review no matter what else is in the proposal.
+  A proposal that changes the rules themselves (`scripts/lint.py`,
+  `docs/schema.json`) gets no Tidy commit from the gate: main's fixes
+  would fight the proposal's own.
 
 When in doubt the gate decides, and it errs toward review. On GitHub Team
 or Pro the checks are enforced; on Free they advise
