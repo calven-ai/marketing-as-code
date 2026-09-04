@@ -17,5 +17,5 @@ Keep columns stable per `<what>` so snapshots diff cleanly across months.
 
 - Interpret event and conversion names through `data/ontology/events.md`.
   Never assume what `signed_up` means.
-- Analyses go to `reports/recurring/analytics/` (or `reports/adhoc/` for
-  one-off questions), not here.
+- Analyses go to `reports/recurring/analytics/`, or `reports/adhoc/` for
+  one-off questions. Never here.

@@ -1,6 +1,6 @@
 # data/crm/
 
-Pipeline, signup, and email-performance pulls from the CRM (HubSpot or
+Pipeline, signup and email-performance pulls from the CRM (HubSpot or
 equivalent). See `integrations/README.md`.
 
 ## Snapshots
@@ -16,8 +16,9 @@ equivalent). See `integrations/README.md`.
 
 ## Rules
 
-- **PII caution applies hardest here.** Company-level aggregates are safe;
-  individual names/emails only if this repo is private and the team logged
-  that decision.
-- Lifecycle-stage labels (MQL, SQL, …) mean what `data/ontology/metrics.md`
-  says they mean. If the ontology is unfilled, ask before analyzing.
+- **The PII rule applies hardest here.** Company-level aggregates are safe.
+  Individual names and emails only if this repo is private and the team
+  logged that decision.
+- Lifecycle-stage labels (MQL, SQL, and the rest) mean what
+  `data/ontology/metrics.md` says they mean. If the ontology is unfilled,
+  ask before analyzing.

@@ -11,7 +11,7 @@ see (a draft, an email, a prototype, an image) loads this folder first.
 | --- | --- |
 | [voice.md](voice.md) | Voice and tone: how we write, with do/don't examples |
 | [visual-identity.md](visual-identity.md) | Colors, typography, imagery rules, logo usage |
-| [tokens.json](tokens.json) | The machine-readable subset (colors, fonts) that scripts and the prototype builder read (an OG-image script is on the roadmap) |
+| [tokens.json](tokens.json) | The machine-readable subset (colors, fonts) that scripts and the prototype builder read |
 | `logos/` | Logo files (SVG preferred) |
 | `templates/` | Reusable design templates: OG-image background, social templates |
 
@@ -19,12 +19,12 @@ see (a draft, an email, a prototype, an image) loads this folder first.
 
 - This is the **one sanctioned binary zone** in the repo (logos, image
   templates). Everywhere else, plain text first.
-- `tokens.json` and `visual-identity.md` must agree; when the identity
+- `tokens.json` and `visual-identity.md` must agree. When the identity
   changes, update both in the same commit.
 - Voice questions are settled by `voice.md`, not by taste. If it doesn't
-  cover a case, propose an addition rather than improvising silently.
+  cover a case, propose an addition instead of improvising.
 - `voice.md` and `visual-identity.md` carry `last_reviewed` in their
-  frontmatter; `scripts/doctor.py` flags them after 90 days. Voice is not
-  served by a context layer (see
-  [integrations/context-layer.md](../integrations/context-layer.md)); it
-  stays here and the team owns it.
+  frontmatter, and `scripts/doctor.py` flags them after 90 days. Voice is
+  not served by a context layer
+  ([integrations/context-layer.md](../integrations/context-layer.md)). It
+  stays here, and the team owns it.
