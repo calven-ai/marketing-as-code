@@ -70,7 +70,8 @@ jobs:
           else
             python3 scripts/doctor.py --format github | tee doctor.txt
           fi
-          echo "status=$?" >> "$GITHUB_OUTPUT"
+          # the doctor's exit code, not tee's: without pipefail, $? is tee's 0
+          echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
           python3 scripts/lint.py --json > findings.json || true
 
       - name: Refresh the sticky comment
