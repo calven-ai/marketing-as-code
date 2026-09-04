@@ -124,6 +124,10 @@ agent, or on a schedule in GitHub Actions.
 
 ## Four kinds of files
 
+<p align="center">
+  <img src="docs/assets/four-kinds-8bit.svg" alt="The four kinds of files as pixel-art panels: Context holds strategy, brand, content, projects, memory and docs plus AGENTS.md and CLAUDE.md; Agents holds agents, .agents/skills and integrations; Data holds data and reports; Code holds scripts, playgrounds and .github/workflows" width="640">
+</p>
+
 - **Context**, what the team knows: `strategy/`, `brand/`, `content/`,
   `projects/`, `memory/`, `docs/`, plus `AGENTS.md` and `CLAUDE.md`. Every
   strategy file is dated, and the health check flags stale ones.
