@@ -67,8 +67,7 @@ marketing-as-code/
 ### `.agents/skills/`: the canonical agent and skill definitions
 
 One folder per agent or skill, in the Agent Skills format: `SKILL.md` with
-frontmatter, plus optional `scripts/` and `references/`. Cursor, Codex,
-Gemini CLI, Copilot and OpenCode discover this location natively. There is
+frontmatter, plus optional `scripts/` and `references/`. Cursor and Codex discover this location natively. There is
 no format distinction between agents (recurring roles like `seo-analyst`)
 and skills (procedures like `qmr`); the roster in `agents/README.md`
 groups them for humans. Claude Code still reads `.claude/skills/`, so the

@@ -3,9 +3,10 @@
 **Kind:** agents, the workforce as instructions in English.
 
 Every agent and skill in this repo, what it does, and what it needs. The
-definitions live in [`.agents/skills/`](../.agents/skills/), where Claude
-Code, Cursor and Codex all find them. Invoke one by slash command
-(`/setup`) or ask in plain English.
+definitions live in [`.agents/skills/`](../.agents/skills/). Cursor and
+Codex read that folder directly; Claude Code reads the same files through
+the symlinks in `.claude/skills/`. Run one by slash command in Claude Code
+(`/setup`), by `$setup` in Codex, or ask for it in plain English anywhere.
 
 The tables are generated from each skill's `description` and `metadata`
 (`python3 scripts/lint.py --fix` refreshes them). Edit the skill, not the

@@ -5,7 +5,9 @@ template improvements, bug reports.
 
 ## Two ways to use this repo, one way to contribute
 
-- **Running your own marketing:** use your own copy (template or fork). Fill
+- **Running your own marketing:** use your own copy, made with "Use this
+  template". Fork only to contribute back here; a fork of a public
+  repository cannot be made private. Fill
   `strategy/`, `content/` and `memory/` with real material, add integrations
   for your stack, rewrite skills, reshape folders. None of that comes back
   here.
