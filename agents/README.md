@@ -30,13 +30,16 @@ table.
 | --- | --- | --- |
 | [add-integration](../.agents/skills/add-integration/SKILL.md) | Connect a tool the team uses to this repo | nothing; the tool's own auth at first use |
 | [campaign-discovery](../.agents/skills/campaign-discovery/SKILL.md) | Run discovery for a campaign idea given in one sentence. Composes the competitive angle, keyword volumes and current ranks, AI answer-engine prompt coverage, and an inventory of existing content into one report in reports/adhoc/ | DataForSEO MCP for the data parts; works partially without |
+| [doctor](../.agents/skills/doctor/SKILL.md) | Say what is wrong with this checkout in plain words and fix what is safe | nothing |
 | [log-decision](../.agents/skills/log-decision/SKILL.md) | Record a decision in memory/decision-log.md | nothing |
 | [make-dashboard](../.agents/skills/make-dashboard/SKILL.md) | Turn data into a self-contained HTML dashboard saved beside its report | nothing |
 | [new-content](../.agents/skills/new-content/SKILL.md) | Scaffold a new piece of content in content/ | nothing |
 | [new-project](../.agents/skills/new-project/SKILL.md) | Scaffold a project or campaign folder in projects/ | nothing |
+| [propose](../.agents/skills/propose/SKILL.md) | Turn what changed into a proposal (a pull request) and hand back the link | nothing; the GitHub CLI to open the proposal itself |
 | [qmr](../.agents/skills/qmr/SKILL.md) | Assemble the Quarterly Marketing Review | integrations help, not required |
 | [review](../.agents/skills/review/SKILL.md) | Pre-publish review of a content draft against strategy, messaging, and brand voice | nothing |
 | [setup](../.agents/skills/setup/SKILL.md) | Onboard a team into this repo | nothing |
+| [sync](../.agents/skills/sync/SKILL.md) | Bring in the latest approved copy and say what is waiting on you | nothing; the GitHub CLI to list proposals |
 <!-- /generated:skills-workflows -->
 
 "Needs: nothing" means it works offline out of the box. Integration setup

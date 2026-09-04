@@ -6,16 +6,27 @@ GitHub Desktop users, no terminal required. New to GitHub? Start with
 
 ## The shape of every change
 
-1. **A branch, not main.** Your agent proposes work on a branch. Main is
+Five words: **Sync. Work. Propose. Review. Merge.** Doctor is the repair
+word beside them. Say the word to your coding agent; it runs the
+machinery. GitHub Desktop users click through the same loop
+([new-to-github.md](new-to-github.md)).
+
+1. **Sync.** Say `/sync`. The agent brings the latest approved copy into
+   your checkout and tells you what is waiting on you.
+2. **Work.** Ask for what you need. The agent works on a branch. Main is
    what the team has approved.
-2. **A pull request a human can read.** The description (the template fills
-   itself in) says what changed and why, linking the brief or decision
-   behind it.
-3. **A human reads the diff.** The actual changed lines, not just the
-   summary. The PR template's checklist is the reviewer's list: on-strategy,
-   on-voice, numbers traceable, no credentials, decisions logged.
-4. **The human merges.** Merging is the approval. Agents never merge,
-   publish or send. The one exception is bookkeeping, below.
+3. **Propose.** Say `/propose`. The agent checks the files, fixes what is
+   safe, writes the description from the template, and hands you the
+   link. It also says which kind of proposal it is (below).
+4. **Review.** A human reads the diff. The actual changed lines, not just
+   the summary. The PR template's checklist is the reviewer's list:
+   on-strategy, on-voice, numbers traceable, no credentials, decisions
+   logged.
+5. **Merge.** Merging is the approval. Agents never merge, publish or
+   send. The one exception is bookkeeping, below.
+
+Something red, or a message you do not understand? Say `/doctor`.
+[troubleshooting.md](troubleshooting.md) lists every message.
 
 ## What must always take this path
 

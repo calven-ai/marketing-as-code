@@ -31,25 +31,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lint  # noqa: E402
+from _common import CommandError, gh, git  # noqa: E402
 
 ROOT = lint.ROOT
 LABELS = {"bookkeeping": "bookkeeping", "needs-review": "needs-review"}
 CHECK = "review-gate"
 BOT_NAME, BOT_EMAIL = "github-actions[bot]", "41898282+github-actions[bot]@users.noreply.github.com"
-
-
-def gh(*args, check=True, cwd=None):
-    run = subprocess.run(["gh", *args], capture_output=True, text=True, cwd=str(cwd or ROOT))
-    if check and run.returncode != 0:
-        sys.exit(f"gh {' '.join(args[:2])} failed: {run.stderr.strip()}")
-    return run.stdout
-
-
-def git(*args, cwd=None, check=True):
-    run = subprocess.run(["git", *args], capture_output=True, text=True, cwd=str(cwd or ROOT))
-    if check and run.returncode != 0:
-        sys.exit(f"git {' '.join(args[:2])} failed: {run.stderr.strip()}")
-    return run.stdout
 
 
 def codeowners_for(paths):
@@ -218,4 +205,7 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except CommandError as err:
+        sys.exit(str(err))

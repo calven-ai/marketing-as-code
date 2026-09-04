@@ -18,6 +18,13 @@ entry that references the old one.
 
 ---
 
+## 2026-09-04: The marketer's lifecycle is three commands, and the GitHub CLI is the agent's way to GitHub
+
+- **Decided by:** David Kolinek (repository maintainer)
+- **Source:** the "lifecycle for people who never open a terminal" pull request, after shipping the docs rewrite by hand showed the gap
+- **Context:** shipping a change meant knowing git and gh. The lifecycle is now five words, Sync. Work. Propose. Review. Merge., with doctor as the repair word, and three commands carry it: `/sync`, `/propose`, `/doctor`. "What is waiting on me" is the last paragraph of `/sync`, not a fourth command. `/propose` pushes and opens the proposal without a second question; saying it is the consent. The agent reaches GitHub through the GitHub CLI logged in as the person; without it, `/propose` still pushes and prints the link to open the proposal by hand, and GitHub Desktop remains the no-agent path. The four lifecycle scripts run without a permission prompt; the deny rules on merge, force-push and `.env` stay, and the scripts are tested never to do what they forbid. A repository with one maintainer sets `review.self_merge` so the gate does not wait for a second person; it goes back to `false` when one joins.
+- **Follow-ups:** none
+
 ## 2026-09-03: Bot keys live in a GitHub environment only main can use; the gate runs from main; the agent in Actions gets no shell
 
 - **Decided by:** David Kolinek (repository maintainer)

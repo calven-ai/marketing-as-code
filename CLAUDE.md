@@ -7,8 +7,8 @@ adds only what is Claude-Code-specific.
 
 - **Skills** are canonical in `.agents/skills/` and reach Claude Code through
   committed symlinks in `.claude/skills/` (one per skill; see
-  `scripts/sync_skills.py`). Invoke them as slash commands: `/setup`,
-  `/new-content`, `/qmr`, `/add-integration`, and more; the roster is
+  `scripts/sync_skills.py`). Invoke them as slash commands: `/sync`,
+  `/propose`, `/doctor`, `/setup`, `/new-content`, `/qmr`, and more; the roster is
   [agents/README.md](agents/README.md).
   If a slash command is missing, run `python3 scripts/sync_skills.py`.
 - **Never read `.env`**: `.claude/settings.json` denies the Read tool and

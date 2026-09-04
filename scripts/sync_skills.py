@@ -55,8 +55,8 @@ def current_state(name):
     return "not a symlink or skill copy"
 
 
-def main():
-    check = "--check" in sys.argv[1:]
+def main(argv=None):
+    check = "--check" in (sys.argv[1:] if argv is None else argv)
     names = canonical_skills()
     SHIM.mkdir(parents=True, exist_ok=True)
 

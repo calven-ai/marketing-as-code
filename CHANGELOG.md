@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- The lifecycle for people who never open a terminal: Sync. Work. Propose.
+  Review. Merge. `/sync` (`scripts/sync.py`) brings in the approved copy
+  and the gate's tidy-up, turns on the pre-push hook, removes branches
+  whose proposal landed, and says what is waiting on you. `/propose`
+  (`scripts/propose.py`) checks the files, fixes what is safe, commits,
+  pushes the branch and opens or updates the proposal from the template,
+  always against the checkout's own repository, then says whether it
+  merges itself or waits for a person; without the GitHub CLI it prints
+  the link to open the proposal by hand. `/doctor` explains the health
+  check's findings and, with `--fix`, turns the hook on and sets your
+  name from your GitHub login. `scripts/_common.py` gains the shared git
+  and gh helpers; `scripts/test_lifecycle.py` runs the scripts against a
+  real repository with a fake gh; `.claude/settings.json` allows the four
+  lifecycle scripts to run without a prompt; `docs/troubleshooting.md`
+  lists every message with its fix; `docs/workflow.md` and
+  `docs/new-to-github.md` teach the five words. `review.self_merge` in
+  `docs/schema.json` lets a repository with one maintainer pass the
+  review gate on its own merge.
 - Security: keys, unattended runs and the review gate. The gate moves to
   `.github/workflows/gate.yml`, which runs from `main` after every check
   (`workflow_run`), so a proposal can no longer change the rules it is

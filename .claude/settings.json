@@ -1,5 +1,11 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(python3 scripts/sync.py*)",
+      "Bash(python3 scripts/propose.py*)",
+      "Bash(python3 scripts/doctor.py*)",
+      "Bash(python3 scripts/lint.py*)"
+    ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
