@@ -7,15 +7,19 @@ owner:
 
 # Messaging
 
-> **Template: unfilled.** Agents: ask the team (or run `/setup`) rather than
-> inventing messaging. Everything written for the outside world derives from
-> this file.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. In the frontmatter, `last_reviewed` is a date (YYYY-MM-DD),
+> `source` stays `repo` unless you connect a context layer, and `document`
+> stays as it is. Agents: ask the team (or run `/setup`) rather than inventing
+> messaging. Everything written for the outside world derives from this file.
 
-The seven sections below mirror the Messaging document a marketing context
-layer serves over MCP (see
-[integrations/context-layer.md](../integrations/context-layer.md)). Words we
-use and words we avoid live in [brand/voice.md](../brand/voice.md), under
-Banned list.
+The seven sections below match the Messaging document a marketing context
+layer serves (see
+[integrations/context-layer.md](../integrations/context-layer.md)), so
+connecting one later restructures nothing; drop a section that does not
+fit. The core narrative and two pillars are enough to start; the matrix and
+the objections can wait. Words we use and words we avoid live in
+[brand/voice.md](../brand/voice.md), under Banned list.
 
 ## Core Narrative & One-Liner
 

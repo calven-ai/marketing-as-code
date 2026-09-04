@@ -37,3 +37,6 @@ studies are content *types* here. They don't get their own top-level folders.
 - Before drafting, load `strategy/` and `brand/`. Before marking
   `in-review`, run the `review` skill. Setting `status: published` is a
   human's call.
+- Publishing, the last mile: when the piece is live, set
+  `status: published`, `published` (YYYY-MM-DD) and `published_url` in one
+  proposal. The check refuses a published piece without a date.

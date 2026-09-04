@@ -6,8 +6,10 @@ owner:
 
 # Visual identity
 
-> **Template: unfilled.** Keep this file and [tokens.json](tokens.json) in
-> agreement: update both in the same commit.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. In the frontmatter, `last_reviewed` is a date (YYYY-MM-DD)
+> and `source` stays `repo` unless you connect a context layer. Keep this file
+> and [tokens.json](tokens.json) in agreement: update both in the same commit.
 
 ## Colors
 

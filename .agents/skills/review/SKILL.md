@@ -3,7 +3,7 @@ name: review
 description: Pre-publish review of a content draft against strategy, messaging, and brand voice. Use when asked to review, check, or QA a draft, or before any piece moves to in-review status. Reports findings; does not rewrite without being asked.
 metadata:
   kind: workflow
-  needs: nothing
+  needs: filled strategy/ and brand/voice.md (run /setup first)
 ---
 
 # Content review
@@ -11,6 +11,14 @@ metadata:
 Review the given draft (or the piece the conversation is about) against the
 repo's own standards. You are the check that the strategy actually made it
 into the words.
+
+## Before the checks
+
+If `strategy/messaging.md`, `strategy/personas.md`, `strategy/icp.md` or
+`brand/voice.md` still carries `Template: unfilled`, stop: there is
+nothing to review against, and a review against placeholders is confident
+nonsense. Say so, suggest `/setup`, and offer only check 5 (mechanics)
+in the meantime.
 
 ## Checks, in order of severity
 

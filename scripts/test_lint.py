@@ -57,6 +57,8 @@ def make_repo(root):
     write(root, ".agents/skills/review/SKILL.md",
           "---\nname: review\ndescription: Review a draft. Use when asked.\nmetadata:\n  kind: workflow\n  needs: nothing\n---\n\n# Review\n")
     for rel in SCHEMA["context_files"]:
+        if "*" in rel:
+            continue
         write(root, rel, FRONT.replace("source: repo", "document: x\nsource: repo") if rel.startswith("strategy") else FRONT)
     return root
 
@@ -393,6 +395,18 @@ class TestSkillsAndDocs(LintCase):
         self.assertFalse(self.findings("generated") + self.findings("docs-index"))
         self.assertIn("extra.md", (self.root / "docs/README.md").read_text())
         self.assertIn("| Agent | What it does | Needs |", (self.root / "agents/README.md").read_text())
+
+
+class TestCompetitive(LintCase):
+    def test_battlecards_carry_frontmatter_and_age(self):
+        write(self.root, "strategy/competitive/README.md", "# competitive\n")
+        write(self.root, "strategy/competitive/_battlecard-template.md", "# [Competitor]\n")
+        self.assertClean()
+        write(self.root, "strategy/competitive/acme.md", "# Acme\n")
+        self.assertTrue(self.findings("frontmatter", lint.ERROR))
+        write(self.root, "strategy/competitive/acme.md", "---\nlast_reviewed: 2020-01-01\nowner: Ana\n---\n\n# Acme\n")
+        self.assertFalse(self.findings("frontmatter"))
+        self.assertTrue(self.findings("context-stale", lint.WARNING))
 
 
 class TestAdoption(LintCase):

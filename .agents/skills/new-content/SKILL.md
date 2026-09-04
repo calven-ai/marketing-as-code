@@ -3,7 +3,7 @@ name: new-content
 description: Scaffold a new piece of content in content/. Use when asked to start, draft, or create a blog post, email, LinkedIn post, case study, webinar asset, or any content piece. Creates the folder, brief, and draft skeleton with wired frontmatter.
 metadata:
   kind: workflow
-  needs: nothing
+  needs: filled strategy/ and brand/voice.md (run /setup first)
 ---
 
 # New content piece

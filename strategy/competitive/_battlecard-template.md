@@ -1,3 +1,8 @@
+---
+last_reviewed:
+owner:
+---
+
 # [Competitor name]
 
 - **What they are:** [their own one-liner, stated fairly]

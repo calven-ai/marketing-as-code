@@ -17,9 +17,11 @@ folder before any marketing thinking. How we sound and look lives in
 | [product-brief.md](product-brief.md) | What the product is: capabilities, use cases, integrations, architecture, pricing, differentiators and weaknesses |
 | [competitive/](competitive/) | Competitor notes and battlecards, one file per competitor |
 
-Every file carries frontmatter: `source` (`repo` or `context-layer`),
-`last_reviewed` (the date the team last confirmed the content), and `owner`.
-The four documents with an MCP twin also carry `document`.
+Every file carries frontmatter: `source` (`repo`, or `context-layer` once
+one is connected), `last_reviewed` (YYYY-MM-DD, the date the team last
+confirmed the content) and `owner`. The five strategy documents also carry
+`document`, the name of the matching context-layer document; leave it as it
+is. Battlecards in `competitive/` carry `last_reviewed` and `owner`.
 
 ## Rules
 
@@ -35,6 +37,8 @@ The four documents with an MCP twin also carry `document`.
 These files go stale by default. `python3 scripts/doctor.py` lists anything
 not reviewed in 90 days, and CI prints the same list on every pull request.
 The other path is a marketing context layer served over MCP, with these
-files as the fallback. The templates mirror the documents Calven serves, so
-switching later restructures nothing. See
+files as the fallback. The templates' headings match the documents such a
+layer serves (Calven, which maintains this repo, makes one), so switching
+later restructures nothing. Change a heading when it does not fit your
+company; the files are yours. See
 [integrations/context-layer.md](../integrations/context-layer.md).

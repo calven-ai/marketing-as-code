@@ -1,7 +1,8 @@
 # Naming conventions
 
-> **Template: unfilled.** These conventions make campaigns traceable across
-> systems; agents apply them exactly and flag violations they encounter.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. These conventions make campaigns traceable across systems;
+> agents apply them exactly and flag violations they encounter.
 
 ## UTM parameters
 

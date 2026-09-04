@@ -107,7 +107,7 @@ already filled in without asking.
    alternative is a context layer (`integrations/context-layer.md`). Then
    move on. Suggest one first workflow: draft a piece with `new-content`,
    or drop a transcript into `memory/transcripts/inbox/` and run
-   `chief-of-staff`.
+   `chief-of-staff`; the ordered first week is `docs/week-one.md`.
 
 ## Rules
 

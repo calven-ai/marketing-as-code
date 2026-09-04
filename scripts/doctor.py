@@ -215,8 +215,7 @@ def main(argv=None):
     warnings = [f for f in findings if f.level == lint.WARNING]
     unfilled = [f.path for f in findings if f.check == "template"]
     stale = [f.path for f in warnings if f.check == "context-stale"]
-    served = [rel for rel in ctx.schema["context_files"]
-              if ctx.exists(rel) and (ctx.fm(rel) or {}).get("source") == "context-layer"]
+    served = [rel for rel in lint.context_files(ctx) if (ctx.fm(rel) or {}).get("source") == "context-layer"]
 
     if args.brief:
         print("\n".join(brief(ctx, findings)))

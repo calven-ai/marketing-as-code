@@ -73,7 +73,8 @@
     "strategy/personas.md",
     "strategy/product-brief.md",
     "brand/voice.md",
-    "brand/visual-identity.md"
+    "brand/visual-identity.md",
+    "strategy/competitive/*.md"
   ],
   "frontmatter": {
     "_doc": "Per file glob: required keys, optional keys, enums, ISO-date keys, defaults --fix may add. Keys not in required+optional are warned as unknown.",
@@ -133,6 +134,25 @@
           "context-layer"
         ]
       },
+      "dates": [
+        "last_reviewed"
+      ],
+      "defaults": {}
+    },
+    "strategy/competitive/*.md": {
+      "except": [
+        "strategy/competitive/README.md",
+        "strategy/competitive/_battlecard-template.md"
+      ],
+      "required": [
+        "last_reviewed",
+        "owner"
+      ],
+      "optional": [
+        "source",
+        "document"
+      ],
+      "enums": {},
       "dates": [
         "last_reviewed"
       ],

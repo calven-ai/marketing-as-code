@@ -7,14 +7,19 @@ owner:
 
 # Product
 
-> **Template: unfilled.** Agents: ask the team (or run `/setup`) before
-> describing capabilities, pricing, or architecture you cannot see.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. In the frontmatter, `last_reviewed` is a date (YYYY-MM-DD),
+> `source` stays `repo` unless you connect a context layer, and `document`
+> stays as it is. Agents: ask the team (or run `/setup`) before describing
+> capabilities, pricing, or architecture you cannot see.
 
 What the product is, in enough detail that an agent never has to guess a
-feature or a price. The seven sections below mirror the Product Brief a
-marketing context layer serves over MCP (see
-[integrations/context-layer.md](../integrations/context-layer.md)). Skippable
-during setup if there is no product documentation to paste yet.
+feature or a price. The seven sections below match the Product Brief a
+marketing context layer serves (see
+[integrations/context-layer.md](../integrations/context-layer.md)), so
+connecting one later restructures nothing; drop a section that does not
+fit. Skippable during setup if there is no product documentation to paste
+yet.
 
 ## Product Overview
 

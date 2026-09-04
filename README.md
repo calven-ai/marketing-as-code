@@ -18,6 +18,7 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#what-this-is-and-what-it-is-not">What this is</a> ·
   <a href="docs/is-this-for-you.md">Is this for you?</a> ·
+  <a href="docs/week-one.md">Week one</a> ·
   <a href="#which-coding-agent">Which agent?</a> ·
   <a href="docs/make-it-yours.md">Make it yours</a> ·
   <a href="docs/new-to-github.md">New to GitHub?</a>
@@ -151,8 +152,8 @@ technical parts for you.
 3. **Say `/doctor`.** It names the one thing to set up on this computer, a
    GitHub login, once, and tells you when you are ready.
 4. **Say `/setup`.** The interview fills the strategy, voice and metric
-   templates from your answers and connects only the tools you use. Four
-   rounds are enough for day one.
+   templates from your answers and connects only the tools you use. Rounds
+   1 to 5 and round 10 are enough for day one.
 5. **Do one real piece of work.** `/new-content` drafts a piece in your
    voice, `/review` checks it against your strategy, `/propose` opens the
    proposal, and you read the diff and click Merge. Or drop a transcript in
@@ -163,7 +164,9 @@ technical parts for you.
    and `/add-integration` builds it by
    [the guide](integrations/adding-an-integration.md).
 
-That loop is the whole ritual ([docs/workflow.md](docs/workflow.md)):
+The full first week, in order, one command per step:
+[docs/week-one.md](docs/week-one.md). That loop is the whole ritual
+([docs/workflow.md](docs/workflow.md)):
 
 <p align="center">
   <img src="docs/assets/lifecycle.svg" alt="The lifecycle as pixel-art panels under a sign reading ONE LOOP: Sync (get the latest), Work (ask the agent), Propose (open the proposal), Review (read the diff), Merge (click merge), and a red Doctor panel below: the repair word when something is red" width="720">

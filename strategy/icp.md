@@ -7,13 +7,19 @@ owner:
 
 # Ideal Customer Profile
 
-> **Template: unfilled.** Agents: ask the team (or run `/setup`) before
-> writing for an audience defined only by placeholders.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. In the frontmatter, `last_reviewed` is a date (YYYY-MM-DD),
+> `source` stays `repo` unless you connect a context layer, and `document`
+> stays as it is. Agents: ask the team (or run `/setup`) before writing for an
+> audience defined only by placeholders.
 
-Who we sell to best, and who we do not chase. The twelve sections below mirror
-the Ideal Customer Profile document a marketing context layer serves over MCP
-(see [integrations/context-layer.md](../integrations/context-layer.md)). The
-people inside those accounts live in [personas.md](personas.md).
+Who we sell to best, and who we do not chase. The twelve sections below
+match the Ideal Customer Profile document a marketing context layer serves
+(see [integrations/context-layer.md](../integrations/context-layer.md)), so
+connecting one later restructures nothing; drop a section that does not
+fit. Fill now: ICP Summary, Firmographic Attributes and Disqualifiers. The
+rest, the scorecard included, can wait for the first campaign. The people
+inside those accounts live in [personas.md](personas.md).
 
 ## ICP Summary
 

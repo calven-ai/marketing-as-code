@@ -298,14 +298,23 @@ def check_projects_readme_enums(ctx):
     return []
 
 
+def context_files(ctx):
+    """The files the freshness rule applies to: schema entries, globs expanded, READMEs and _templates skipped."""
+    out = []
+    for entry in ctx.schema["context_files"]:
+        if "*" in entry:
+            out += [f for f in ctx.glob(entry) if Path(f).name != "README.md" and not Path(f).name.startswith("_")]
+        elif entry in ctx.files:
+            out.append(entry)
+    return out
+
+
 def check_context_freshness(ctx):
     """Context files reviewed within stale_after_days; served files are fine."""
     out = []
     today = date.today()
     limit = ctx.schema["stale_after_days"]
-    for rel in ctx.schema["context_files"]:
-        if rel not in ctx.files:
-            continue
+    for rel in context_files(ctx):
         text = ctx.text(rel)
         marker = ctx.schema["templates"].get(rel)
         if marker and marker in text:
