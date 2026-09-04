@@ -28,5 +28,6 @@ them.
 
 - [architecture.md](architecture.md): the structure and the reasoning behind it.
 - [schema.json](schema.json): what "valid" means here, enforced by `scripts/lint.py`.
+- [skill-authoring.md](skill-authoring.md): the contract for a skill: frontmatter, body, references, how it binds to an integration category.
 - [../integrations/adding-an-integration.md](../integrations/adding-an-integration.md): how your agent connects a tool this template does not ship.
 - [roadmap.md](roadmap.md): what is still planned.
