@@ -9,7 +9,9 @@
   keyword,intent,target_url,difficulty,volume,current_rank,last_checked,notes
   ```
 
-  A row here means "we care about ranking for this", so add rows on purpose.
+  `intent` is one of informational, commercial, transactional or
+  navigational. A row here means "we care about ranking for this", so add
+  rows on purpose.
   Update `difficulty`, `volume`, `current_rank` and `last_checked` from
   fresh pulls. The three rows it ships with are examples; replace them with
   yours. `scripts/seo_snapshot.py` refreshes volume and difficulty for every
@@ -23,8 +25,10 @@
   prompt,persona,stage,category,notes
   ```
 
-  Never rewrite a prompt in place, since history only compares when the
-  wording is stable. Retire one via `notes`. The `brand-monitor` skill runs
+  `stage` is a buying stage: awareness, consideration or decision (the axis
+  in `strategy/messaging.md`, not the lifecycle stages in
+  `../ontology/funnel.md`). Never rewrite a prompt in place, since history
+  only compares when the wording is stable. Retire one via `notes`. The `brand-monitor` skill runs
   it.
 
 ## Snapshots

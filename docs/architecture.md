@@ -151,8 +151,8 @@ marketers browse.
 
 Analyses, the quarterly review, ad-hoc reports, each dated and immutable
 once delivered. Dashboards are self-contained HTML files beside the report
-they support: inline CSS, a vendored chart library, a data block the agent
-fills from CSV. They open from Finder with no build step and no dependence
+they support: inline CSS, charts drawn as SVG by a few helpers with no library, a data
+block the agent fills from CSV. They open from Finder with no build step and no dependence
 on any one AI tool's format. The QMR composes the analyst, the
 integrations, the ontology and the dashboard template: proof the
 architecture composes.

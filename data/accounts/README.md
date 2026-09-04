@@ -12,6 +12,11 @@ enrichment outputs.
   company,domain,tier,owner,status,notes
   ```
 
+  `tier` is 1, 2 or 3 as defined under Segment Tiers in
+  [`strategy/icp.md`](../../strategy/icp.md). `status` is one of prospect,
+  engaged, customer or lost. The two rows it ships with are examples;
+  replace them with yours.
+
 ## Snapshots
 
 `snapshots/YYYY-MM-DD-<source>-<what>.csv`, immutable. Typical:

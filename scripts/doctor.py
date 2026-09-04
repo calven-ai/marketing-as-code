@@ -94,7 +94,7 @@ def local_setup(root=ROOT, fix=False):
     notes, fixed = [], []
     if shutil.which("git") is None:
         notes.append("git is not installed. On a Mac run `xcode-select --install`; on Windows install Git for "
-                     "Windows (docs/troubleshooting.md).")
+                     "Windows; on Linux use your package manager (docs/troubleshooting.md).")
         return notes, fixed
     if not (Path(root) / ".git").exists():
         notes.append("this folder is not a copy of the repository yet; clone it with GitHub Desktop (docs/new-to-github.md)")

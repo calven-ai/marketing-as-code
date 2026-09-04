@@ -218,7 +218,8 @@ def check_content(ctx):
     """Content pieces: folder name, brief present, status-dependent fields, project link."""
     out = []
     naming = re.compile(ctx.schema["naming"]["content_folder"])
-    placeholder = re.compile(r"\[[A-Z][^\]\n]{0,80}\](?!\()")
+    placeholder = re.compile(r"\[[A-Z][^\]\n:]{0,80}\](?![\(\[:])")
+    template_marks = ctx.schema.get("content", {}).get("template_placeholders", [])
     folders = sorted({f.split("/")[1] for f in ctx.files
                       if f.startswith("content/") and f.count("/") >= 2 and not f.startswith("content/_")})
     for folder in folders:
@@ -247,10 +248,16 @@ def check_content(ctx):
                 out.append(Finding(ERROR, draft, "still carries the 'Template: unfilled' marker",
                                    "content-placeholder", line=line_of(text, "Template: unfilled")))
             body = text.split("\n---", 2)[-1]
-            hit = placeholder.search(body)
-            if hit:
-                out.append(Finding(ERROR, draft, f"template placeholder left in a {status} piece: {hit.group(0)}",
-                                   "content-placeholder", line=line_of(text, hit.group(0))))
+            left = next((m for m in template_marks if m in body), None)
+            if left:
+                out.append(Finding(ERROR, draft, f"the template's placeholder is still in a {status} piece: {left}",
+                                   "content-placeholder", line=line_of(text, left)))
+            else:
+                hit = placeholder.search(body)
+                if hit:
+                    out.append(Finding(WARNING, draft, f"looks like a placeholder in a {status} piece: "
+                                       f"{hit.group(0)}; if it is prose, ignore this",
+                                       "content-placeholder", line=line_of(text, hit.group(0))))
         project = str(fm.get("project", "") or "")
         if project:
             if project.startswith("projects/_archive/"):
@@ -276,6 +283,19 @@ def check_content_readme_enums(ctx):
             out.append(Finding(WARNING, rel, f"README lists different `{key}` values than docs/schema.json "
                                f"(expected `{expected}`)", "schema-prose", line=line_of(text, f"{key}:")))
     return out
+
+
+def check_projects_readme_enums(ctx):
+    """projects/README.md states the same State values as the schema."""
+    rel = "projects/README.md"
+    if rel not in ctx.files:
+        return []
+    text = ctx.text(rel)
+    expected = "State: " + " | ".join(ctx.schema["project_status"]["states"])
+    if expected not in text:
+        return [Finding(WARNING, rel, f"README lists different `State` values than docs/schema.json "
+                        f"(expected `{expected}`)", "schema-prose", line=line_of(text, "State:"))]
+    return []
 
 
 def check_context_freshness(ctx):
@@ -336,7 +356,7 @@ def check_projects(ctx):
                 if m:
                     dates.append((m.group(1), i))
                 sm = re.match(r"- \*\*State:\*\* (.+)$", line.strip())
-                if sm and sm.group(1).strip().strip("[]") not in states and not sm.group(1).startswith("["):
+                if sm and sm.group(1).strip().strip("[]").lower() not in states and not sm.group(1).startswith("["):
                     out.append(Finding(ERROR, status, f"State `{sm.group(1).strip()}` is not one of "
                                        f"{', '.join(states)}", "project-status", line=i))
             if dates != sorted(dates, key=lambda x: x[0], reverse=True):
@@ -422,7 +442,7 @@ def check_transcripts(ctx):
         if not rel.startswith(("memory/transcripts/inbox/", "memory/transcripts/processed/")):
             continue
         name = Path(rel).name
-        if name == ".gitkeep":
+        if name in (".gitkeep", "README.md"):
             continue
         m = naming.match(name)
         fm = ctx.fm(rel) if rel.endswith(".md") else {}
@@ -525,7 +545,7 @@ def check_reports(ctx):
         if not rel.startswith("reports/") or rel.startswith("reports/_templates/") or rel.endswith(".gitkeep"):
             continue
         parts = rel.split("/")
-        if len(parts) < 3 or parts[1] == "README.md":
+        if len(parts) < 3 or parts[-1] == "README.md":
             continue
         kind, name = parts[1], parts[-1]
         if kind == "recurring" and len(parts) == 4 and not re.match(n["report_recurring"], name):
@@ -537,6 +557,13 @@ def check_reports(ctx):
             out.append(Finding(WARNING, rel, "QMRs live in qmr/<year>-q<n>/", "report-naming"))
         if rel.endswith(".md"):
             text = ctx.text(rel)
+            qmr_states = ctx.schema.get("reports", {}).get("qmr_states", [])
+            sm = re.search(r"^- \*\*Status:\*\* (.+)$", text, re.M) if kind == "qmr" and name == "report.md" else None
+            if sm and qmr_states:
+                value = sm.group(1).strip()
+                if not value.startswith("[") and value.strip("[]").lower() not in qmr_states:
+                    out.append(Finding(ERROR, rel, f"Status `{value}` is not one of {', '.join(qmr_states)} "
+                                       "(reports/README.md)", "report-status", line=line_of(text, sm.group(0))))
             if "## Data used" not in text:
                 out.append(Finding(WARNING, rel, "no `## Data used` section; a report must trace back to its "
                                    "snapshots (reports/README.md)", "report-data"))
@@ -546,6 +573,14 @@ def check_reports(ctx):
                     if not ctx.exists(path):
                         out.append(Finding(WARNING, rel, f"Data used lists `{path}`, which does not exist",
                                            "report-data", line=line_of(text, path)))
+        elif rel.endswith(".html"):
+            text = ctx.text(rel)
+            sentinels = ctx.schema.get("reports", {}).get("dashboard_sentinels", [])
+            left = next((s for s in sentinels if s in text), None)
+            if left:
+                out.append(Finding(ERROR, rel, "dashboard still holds the template's example numbers; replace the "
+                                   "DATA block, set the title, and remove data-example from the <html> tag",
+                                   "report-example", line=line_of(text, left)))
     return out
 
 
@@ -859,15 +894,31 @@ def render_block(ctx, block):
         return "\n".join(rows)
     if block == "scripts":
         rows = ["| Script | What it does |", "| --- | --- |"]
-        for rel in sorted(ctx.glob("scripts/*.py")):
-            name = Path(rel).name
-            if name.startswith("test_"):
-                continue
-            doc = re.search(r'^"""(.*?)(?:\n\n|""")', ctx.text(rel), re.S | re.M)
-            first = " ".join(doc.group(1).split()) if doc else ""
-            rows.append(f"| [{name}]({name}) | {cell(first)} |")
+        files = sorted(ctx.glob("scripts/*.py") + ctx.glob("scripts/*.sh") + ctx.glob("scripts/hooks/*"))
+        for rel in files:
+            name = rel[len("scripts/"):]
+            rows.append(f"| [{name}]({name}) | {cell(script_summary(ctx.text(rel)))} |")
         return "\n".join(rows)
     raise ValueError(block)
+
+
+def script_summary(text):
+    """A script's first paragraph: the docstring for Python, the leading comment block for shell."""
+    doc = re.search(r'^"""(.*?)(?:\n\n|""")', text, re.S | re.M)
+    if doc:
+        return " ".join(doc.group(1).split())
+    lines = []
+    for line in text.splitlines():
+        if line.startswith("#!"):
+            continue
+        if line.startswith("#"):
+            body = line[1:].strip()
+            if not body:
+                break
+            lines.append(body)
+        elif lines or line.strip():
+            break
+    return " ".join(lines)
 
 
 def cell(text):
@@ -947,6 +998,7 @@ CHECKS = [
     (check_frontmatter_schema, "file"),
     (check_content, "file"),
     (check_content_readme_enums, "file"),
+    (check_projects_readme_enums, "file"),
     (check_context_freshness, "file"),
     (check_projects, "file"),
     (check_decision_log, "file"),

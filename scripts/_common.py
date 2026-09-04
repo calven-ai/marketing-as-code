@@ -148,6 +148,7 @@ def git(*args, cwd=None, check=True):
 
 
 GH_CANDIDATES = ("/opt/homebrew/bin/gh", "/usr/local/bin/gh", "/usr/bin/gh",
+                 os.path.expanduser("~/.local/bin/gh"), "/snap/bin/gh",
                  r"C:\Program Files\GitHub CLI\gh.exe")
 
 

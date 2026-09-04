@@ -1,7 +1,7 @@
 {
   "_doc": [
     "What 'valid' means in this repository, in one place. scripts/lint.py enforces",
-    "it, scripts/doctor.py reports it, the doctor and audit skills read it, and a",
+    "it, scripts/doctor.py reports it, the doctor skill reads it, and a",
     "person can read it too. Change a convention here and in the folder README",
     "that explains it, in the same proposal. Keys starting with _ are comments."
   ],
@@ -179,6 +179,10 @@
       "defaults": {}
     },
     "memory/transcripts/*/*.md": {
+      "except": [
+        "memory/transcripts/inbox/README.md",
+        "memory/transcripts/processed/README.md"
+      ],
       "required": [
         "title",
         "date",
@@ -248,6 +252,25 @@
       "*.xlsx",
       "*.pptx",
       "*.key"
+    ]
+  },
+  "content": {
+    "_doc": "The content template's own placeholders (content/_template/draft.md). Any of these left in a piece past status brief is an error; other [Bracketed] text only warns, because it may be prose.",
+    "template_placeholders": [
+      "[Title]",
+      "[The draft."
+    ]
+  },
+  "reports": {
+    "_doc": "QMR status values (reports/_templates/qmr/report.md, reports/README.md), and the strings that mean a dashboard still holds the template's example numbers (reports/_templates/dashboard.html).",
+    "qmr_states": [
+      "assembling",
+      "ready for review",
+      "final"
+    ],
+    "dashboard_sentinels": [
+      "data-example=\"replace\"",
+      "[Dashboard title]"
     ]
   },
   "csv": {
