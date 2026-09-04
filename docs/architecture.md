@@ -120,7 +120,7 @@ brief, status, working notes. Content never lives here; the brief lists
 repo paths into `content/`, and each piece points back with `project:`.
 When a project closes its folder is archived, and nothing of lasting value
 goes with it. Tasks live in the team's task tool via
-[`integrations/tasks.md`](#integrations--the-registry-and-the-task-adapter).
+[`integrations/tasks.md`](#integrations-the-registry-and-the-task-adapter).
 
 *Rejected:* separate `campaigns/` and `projects/` (the filing ambiguity
 never ends), content inside project folders, and symlinks from projects

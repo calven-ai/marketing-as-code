@@ -3,16 +3,13 @@
 **Kind:** agents, the workforce as instructions in English.
 
 Every agent and skill in this repo, what it does, and what it needs. The
-tables are generated from each skill's `description` and `metadata`
-(`python3 scripts/lint.py --fix` refreshes them), so edit the skill, not
-the table. This page is the index for humans; the definitions any coding agent actually loads
-live in [`.agents/skills/`](../.agents/skills/) (the Agent Skills open
-standard: Cursor, Codex, and friends discover them there automatically;
-Claude Code reads the same files via `.claude/skills/` symlinks).
+definitions live in [`.agents/skills/`](../.agents/skills/), where Claude
+Code, Cursor and Codex all find them. Invoke one by slash command
+(`/setup`) or ask in plain English.
 
-Invoke any of these by slash command (`/setup`) in tools that support it, or
-just ask in plain English; the descriptions are written so your agent routes
-correctly.
+The tables are generated from each skill's `description` and `metadata`
+(`python3 scripts/lint.py --fix` refreshes them). Edit the skill, not the
+table.
 
 ## Roles (recurring specialists)
 
@@ -43,21 +40,19 @@ correctly.
 <!-- /generated:skills-workflows -->
 
 "Needs: nothing" means it works offline out of the box. Integration setup
-lives in [`integrations/`](../integrations/); keys never live in this repo
-(see [docs/secrets.md](../docs/secrets.md)).
+is in [`integrations/`](../integrations/). Keys never live in this repo
+([docs/secrets.md](../docs/secrets.md)).
 
 ## Running them, and adding your own
 
-Every one of these is run by a person in a coding agent by default. The
-recurring ones (transcript processing, the keyword refresh, the mentions
-report) can also run unattended in GitHub Actions if the team opts in;
-[docs/operating-model.md](../docs/operating-model.md) has the trade-off and
-a who-triggers-what table.
+A person runs these in a coding agent by default. The recurring ones can
+also run unattended in GitHub Actions; the trade-off is in
+[docs/operating-model.md](../docs/operating-model.md).
 
-An agent this roster lacks (a web analyst on your analytics tool, a weekly
-ranking diff, a newsletter assembler) is a Markdown file you add to
-`.agents/skills/<name>/SKILL.md` in the same shape as these, followed by
-`python3 scripts/sync_skills.py`. The tool it needs is added per
+An agent this roster lacks (a web analyst, a weekly ranking diff, a
+newsletter assembler) is a Markdown file you add at
+`.agents/skills/<name>/SKILL.md` in the same shape, followed by
+`python3 scripts/sync_skills.py`. Its tool is wired per
 [integrations/adding-an-integration.md](../integrations/adding-an-integration.md).
 Skills others could reuse are welcome upstream
 ([CONTRIBUTING.md](../CONTRIBUTING.md)).

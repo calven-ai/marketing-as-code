@@ -2,11 +2,11 @@
 
 **Kind:** code, deterministic scripts and throwaway prototypes the agent writes.
 
-Deterministic, non-AI code. Skills call these instead of reimplementing them.
-Python 3.9 or newer, standard library only unless a script says otherwise.
-The table is generated from each script's docstring
-(`python3 scripts/lint.py --fix` refreshes it); the docstring is the place
-to edit.
+Deterministic, non-AI code. Skills call these instead of reimplementing
+them. Python 3.9 or newer, standard library only unless a script says
+otherwise. The table is generated from each script's docstring
+(`python3 scripts/lint.py --fix` refreshes it). Edit the docstring, not the
+table.
 
 <!-- generated:scripts -->
 | Script | What it does |
@@ -23,6 +23,6 @@ to edit.
 
 Run from the repo root: `python3 scripts/doctor.py`.
 
-Scripts are the only code in this repo allowed to open `.env`: they read the
-keys they need and never print them. Agents keep reading the variable names
+Scripts are the only code in this repo allowed to open `.env`. They read
+the keys they need and never print them. Agents read the variable names
 from `integrations/README.md` instead.
