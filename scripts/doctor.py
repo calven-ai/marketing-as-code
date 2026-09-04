@@ -21,6 +21,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lint  # noqa: E402
+from _common import find_gh, origin_repo, run  # noqa: E402
 
 ROOT = lint.ROOT
 
@@ -28,14 +29,9 @@ ROOT = lint.ROOT
 def github_settings():
     """Warnings about repo settings scripts/github_setup.sh would apply. Needs gh."""
     out = []
-    try:
-        view = subprocess.run(["gh", "repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"],
-                              capture_output=True, text=True, check=True, cwd=str(ROOT))
-        name = view.stdout.strip()
-        repo = _api(f"repos/{name}") or {}
-        if not repo:
-            raise subprocess.CalledProcessError(1, "gh api")
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    name = origin_repo(ROOT)  # this checkout's own repository, never a fork's parent
+    repo = _api(f"repos/{name}") if name and find_gh() else None
+    if not repo:
         return ["gh is not available or not logged in; skipped the GitHub settings check"]
     if not repo.get("allow_squash_merge") or repo.get("allow_merge_commit") or repo.get("allow_rebase_merge"):
         out.append("merge method is not squash-only (proposals should land as one commit)")
@@ -53,11 +49,11 @@ def github_settings():
 
 
 def _api(path):
-    run = subprocess.run(["gh", "api", path], capture_output=True, text=True, cwd=str(ROOT))
-    if run.returncode != 0:
+    proc = run([find_gh() or "gh", "api", path], cwd=ROOT, check=False)
+    if proc.returncode != 0:
         return None
     try:
-        return json.loads(run.stdout)
+        return json.loads(proc.stdout)
     except json.JSONDecodeError:
         return None
 

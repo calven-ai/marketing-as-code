@@ -10,6 +10,8 @@ copies the closest script and inherits the conventions:
     path = snapshot_path("crm", "hubspot", "pipeline")
     # -> data/crm/snapshots/2026-09-03-hubspot-pipeline.csv
     fm = frontmatter(text)                     # {} without a block, None if unclosed
+    out = git("status", "--porcelain")         # git and gh as functions; CommandError on failure
+    repo = origin_repo()                       # "owner/name" from the origin URL, or None
 
 Scripts are the only code in this repo allowed to open .env, and they never
 print what they find there.
@@ -17,6 +19,8 @@ print what they find there.
 
 import os
 import re
+import shutil
+import subprocess
 import sys
 from datetime import date
 from pathlib import Path
@@ -114,3 +118,74 @@ def frontmatter(text):
         if value == {}:
             out[key] = ""
     return out
+
+
+# ------------------------------------------------------------ git and gh --
+
+class CommandError(RuntimeError):
+    """A git or gh command failed. Carries the command, its exit code and stderr."""
+
+    def __init__(self, cmd, returncode, stderr):
+        self.cmd, self.returncode, self.stderr = list(cmd), returncode, stderr or ""
+        super().__init__(f"{' '.join(self.cmd[:2])} failed: {self.stderr.strip()}")
+
+
+def run(cmd, cwd=None, check=True, env=None, input=None):
+    """Run a command and return the CompletedProcess. check=True raises CommandError on failure,
+    and a missing executable is a CommandError with exit code 127, never a traceback."""
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, cwd=str(cwd or ROOT), env=env, input=input)
+    except FileNotFoundError:
+        raise CommandError(cmd, 127, f"{cmd[0]} is not installed") from None
+    if check and proc.returncode != 0:
+        raise CommandError(cmd, proc.returncode, proc.stderr)
+    return proc
+
+
+def git(*args, cwd=None, check=True):
+    """git ARGS in the checkout; returns stdout."""
+    return run(["git", *args], cwd=cwd, check=check).stdout
+
+
+GH_CANDIDATES = ("/opt/homebrew/bin/gh", "/usr/local/bin/gh", "/usr/bin/gh",
+                 r"C:\Program Files\GitHub CLI\gh.exe")
+
+
+def find_gh():
+    """The GitHub CLI executable, or None. Looks past PATH because the desktop app's shell may lack it."""
+    found = shutil.which("gh")
+    if found:
+        return found
+    for candidate in GH_CANDIDATES:
+        if Path(candidate).is_file():
+            return candidate
+    return None
+
+
+def gh(*args, cwd=None, check=True):
+    """gh ARGS; returns stdout. CommandError (exit 127) when gh is not installed."""
+    return run([find_gh() or "gh", *args], cwd=cwd, check=check).stdout
+
+
+def gh_ready(cwd=None):
+    """True when gh is installed and logged in to github.com."""
+    exe = find_gh()
+    if not exe:
+        return False
+    return run([exe, "auth", "status", "-h", "github.com"], cwd=cwd, check=False).returncode == 0
+
+
+ORIGIN_RE = re.compile(r"(?:github\.com[:/])([^/\s]+)/([^/\s]+?)(?:\.git)?/?$")
+
+
+def origin_repo(cwd=None):
+    """'owner/name' parsed from the origin URL (ssh or https), or None without a GitHub origin."""
+    url = run(["git", "remote", "get-url", "origin"], cwd=cwd, check=False).stdout.strip()
+    m = ORIGIN_RE.search(url)
+    return f"{m.group(1)}/{m.group(2)}" if m else None
+
+
+def default_branch(cwd=None):
+    """The approved copy's branch name: origin's HEAD when known, else main."""
+    out = run(["git", "symbolic-ref", "--short", "refs/remotes/origin/HEAD"], cwd=cwd, check=False).stdout.strip()
+    return out.split("/", 1)[1] if out.startswith("origin/") else "main"
