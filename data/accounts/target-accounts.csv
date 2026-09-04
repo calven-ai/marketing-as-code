@@ -1,1 +1,3 @@
 company,domain,tier,owner,status,notes
+"Example Corp",example.com,1,,prospect,"example row: a Tier 1 account nobody has contacted yet"
+"Sample Industries",example.org,2,,engaged,"example row: in conversation, owner to be named"

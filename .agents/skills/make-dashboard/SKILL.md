@@ -27,7 +27,9 @@ contract; never break it by adding external references.
    the template documents its own helpers (`bigNumber`, `barChart`,
    `lineChart`, `table`) with examples. Apply `brand/tokens.json` colors if
    filled. Keep it to the few views that answer the question; a dashboard
-   with twenty charts answers nothing.
+   with twenty charts answers nothing. Then remove `data-example="replace"`
+   from the `<html>` tag and the example line from the footer: the check
+   refuses a dashboard that still carries the template's numbers.
 4. **List sources**: the footer's data-sources line gets the exact snapshot
    paths used, same as a report's "Data used" section.
 

@@ -1,5 +1,6 @@
 #!/bin/sh
 # Refuses a push straight to main and runs the lint before any push.
+#
 # Enable once per clone:  git config core.hooksPath scripts/hooks
 # scripts/doctor.py reminds you when it is not set. docs/workflow.md.
 #

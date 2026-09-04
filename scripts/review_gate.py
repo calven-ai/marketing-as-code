@@ -31,7 +31,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lint  # noqa: E402
-from _common import CommandError, gh, git  # noqa: E402
+from _common import CommandError, find_gh, gh, git  # noqa: E402
 
 ROOT = lint.ROOT
 LABELS = {"bookkeeping": "bookkeeping", "needs-review": "needs-review"}
@@ -189,7 +189,7 @@ def main(argv=None):
         publish(repo, head_sha, "success", "Bookkeeping: merging",
                 "Only agent-maintained files changed and the health check passed on this commit, so the gate on "
                 "main merges this proposal itself (docs/workflow.md).", view["url"])
-        run = subprocess.run(["gh", "pr", "merge", str(args.pr), "--squash", "--delete-branch",
+        run = subprocess.run([find_gh() or "gh", "pr", "merge", str(args.pr), "--squash", "--delete-branch",
                               "--match-head-commit", head_sha], capture_output=True, text=True, cwd=str(ROOT))
         if run.returncode != 0:
             print(f"merge refused: {run.stderr.strip()}")

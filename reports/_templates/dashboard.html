@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-example="replace">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,6 +19,9 @@
          lineChart({title, labels, series: [{name, values}], unit})
          table({title, columns, rows})
     4. List every snapshot path in the footer sources line.
+    5. Remove data-example="replace" from the <html> tag above and the
+       example line from the footer. The check refuses a dashboard that
+       still carries either, or the template's title.
 -->
 <style>
   :root {
@@ -75,6 +78,8 @@
 <footer>
   Data: <code>[data/crm/snapshots/....csv]</code> · <code>[data/analytics/snapshots/....csv]</code>.
   Definitions per <code>data/ontology/</code>. Gaps are shown as gaps.
+  <p>[EXAMPLE DATA: every number on this page is the template's. Replace the
+  DATA block, then remove data-example from the html tag.]</p>
 </footer>
 
 <script>

@@ -3,9 +3,9 @@
 **Kind:** data, the numbers as tables, dated snapshots, and the reports built from them.
 
 Human-first outputs: analyses, recurring reports, the QMR, and dashboards.
-Dated, and immutable once delivered. A QMR is edited while its status is
-"assembling"; once "final", a new analysis is a new file. The
-machine-readable inputs live in [`data/`](../data/).
+Dated, and immutable once delivered. A QMR's status moves through
+"assembling", "ready for review" and "final"; once final, a new analysis is
+a new file. The machine-readable inputs live in [`data/`](../data/).
 
 ## Layout
 

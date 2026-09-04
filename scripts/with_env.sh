@@ -1,7 +1,7 @@
 #!/bin/sh
 # Start a command with the keys from .env in its environment, so the MCP
 # servers in .mcp.json (which read ${VAR} placeholders from the environment,
-# not from .env) find them. The usual command is your coding agent:
+# not from .env) find them. The usual command is your coding agent.
 #
 #   sh scripts/with_env.sh claude            # Claude Code in the terminal
 #   sh scripts/with_env.sh cursor .          # Cursor
