@@ -35,7 +35,8 @@ three servers. Codex users paste the TOML from
 `scripts/doctor.py` checks the two JSON files agree.
 
 - **`dataforseo`**: the official `dataforseo-mcp-server` npm package, run
-  with `npx` and pinned to `@3.1.1`. Unpinned `npx -y` would run whatever
+  with `npx` and pinned to `@3.1.1`. It needs Node.js on the machine;
+  without Node, swap in the remote endpoint below. Unpinned `npx -y` would run whatever
   was published last, with your DataForSEO login in its environment. Bump
   the version on purpose, in a proposal. Credentials come from
   `DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD` in your environment. A

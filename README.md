@@ -19,7 +19,7 @@
   <a href="#what-this-is-and-what-it-is-not">What this is</a> ·
   <a href="docs/is-this-for-you.md">Is this for you?</a> ·
   <a href="#which-coding-agent">Which agent?</a> ·
-  <a href="#a-blueprint-not-a-product">Make it yours</a> ·
+  <a href="docs/make-it-yours.md">Make it yours</a> ·
   <a href="docs/new-to-github.md">New to GitHub?</a>
 </p>
 
@@ -205,6 +205,10 @@ MCP server first, its CLI second, a small script last.
 Nothing here needs a server. Work runs where a person is typing to a coding
 agent, or on a schedule in GitHub Actions.
 [docs/operating-model.md](docs/operating-model.md) lays out the trade-off.
+
+What to rename, replace and delete when you adopt it, and how to take
+later improvements from the template without touching your own files, is
+in [docs/make-it-yours.md](docs/make-it-yours.md).
 
 ## Four kinds of files
 

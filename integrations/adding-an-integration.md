@@ -132,6 +132,9 @@ under `data/<domain>/snapshots/` with the naming in
 
 ## The script contract
 
+From here on this page is written for your coding agent. You can stop
+reading; the agent follows it and the check enforces it.
+
 Every script in `scripts/` follows these rules. The three shipped scripts
 (`pull_transcripts.py`, `slack_post.py`, `seo_snapshot.py`) are the
 reference; a new connector copies the closest one.

@@ -16,7 +16,12 @@ adds only what is Claude-Code-specific.
   merge and force-push commands a person owns; keys stay out of context
   by design, and [docs/secrets.md](docs/secrets.md) says exactly what the
   rules stop and what they do not.
+- **Every session opens with the doctor's lines** (a `SessionStart` hook
+  runs `scripts/doctor.py --brief`). Act on them before anything else:
+  problems mean `/doctor`, unfilled templates mean `/setup`, "make it
+  yours" items mean [docs/make-it-yours.md](docs/make-it-yours.md).
 - MCP servers for integrations are declared in `.mcp.json` (DataForSEO, Apify
   and Calven today; the list is explained in
-  [integrations/README.md](integrations/README.md)). Enable only what
-  `/setup` configured; Claude Code asks before starting a project server.
+  [integrations/README.md](integrations/README.md)). Claude Code asks about
+  all three in the first session, before `/setup` has run: No to all three
+  is the right answer, and `/setup` says which to turn on afterwards.

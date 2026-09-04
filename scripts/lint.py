@@ -981,6 +981,41 @@ def check_skill_links(ctx):
                                                               capture_output=True, cwd=str(ctx.root)))]
 
 
+def check_adoption(ctx):
+    """What an adopting team still has to make its own (docs/make-it-yours.md); informational."""
+    out = []
+    spec = ctx.schema.get("adoption")
+    if not spec:
+        return out
+    where = "(docs/make-it-yours.md)"
+    for m in spec.get("markers", []):
+        rel = m["file"]
+        if rel in ctx.files and m["text"] in ctx.text(rel):
+            out.append(Finding(INFO, rel, f"make it yours: {m['what']} {where}", "adoption",
+                               line=line_of(ctx.text(rel), m["text"])))
+    tag = spec.get("example_rows", "example row:")
+    for rel in ctx.schema["csv"]["canonical"]:
+        if rel in ctx.files and tag in ctx.text(rel):
+            out.append(Finding(INFO, rel, f"make it yours: replace the rows marked `{tag}` in {rel} with your own {where}",
+                               "adoption", line=line_of(ctx.text(rel), tag)))
+    templates = [(rel, marker) for rel, marker in ctx.schema["templates"].items() if not rel.startswith("_")]
+    unfilled = sum(1 for rel, marker in templates if ctx.exists(rel) and marker in ctx.text(rel))
+    examples = spec.get("examples_dir", "examples/")
+    if any(f.startswith(examples) for f in ctx.files) and unfilled < len(templates):
+        out.append(Finding(INFO, examples.rstrip("/"), "make it yours: the example company is still here; delete "
+                           f"the folder now that your own templates are filled {where}", "adoption"))
+    if not ctx.schema["repo"].get("private"):
+        accounts = "data/accounts/target-accounts.csv"
+        has_rows = accounts in ctx.files and any(l.strip() for l in ctx.text(accounts).splitlines()[1:])
+        has_transcripts = any(f.startswith(("memory/transcripts/inbox/", "memory/transcripts/processed/"))
+                              and Path(f).name not in (".gitkeep", "README.md") for f in ctx.files)
+        if has_rows or has_transcripts:
+            out.append(Finding(INFO, "docs/schema.json", "make it yours: repo.private is false but the repository "
+                               "holds account rows or transcripts; make it private and set repo.private to true, "
+                               f"or keep personal data out {where}", "adoption"))
+    return out
+
+
 def check_templates(ctx):
     """Which templates are still unfilled (informational; /setup fills them)."""
     out = []
@@ -1021,6 +1056,7 @@ CHECKS = [
     (check_docs_index, "repo"),
     (check_skill_links, "repo"),
     (check_templates, "repo"),
+    (check_adoption, "repo"),
 ]
 
 

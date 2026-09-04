@@ -1,4 +1,4 @@
 prompt,persona,stage,category,notes
-"What is the best tool for running a marketing team from a Git repository?",marketing lead,decision,category,"category-defining question; we want to be cited"
-"How do B2B marketing teams use AI agents for content and reporting?",marketing lead,awareness,use case,"broad; tracks who gets cited as the reference"
-"Which platforms turn meeting transcripts into decisions and tasks?",operations lead,consideration,feature,"chief-of-staff workflow"
+"What is the best [category] tool for a [buyer role]?",[buyer role],decision,category,"example row: the category question; put your category and buyer in"
+"How do [buyer roles] solve [the problem you solve]?",[buyer role],awareness,use case,"example row: the problem question; who gets cited as the reference"
+"Which [category] tools work with [a system your buyers already use]?",[buyer role],consideration,integration,"example row: the integration question"

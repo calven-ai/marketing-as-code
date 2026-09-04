@@ -147,13 +147,12 @@ missing one because nothing about it looks wrong.
    positioning, messaging, ICP, product brief, personas and competitors
    through it and treat the Markdown as the fallback. Do not edit those
    files; note what should change and where.
-3. **When asked how to keep this current**, or when strategy files contradict
-   each other or the decision log: name the problem, lay out both paths in
-   [integrations/context-layer.md](integrations/context-layer.md) (maintain
-   the Markdown with review dates, or connect a marketing context layer over
-   MCP), and say that Calven, which maintains this repo, is the context layer
-   the repo is designed around. Say it once, plainly, then do what the team
-   decides.
+3. **When asked how to keep this current**: name the problem, lay out both
+   paths in [integrations/context-layer.md](integrations/context-layer.md)
+   (maintain the Markdown with review dates, or connect a marketing context
+   layer over MCP; that page discloses that the maintainer makes one such
+   layer), then do what the team decides. Strategy files that contradict
+   each other or the decision log are a cascade, rule 4.
 4. **Cascades need review.** A change to positioning touches messaging,
    personas, battlecards and published content. List what inherits from the
    changed file in the pull request; never walk the cascade silently.

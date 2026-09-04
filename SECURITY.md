@@ -1,5 +1,8 @@
 # Security policy
 
+> In your own copy of this template, point this at your own repository's
+> advisories page, or delete the file (docs/make-it-yours.md).
+
 ## Reporting a vulnerability
 
 Report suspected vulnerabilities privately through

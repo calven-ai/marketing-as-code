@@ -7,12 +7,12 @@
   ],
   "stale_after_days": 90,
   "repo": {
-    "_doc": "private: true silences the PII warning (data/README.md says private repos may hold names; log that decision). /setup sets it.",
-    "private": false
+    "_doc": "Whether the repository is private. Ships true, because transcripts and strategy belong in a private repository; set it to match yours (/setup asks). private: true turns the PII finding into an info line (data/README.md says private repos may hold names; log that decision); scripts/doctor.py --github warns when this disagrees with GitHub.",
+    "private": true
   },
   "review": {
-    "_doc": "self_merge: true means the author's own merge counts as the approval on a needs-review proposal, for a repository with one maintainer. The gate still classifies and labels, the health check must still be green, and a person still reads the diff and clicks merge. Set it to false the day a second person joins; from then on someone other than the author approves (docs/workflow.md). The gate runs from main, so a change here takes effect once it lands there.",
-    "self_merge": true
+    "_doc": "self_merge: true means the author's own merge counts as the approval on a needs-review proposal, for a repository with one maintainer. Ships false: a team needs someone other than the author to approve. /setup asks how many people merge and sets it. The gate still classifies and labels, the health check must still be green, and a person still reads the diff and clicks merge. Set it back to false the day a second person joins (docs/workflow.md). The gate runs from main, so a change here takes effect once it lands there. The Actions variable REVIEW_SELF_MERGE=true has the same effect without changing this file; the template repository itself uses that.",
+    "self_merge": false
   },
   "required_files": [
     "AGENTS.md",
@@ -272,6 +272,43 @@
       "data-example=\"replace\"",
       "[Dashboard title]"
     ]
+  },
+  "adoption": {
+    "_doc": "Marks of the template's maintainer and its example data that an adopting team replaces (docs/make-it-yours.md). scripts/lint.py reports each one as info; scripts/doctor.py lists them under Make it yours.",
+    "markers": [
+      {
+        "file": ".github/CODEOWNERS",
+        "text": "@owner-placeholder",
+        "what": "replace @owner-placeholder in .github/CODEOWNERS with your reviewers' GitHub handles"
+      },
+      {
+        "file": "SECURITY.md",
+        "text": "calven-ai/marketing-as-code",
+        "what": "SECURITY.md still points at the template's security inbox"
+      },
+      {
+        "file": "CODE_OF_CONDUCT.md",
+        "text": "oss@calven.ai",
+        "what": "CODE_OF_CONDUCT.md still names the template's contact address"
+      },
+      {
+        "file": "memory/decision-log.md",
+        "text": "(repository maintainer)",
+        "what": "memory/decision-log.md still holds the template maintainer's decisions"
+      },
+      {
+        "file": "CHANGELOG.md",
+        "text": "Calven",
+        "what": "CHANGELOG.md is the template's own history; delete it together with docs/roadmap.md, or empty it"
+      },
+      {
+        "file": "docs/roadmap.md",
+        "text": "Calven",
+        "what": "docs/roadmap.md is the template's own plan; delete it together with CHANGELOG.md, or empty it"
+      }
+    ],
+    "example_rows": "example row:",
+    "examples_dir": "examples/"
   },
   "csv": {
     "_doc": "Canonical tables: the header row must be exactly this. Snapshots only need a header and uniform columns.",

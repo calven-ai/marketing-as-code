@@ -29,8 +29,10 @@ settings any time and says what drifted.
 
 `.github/CODEOWNERS` names who reviews each area. Replace the placeholder
 with real handles; `/setup` does it during onboarding. A repository with
-one maintainer sets `review.self_merge` in `docs/schema.json` instead, so
-the gate does not wait for a second person ([workflow.md](workflow.md)).
+one maintainer sets `review.self_merge` in `docs/schema.json` instead (or
+the Actions variable `REVIEW_SELF_MERGE` to `true`, which wins over the
+file), so the gate does not wait for a second person
+([workflow.md](workflow.md)).
 
 ## How a proposal lands
 

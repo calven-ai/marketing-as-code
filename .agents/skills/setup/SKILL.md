@@ -46,19 +46,25 @@ already filled in without asking.
       per person in the deal. Offer `product-brief.md` here too, skippable
       if there is no product documentation to paste yet. Same
       `last_reviewed` and `owner` rule.
-   4. *Voice*: three adjectives, do/don't examples (ask for a paragraph
+   4. *Competitors*: the two or three alternatives buyers compare you
+      with, including "do nothing" if that is the real one. One file each
+      in `strategy/competitive/<slug>.md` from
+      `strategy/competitive/_battlecard-template.md`; a line per section
+      is enough today, and the `battlecard` skill deepens them later.
+      Two skills (`brand-monitor`, `campaign-discovery`) read this folder.
+   5. *Voice*: three adjectives, do/don't examples (ask for a paragraph
       they love and one that made them cringe; derive rules from those),
       banned words.
-   5. *Visual identity*: colors and fonts if known; fill `tokens.json` and
+   6. *Visual identity*: colors and fonts if known; fill `tokens.json` and
       `visual-identity.md` together. Skippable.
-   6. *Ontology*: what a signup/MQL/SQL actually means here, funnel stages,
+   7. *Ontology*: what a signup/MQL/SQL actually means here, funnel stages,
       the few events that matter, UTM conventions. If they don't know, leave
       the template and note who would.
-   7. *Task tool*: which tool the team uses (Asana, monday, other, none).
+   8. *Task tool*: which tool the team uses (Asana, monday, other, none).
       Rewrite `integrations/tasks.md` per its embedded example: workspace,
       default project, filing conventions. If none, leave the in-repo
       fallback.
-   8. *Integrations*: which tools the team uses, against the two tables in
+   9. *Integrations*: which tools the team uses, against the two tables in
       `integrations/README.md`. For a tool that is **wired**, follow its
       registry row: OAuth MCPs need nothing but the browser prompt on first
       use; for key-based ones, have them copy `.env.example` → `.env` and
@@ -67,17 +73,41 @@ already filled in without asking.
       a tool that is **not wired**, do not build it during the interview:
       list it in the closing summary as a follow-up, "add with
       `add-integration`", one line per tool with the job it must do. Enable
-      only what they asked for; never edit `.env` yourself.
+      only what they asked for; never edit `.env` yourself. Say once: the
+      first session asks whether to start the three project MCP servers;
+      No to all three is the right answer until one is connected here.
+   10. *Make the repo real*: the settings a fresh copy ships without.
+      - Who reviews strategy and brand, and who reviews the machinery
+        (`scripts/`, `.github/`, the skills)? One GitHub handle each is
+        enough. Replace every `@owner-placeholder` in `.github/CODEOWNERS`.
+      - How many people will merge proposals? One: set `review.self_merge`
+        to `true` in `docs/schema.json` and say it goes back to `false`
+        the day a second person joins. More than one: leave it `false`.
+      - Is the repository private? Set `repo.private` in `docs/schema.json`
+        to match. If it is public, say that account lists and transcripts
+        must stay out of it.
+      - An admin runs `sh scripts/github_setup.sh` once, or follows the
+        click path in `docs/github-settings.md`. On a private repo the
+        rules are enforced only on GitHub Team or Pro; say so once.
+      - Run `python3 scripts/doctor.py --fix` so the pre-push hook is on
+        and their name is set for commits.
 
 3. **Close.** Summarize what's filled, what's skipped and who owes an
    answer. Log the setup in `memory/decision-log.md` (one entry: "Repo set
    up for <team>", with skipped items as follow-ups, and which path the
-   strategy files took: Markdown or context layer). Say once: these files
-   go stale by default; `scripts/doctor.py` flags files not reviewed in 90
-   days, and the alternative is a context layer
-   (`integrations/context-layer.md`). Then move on. Suggest one first
-   workflow: draft a piece with `new-content`, or drop a transcript into
-   `memory/transcripts/inbox/` and run `chief-of-staff`.
+   strategy files took: Markdown or context layer). Seed the tables from
+   the answers: five terms in `data/seo/keywords.csv` (the category term,
+   two problem phrases, two alternatives) and three buyer questions in
+   `data/seo/prompts.csv`, replacing the rows marked `example row:`; leave
+   `data/accounts/target-accounts.csv` unless they named accounts. Point
+   at `docs/make-it-yours.md` for what remains (the example company, the
+   maintainer's community files, the changelog) and list which of its
+   items are still open. Say once: these files go stale by default;
+   `scripts/doctor.py` flags files not reviewed in 90 days, and the
+   alternative is a context layer (`integrations/context-layer.md`). Then
+   move on. Suggest one first workflow: draft a piece with `new-content`,
+   or drop a transcript into `memory/transcripts/inbox/` and run
+   `chief-of-staff`.
 
 ## Rules
 

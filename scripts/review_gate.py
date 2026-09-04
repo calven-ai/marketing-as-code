@@ -74,7 +74,10 @@ def approvals(pr):
 
 
 def self_merge_allowed(schema):
-    """review.self_merge in docs/schema.json: the author's merge counts as the approval."""
+    """review.self_merge in docs/schema.json, or the repository variable REVIEW_SELF_MERGE=true (gate.yml passes
+    it through): the author's merge counts as the approval."""
+    if os.environ.get("REVIEW_SELF_MERGE", "").strip().lower() == "true":
+        return True
     return bool((schema.get("review") or {}).get("self_merge"))
 
 
@@ -86,8 +89,9 @@ def needs_review_verdict(schema, author, approved, owners):
                 "A person who is not the author read the diff and approved it; this proposal may land.")
     if self_merge_allowed(schema):
         return ("success", "Needs review: a person reads the diff, then merges",
-                "This repository has one maintainer (review.self_merge in docs/schema.json), so the author's "
-                "own merge is the approval. Nothing merges on its own: read the diff, then merge.")
+                "Self-merge is on for this repository (review.self_merge in docs/schema.json, or the "
+                "REVIEW_SELF_MERGE variable), so the author's own merge is the approval. Nothing merges on its "
+                "own: read the diff, then merge.")
     ask = ", ".join(owners) if owners else "a teammate who is not the author"
     return ("action_required", f"Waiting for approval from {ask}",
             f"This proposal needs a person to read the diff and approve it (the author, {author or 'unknown'}, "

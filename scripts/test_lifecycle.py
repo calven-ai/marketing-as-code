@@ -149,7 +149,7 @@ class TestPropose(LifecycleCase):
                       self.gh_log())
         self.assertEqual("https://github.com/ana/repo/pull/7", out["url"])
         self.assertEqual("needs-review", out["kind"])
-        self.assertIn("You are the reviewer", out["outcome"])  # review.self_merge is on in the real schema
+        self.assertIn("needs review from a teammate", out["outcome"])  # the template ships review.self_merge: false
         self.assertEqual(["content/2026-09-post/draft.md"], out["files"])
         self.assertEqual("Post: the September piece", git(self.work, "log", "-1", "--format=%s"))
 

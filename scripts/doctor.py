@@ -49,6 +49,26 @@ def github_settings():
     out += environment_settings(name)
     if out:
         out.append("run: scripts/github_setup.sh (docs/github-settings.md explains each setting and the plan it needs)")
+    return out + review_policy(name, repo)
+
+
+def review_policy(name, repo):
+    """docs/schema.json's repo.private and review.self_merge against what GitHub says (docs/make-it-yours.md)."""
+    out = []
+    schema = json.loads((ROOT / "docs" / "schema.json").read_text(encoding="utf-8"))
+    declared = bool((schema.get("repo") or {}).get("private"))
+    if repo.get("private") is not None and bool(repo.get("private")) != declared:
+        actual = "private" if repo.get("private") else "public"
+        out.append(f"docs/schema.json says repo.private is {str(declared).lower()} but the repository is {actual}; "
+                   "set repo.private to match (/setup asks)")
+    variable = _api(f"repos/{name}/actions/variables/REVIEW_SELF_MERGE") or {}
+    self_merge = bool((schema.get("review") or {}).get("self_merge")) or \
+        str(variable.get("value", "")).strip().lower() == "true"
+    people = _api(f"repos/{name}/collaborators")
+    if self_merge and isinstance(people, list) and len(people) > 1:
+        out.append(f"self-merge is on but {len(people)} people can push; set review.self_merge to false in "
+                   "docs/schema.json (or remove the REVIEW_SELF_MERGE variable) so someone other than the author "
+                   "approves (docs/workflow.md)")
     return out
 
 
@@ -145,16 +165,34 @@ def local_setup(root=ROOT, fix=False):
 
 
 def brief(ctx, findings=None):
-    """The three lines the session-start hook and /sync print: problems, stale context, unfilled templates."""
+    """The three lines the session-start hook and /sync print: problems, stale context, unfilled templates.
+    A fourth line, only while the template's residue is still here (docs/make-it-yours.md)."""
     findings = lint.run_checks(ctx) if findings is None else findings
     errors = [f for f in findings if f.level == lint.ERROR]
     warnings = [f for f in findings if f.level == lint.WARNING]
     unfilled = [f.path for f in findings if f.check == "template"]
     stale = [f.path for f in warnings if f.check == "context-stale"]
-    return [f"doctor: {len(errors)} problems, {len(warnings)} warnings"
-            + ("; run python3 scripts/doctor.py" if errors or warnings else ""),
-            f"stale context: {', '.join(stale) if stale else 'none'}",
-            f"unfilled templates: {len(unfilled)}" + (" (run /setup)" if unfilled else "")]
+    adoption = [f for f in findings if f.check == "adoption"]
+    lines = [f"doctor: {len(errors)} problems, {len(warnings)} warnings"
+             + ("; run python3 scripts/doctor.py" if errors or warnings else ""),
+             f"stale context: {', '.join(stale) if stale else 'none'}",
+             f"unfilled templates: {len(unfilled)}" + (" (run /setup)" if unfilled else "")]
+    if adoption:
+        lines.append(f"make it yours: {len(adoption)} items left (docs/make-it-yours.md)")
+    return lines
+
+
+def adoption_lines(findings):
+    """The Make it yours items, without the prefix and pointer every finding carries."""
+    out = []
+    for f in findings:
+        if f.check != "adoption":
+            continue
+        text = f.message
+        for cut in ("make it yours: ", " (docs/make-it-yours.md)"):
+            text = text.replace(cut, "")
+        out.append(text)
+    return out
 
 
 def main(argv=None):
@@ -194,6 +232,8 @@ def main(argv=None):
         print("info: .env present (gitignored; keep it that way)")
     else:
         print("info: no .env; fine unless you use key-based integrations (copy .env.example)")
+    if shutil.which("npx") is None:
+        print("info: Node.js is not installed; only the DataForSEO server in .mcp.json needs it (integrations/README.md)")
     notes, done = local_setup(ROOT, fix=args.fix)
     for line in done:
         print(f"fixed: {line}")
@@ -212,6 +252,11 @@ def main(argv=None):
         print(f"\ncontext served by a context layer ({len(served)}), files are fallbacks:")
         for rel in served:
             print(f"  - {rel}")
+    residue = adoption_lines(findings)
+    if residue:
+        print(f"\nMake it yours ({len(residue)} left), docs/make-it-yours.md:")
+        for line in residue:
+            print(f"  - {line}")
 
     visible = [f for f in findings if f.level != lint.INFO]
     if args.format == "github":

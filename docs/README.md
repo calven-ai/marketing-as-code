@@ -10,6 +10,7 @@ them.
 - [new-to-github.md](new-to-github.md): what a repository is, in plain words, and the path with one command, once.
 - [workflow.md](workflow.md): Sync, Work, Propose, Review, Merge. How agent-proposed work gets reviewed and merged.
 - [troubleshooting.md](troubleshooting.md): every message the lifecycle commands print, and the one thing to do.
+- [make-it-yours.md](make-it-yours.md): what to rename, replace and delete in your copy, and how to take later improvements from the template.
 
 ## Deciding whether to do this at all
 

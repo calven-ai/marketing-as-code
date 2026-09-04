@@ -60,6 +60,9 @@ jobs:
           HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
           DOCTOR: ${{ github.event.workflow_run.conclusion }}
           PRS: ${{ toJSON(github.event.workflow_run.pull_requests) }}
+          # A repository variable; "true" lets the author's own merge count as the
+          # approval without changing docs/schema.json (docs/workflow.md).
+          REVIEW_SELF_MERGE: ${{ vars.REVIEW_SELF_MERGE }}
         run: |
           n="$PR_INPUT"
           if [ -z "$n" ] && [ -n "$PRS" ] && [ "$PRS" != "null" ]; then
