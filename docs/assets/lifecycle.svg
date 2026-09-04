@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 264" shape-rendering="crispEdges" role="img" aria-label="The lifecycle as 8-bit pixel-art panels under a green LED sign reading ONE LOOP. Five panels joined by arrows: Sync (get the latest), Work (ask the agent), Propose (open the proposal), Review (read the diff), Merge (click merge). Below them a red Doctor panel: the repair word when something is red.">
+  <defs>
+    <pattern id="stripes" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#ffffff"/>
+      <rect width="8" height="3" fill="#f7f6f1"/>
+    </pattern>
+    <!-- 5x7 pixel font shared with four-kinds-8bit.svg; rects unfilled so the parent <g fill> colours them -->
+    <g id="tA"><rect x="1" width="3" height="1"/><rect y="1" width="1" height="6"/><rect x="4" y="1" width="1" height="6"/><rect x="1" y="3" width="3" height="1"/></g>
+    <g id="tC"><rect x="1" width="3" height="1"/><rect y="1" width="1" height="5"/><rect x="4" y="1" width="1" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="tD"><rect width="4" height="1"/><rect y="1" width="1" height="6"/><rect x="4" y="1" width="1" height="5"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="tE"><rect width="5" height="1"/><rect y="1" width="1" height="6"/><rect x="1" y="3" width="3" height="1"/><rect x="1" y="6" width="4" height="1"/></g>
+    <g id="tF"><rect width="5" height="1"/><rect y="1" width="1" height="6"/><rect x="1" y="3" width="3" height="1"/></g>
+    <g id="tG"><rect x="1" width="3" height="1"/><rect y="1" width="1" height="5"/><rect x="4" y="1" width="1" height="1"/><rect x="2" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="2"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="tI"><rect x="1" width="3" height="1"/><rect x="2" y="1" width="1" height="6"/><rect x="1" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></g>
+    <g id="tK"><rect width="1" height="7"/><rect x="4" width="1" height="1"/><rect x="3" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/></g>
+    <g id="tL"><rect width="1" height="7"/><rect x="1" y="6" width="4" height="1"/></g>
+    <g id="tN"><rect width="1" height="7"/><rect x="4" width="1" height="7"/><rect x="1" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/></g>
+    <g id="tO"><rect x="1" width="3" height="1"/><rect y="1" width="1" height="5"/><rect x="4" y="1" width="1" height="5"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="tR"><rect width="4" height="1"/><rect y="1" width="1" height="6"/><rect x="4" y="1" width="1" height="2"/><rect x="1" y="3" width="3" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/></g>
+    <g id="tS"><rect x="1" width="4" height="1"/><rect y="1" width="1" height="2"/><rect x="1" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="2"/><rect y="6" width="4" height="1"/></g>
+    <g id="tT"><rect width="5" height="1"/><rect x="2" y="1" width="1" height="6"/></g>
+    <g id="tU"><rect width="1" height="6"/><rect x="4" width="1" height="6"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="tX"><rect width="1" height="2"/><rect x="4" width="1" height="2"/><rect x="1" y="2" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="1" height="1"/><rect y="5" width="1" height="2"/><rect x="4" y="5" width="1" height="2"/></g>
+    <g id="t_a"><rect x="1" y="2" width="3" height="1"/><rect x="4" y="3" width="1" height="4"/><rect x="1" y="4" width="3" height="1"/><rect y="5" width="1" height="1"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="t_b"><rect width="1" height="7"/><rect x="1" y="2" width="3" height="1"/><rect x="4" y="3" width="1" height="3"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="t_c"><rect x="1" y="2" width="3" height="1"/><rect y="3" width="1" height="3"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="t_d"><rect x="4" width="1" height="7"/><rect x="1" y="2" width="3" height="1"/><rect y="3" width="1" height="3"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="t_e"><rect x="1" y="2" width="3" height="1"/><rect y="3" width="1" height="3"/><rect x="4" y="3" width="1" height="2"/><rect x="1" y="4" width="3" height="1"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="t_f"><rect x="2" width="2" height="1"/><rect x="1" y="1" width="1" height="6"/><rect y="3" width="1" height="1"/><rect x="2" y="3" width="2" height="1"/></g>
+    <g id="t_g"><rect x="1" y="2" width="4" height="1"/><rect y="3" width="1" height="2"/><rect x="4" y="3" width="1" height="4"/><rect x="1" y="5" width="3" height="1"/><rect x="1" y="7" width="3" height="1"/></g>
+    <g id="t_h"><rect width="1" height="7"/><rect x="1" y="2" width="3" height="1"/><rect x="4" y="3" width="1" height="4"/></g>
+    <g id="t_i"><rect x="2" width="1" height="1"/><rect x="1" y="2" width="2" height="1"/><rect x="2" y="3" width="1" height="4"/><rect x="1" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></g>
+    <g id="t_j"><rect x="3" width="1" height="1"/><rect x="2" y="2" width="2" height="1"/><rect x="3" y="3" width="1" height="4"/><rect y="6" width="1" height="1"/><rect x="1" y="7" width="2" height="1"/></g>
+    <g id="t_k"><rect width="1" height="7"/><rect x="3" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></g>
+    <g id="t_l"><rect x="1" width="2" height="1"/><rect x="2" y="1" width="1" height="6"/><rect x="1" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></g>
+    <g id="t_m"><rect y="2" width="2" height="1"/><rect x="3" y="2" width="1" height="1"/><rect y="3" width="1" height="4"/><rect x="2" y="3" width="1" height="2"/><rect x="4" y="3" width="1" height="4"/></g>
+    <g id="t_n"><rect y="2" width="4" height="1"/><rect y="3" width="1" height="4"/><rect x="4" y="3" width="1" height="4"/></g>
+    <g id="t_o"><rect x="1" y="2" width="3" height="1"/><rect y="3" width="1" height="3"/><rect x="4" y="3" width="1" height="3"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="t_p"><rect y="2" width="4" height="1"/><rect y="3" width="1" height="5"/><rect x="4" y="3" width="1" height="2"/><rect x="1" y="5" width="3" height="1"/></g>
+    <g id="t_r"><rect y="2" width="1" height="5"/><rect x="2" y="2" width="2" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="4" y="3" width="1" height="1"/></g>
+    <g id="t_s"><rect x="1" y="2" width="4" height="1"/><rect y="3" width="1" height="1"/><rect x="1" y="4" width="3" height="1"/><rect x="4" y="5" width="1" height="1"/><rect y="6" width="4" height="1"/></g>
+    <g id="t_t"><rect x="1" width="1" height="6"/><rect y="2" width="1" height="1"/><rect x="2" y="2" width="2" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="2" y="6" width="2" height="1"/></g>
+    <g id="t_u"><rect y="2" width="1" height="4"/><rect x="4" y="2" width="1" height="5"/><rect x="1" y="6" width="3" height="1"/></g>
+    <g id="t_w"><rect y="2" width="1" height="4"/><rect x="4" y="2" width="1" height="4"/><rect x="2" y="4" width="1" height="2"/><rect x="1" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></g>
+    <g id="t_y"><rect y="2" width="1" height="3"/><rect x="4" y="2" width="1" height="5"/><rect x="1" y="5" width="3" height="1"/><rect x="1" y="7" width="3" height="1"/></g>
+    <g id="tc46"><rect x="1" y="5" width="2" height="2"/></g>
+    <g id="tc47"><rect x="4" width="1" height="2"/><rect x="3" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect y="5" width="1" height="2"/></g>
+    <g id="tP"><rect width="4" height="1"/><rect y="1" width="1" height="6"/><rect x="4" y="1" width="1" height="2"/><rect x="1" y="3" width="3" height="1"/></g>
+    <g id="tM"><rect width="1" height="7"/><rect x="4" width="1" height="7"/><rect x="1" y="1" width="1" height="1"/><rect x="3" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/></g>
+    <g id="tW"><rect width="1" height="6"/><rect x="4" width="1" height="6"/><rect x="2" y="3" width="1" height="3"/><rect x="1" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></g>
+    <g id="t_v"><rect y="2" width="1" height="3"/><rect x="4" y="2" width="1" height="3"/><rect x="1" y="5" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/></g>
+  </defs>
+  <rect width="720" height="264" fill="url(#stripes)"/>
+  <!-- LED sign -->
+  <rect x="246" y="22" width="240" height="48" fill="#d5d2c6"/>
+  <rect x="240" y="16" width="240" height="48" fill="#111111"/>
+  <rect x="244" y="20" width="232" height="40" fill="#161616"/>
+  <g fill="#22c55e"><g transform="translate(289.5,29) scale(3)"><use href="#tO"/><use href="#tN" x="6"/><use href="#tE" x="12"/><use href="#tL" x="24"/><use href="#tO" x="30"/><use href="#tO" x="36"/><use href="#tP" x="42"/></g><g transform="translate(290.5,29) scale(3)"><use href="#tO"/><use href="#tN" x="6"/><use href="#tE" x="12"/><use href="#tL" x="24"/><use href="#tO" x="30"/><use href="#tO" x="36"/><use href="#tP" x="42"/></g></g>
+  <!-- Sync -->
+  <rect x="22" y="86" width="112" height="64" fill="#d5d2c6"/>
+  <rect x="16" y="80" width="112" height="64" fill="#111111"/>
+  <rect x="20" y="84" width="104" height="56" fill="#33527f"/>
+  <rect x="20" y="84" width="104" height="4" fill="#5e7fb0"/>
+  <rect x="20" y="136" width="104" height="4" fill="#1e3352"/>
+  <g fill="#ffffff"><g transform="translate(47.5,105) scale(2)"><use href="#tS"/><use href="#t_y" x="6.5"/><use href="#t_n" x="13"/><use href="#t_c" x="19.5"/></g><g transform="translate(48.5,105) scale(2)"><use href="#tS"/><use href="#t_y" x="6.5"/><use href="#t_n" x="13"/><use href="#t_c" x="19.5"/></g></g>
+  <g fill="#111111"><g transform="translate(28,158) scale(2)"><use href="#t_g"/><use href="#t_e" x="6.5"/><use href="#t_t" x="13"/><use href="#t_t" x="26"/><use href="#t_h" x="32.5"/><use href="#t_e" x="39"/></g><g transform="translate(29,158) scale(2)"><use href="#t_g"/><use href="#t_e" x="6.5"/><use href="#t_t" x="13"/><use href="#t_t" x="26"/><use href="#t_h" x="32.5"/><use href="#t_e" x="39"/></g></g>
+  <g fill="#111111"><g transform="translate(34.5,178) scale(2)"><use href="#t_l"/><use href="#t_a" x="6.5"/><use href="#t_t" x="13"/><use href="#t_e" x="19.5"/><use href="#t_s" x="26"/><use href="#t_t" x="32.5"/></g><g transform="translate(35.5,178) scale(2)"><use href="#t_l"/><use href="#t_a" x="6.5"/><use href="#t_t" x="13"/><use href="#t_e" x="19.5"/><use href="#t_s" x="26"/><use href="#t_t" x="32.5"/></g></g>
+  <rect x="128" y="110" width="20" height="4" fill="#111111"/>
+  <rect x="148" y="104" width="4" height="16" fill="#111111"/>
+  <rect x="152" y="108" width="4" height="8" fill="#111111"/>
+  <rect x="156" y="110" width="4" height="4" fill="#111111"/>
+  <!-- Work -->
+  <rect x="166" y="86" width="112" height="64" fill="#d5d2c6"/>
+  <rect x="160" y="80" width="112" height="64" fill="#111111"/>
+  <rect x="164" y="84" width="104" height="56" fill="#56399a"/>
+  <rect x="164" y="84" width="104" height="4" fill="#8062cc"/>
+  <rect x="164" y="136" width="104" height="4" fill="#35225f"/>
+  <g fill="#ffffff"><g transform="translate(191.5,105) scale(2)"><use href="#tW"/><use href="#t_o" x="6.5"/><use href="#t_r" x="13"/><use href="#t_k" x="19.5"/></g><g transform="translate(192.5,105) scale(2)"><use href="#tW"/><use href="#t_o" x="6.5"/><use href="#t_r" x="13"/><use href="#t_k" x="19.5"/></g></g>
+  <g fill="#111111"><g transform="translate(172,158) scale(2)"><use href="#t_a"/><use href="#t_s" x="6.5"/><use href="#t_k" x="13"/><use href="#t_t" x="26"/><use href="#t_h" x="32.5"/><use href="#t_e" x="39"/></g><g transform="translate(173,158) scale(2)"><use href="#t_a"/><use href="#t_s" x="6.5"/><use href="#t_k" x="13"/><use href="#t_t" x="26"/><use href="#t_h" x="32.5"/><use href="#t_e" x="39"/></g></g>
+  <g fill="#111111"><g transform="translate(185,178) scale(2)"><use href="#t_a"/><use href="#t_g" x="6.5"/><use href="#t_e" x="13"/><use href="#t_n" x="19.5"/><use href="#t_t" x="26"/></g><g transform="translate(186,178) scale(2)"><use href="#t_a"/><use href="#t_g" x="6.5"/><use href="#t_e" x="13"/><use href="#t_n" x="19.5"/><use href="#t_t" x="26"/></g></g>
+  <rect x="272" y="110" width="20" height="4" fill="#111111"/>
+  <rect x="292" y="104" width="4" height="16" fill="#111111"/>
+  <rect x="296" y="108" width="4" height="8" fill="#111111"/>
+  <rect x="300" y="110" width="4" height="4" fill="#111111"/>
+  <!-- Propose -->
+  <rect x="310" y="86" width="112" height="64" fill="#d5d2c6"/>
+  <rect x="304" y="80" width="112" height="64" fill="#111111"/>
+  <rect x="308" y="84" width="104" height="56" fill="#1d7a33"/>
+  <rect x="308" y="84" width="104" height="4" fill="#3aa851"/>
+  <rect x="308" y="136" width="104" height="4" fill="#10501f"/>
+  <g fill="#ffffff"><g transform="translate(316,105) scale(2)"><use href="#tP"/><use href="#t_r" x="6.5"/><use href="#t_o" x="13"/><use href="#t_p" x="19.5"/><use href="#t_o" x="26"/><use href="#t_s" x="32.5"/><use href="#t_e" x="39"/></g><g transform="translate(317,105) scale(2)"><use href="#tP"/><use href="#t_r" x="6.5"/><use href="#t_o" x="13"/><use href="#t_p" x="19.5"/><use href="#t_o" x="26"/><use href="#t_s" x="32.5"/><use href="#t_e" x="39"/></g></g>
+  <g fill="#111111"><g transform="translate(309.5,158) scale(2)"><use href="#t_o"/><use href="#t_p" x="6.5"/><use href="#t_e" x="13"/><use href="#t_n" x="19.5"/><use href="#t_t" x="32.5"/><use href="#t_h" x="39"/><use href="#t_e" x="45.5"/></g><g transform="translate(310.5,158) scale(2)"><use href="#t_o"/><use href="#t_p" x="6.5"/><use href="#t_e" x="13"/><use href="#t_n" x="19.5"/><use href="#t_t" x="32.5"/><use href="#t_h" x="39"/><use href="#t_e" x="45.5"/></g></g>
+  <g fill="#111111"><g transform="translate(309.5,178) scale(2)"><use href="#t_p"/><use href="#t_r" x="6.5"/><use href="#t_o" x="13"/><use href="#t_p" x="19.5"/><use href="#t_o" x="26"/><use href="#t_s" x="32.5"/><use href="#t_a" x="39"/><use href="#t_l" x="45.5"/></g><g transform="translate(310.5,178) scale(2)"><use href="#t_p"/><use href="#t_r" x="6.5"/><use href="#t_o" x="13"/><use href="#t_p" x="19.5"/><use href="#t_o" x="26"/><use href="#t_s" x="32.5"/><use href="#t_a" x="39"/><use href="#t_l" x="45.5"/></g></g>
+  <rect x="416" y="110" width="20" height="4" fill="#111111"/>
+  <rect x="436" y="104" width="4" height="16" fill="#111111"/>
+  <rect x="440" y="108" width="4" height="8" fill="#111111"/>
+  <rect x="444" y="110" width="4" height="4" fill="#111111"/>
+  <!-- Review -->
+  <rect x="454" y="86" width="112" height="64" fill="#d5d2c6"/>
+  <rect x="448" y="80" width="112" height="64" fill="#111111"/>
+  <rect x="452" y="84" width="104" height="56" fill="#b8792c"/>
+  <rect x="452" y="84" width="104" height="4" fill="#dda255"/>
+  <rect x="452" y="136" width="104" height="4" fill="#7a4c14"/>
+  <g fill="#ffffff"><g transform="translate(466.5,105) scale(2)"><use href="#tR"/><use href="#t_e" x="6.5"/><use href="#t_v" x="13"/><use href="#t_i" x="19.5"/><use href="#t_e" x="26"/><use href="#t_w" x="32.5"/></g><g transform="translate(467.5,105) scale(2)"><use href="#tR"/><use href="#t_e" x="6.5"/><use href="#t_v" x="13"/><use href="#t_i" x="19.5"/><use href="#t_e" x="26"/><use href="#t_w" x="32.5"/></g></g>
+  <g fill="#111111"><g transform="translate(453.5,158) scale(2)"><use href="#t_r"/><use href="#t_e" x="6.5"/><use href="#t_a" x="13"/><use href="#t_d" x="19.5"/><use href="#t_t" x="32.5"/><use href="#t_h" x="39"/><use href="#t_e" x="45.5"/></g><g transform="translate(454.5,158) scale(2)"><use href="#t_r"/><use href="#t_e" x="6.5"/><use href="#t_a" x="13"/><use href="#t_d" x="19.5"/><use href="#t_t" x="32.5"/><use href="#t_h" x="39"/><use href="#t_e" x="45.5"/></g></g>
+  <g fill="#111111"><g transform="translate(479.5,178) scale(2)"><use href="#t_d"/><use href="#t_i" x="6.5"/><use href="#t_f" x="13"/><use href="#t_f" x="19.5"/></g><g transform="translate(480.5,178) scale(2)"><use href="#t_d"/><use href="#t_i" x="6.5"/><use href="#t_f" x="13"/><use href="#t_f" x="19.5"/></g></g>
+  <rect x="560" y="110" width="20" height="4" fill="#111111"/>
+  <rect x="580" y="104" width="4" height="16" fill="#111111"/>
+  <rect x="584" y="108" width="4" height="8" fill="#111111"/>
+  <rect x="588" y="110" width="4" height="4" fill="#111111"/>
+  <!-- Merge -->
+  <rect x="598" y="86" width="112" height="64" fill="#d5d2c6"/>
+  <rect x="592" y="80" width="112" height="64" fill="#111111"/>
+  <rect x="596" y="84" width="104" height="56" fill="#0f766e"/>
+  <rect x="596" y="84" width="104" height="4" fill="#2ba79c"/>
+  <rect x="596" y="136" width="104" height="4" fill="#0b4f4a"/>
+  <g fill="#ffffff"><g transform="translate(617,105) scale(2)"><use href="#tM"/><use href="#t_e" x="6.5"/><use href="#t_r" x="13"/><use href="#t_g" x="19.5"/><use href="#t_e" x="26"/></g><g transform="translate(618,105) scale(2)"><use href="#tM"/><use href="#t_e" x="6.5"/><use href="#t_r" x="13"/><use href="#t_g" x="19.5"/><use href="#t_e" x="26"/></g></g>
+  <g fill="#111111"><g transform="translate(617,158) scale(2)"><use href="#t_c"/><use href="#t_l" x="6.5"/><use href="#t_i" x="13"/><use href="#t_c" x="19.5"/><use href="#t_k" x="26"/></g><g transform="translate(618,158) scale(2)"><use href="#t_c"/><use href="#t_l" x="6.5"/><use href="#t_i" x="13"/><use href="#t_c" x="19.5"/><use href="#t_k" x="26"/></g></g>
+  <g fill="#111111"><g transform="translate(617,178) scale(2)"><use href="#t_m"/><use href="#t_e" x="6.5"/><use href="#t_r" x="13"/><use href="#t_g" x="19.5"/><use href="#t_e" x="26"/></g><g transform="translate(618,178) scale(2)"><use href="#t_m"/><use href="#t_e" x="6.5"/><use href="#t_r" x="13"/><use href="#t_g" x="19.5"/><use href="#t_e" x="26"/></g></g>
+  <!-- Doctor -->
+  <rect x="22" y="214" width="112" height="44" fill="#d5d2c6"/>
+  <rect x="16" y="208" width="112" height="44" fill="#111111"/>
+  <rect x="20" y="212" width="104" height="36" fill="#b13a3a"/>
+  <rect x="20" y="212" width="104" height="4" fill="#d95f5f"/>
+  <rect x="20" y="244" width="104" height="4" fill="#7a2323"/>
+  <g fill="#ffffff"><g transform="translate(34.5,223) scale(2)"><use href="#tD"/><use href="#t_o" x="6.5"/><use href="#t_c" x="13"/><use href="#t_t" x="19.5"/><use href="#t_o" x="26"/><use href="#t_r" x="32.5"/></g><g transform="translate(35.5,223) scale(2)"><use href="#tD"/><use href="#t_o" x="6.5"/><use href="#t_c" x="13"/><use href="#t_t" x="19.5"/><use href="#t_o" x="26"/><use href="#t_r" x="32.5"/></g></g>
+  <g fill="#111111"><g transform="translate(148,223) scale(2)"><use href="#t_t"/><use href="#t_h" x="6.5"/><use href="#t_e" x="13"/><use href="#t_r" x="26"/><use href="#t_e" x="32.5"/><use href="#t_p" x="39"/><use href="#t_a" x="45.5"/><use href="#t_i" x="52"/><use href="#t_r" x="58.5"/><use href="#t_w" x="71.5"/><use href="#t_o" x="78"/><use href="#t_r" x="84.5"/><use href="#t_d" x="91"/><use href="#t_w" x="104"/><use href="#t_h" x="110.5"/><use href="#t_e" x="117"/><use href="#t_n" x="123.5"/><use href="#t_s" x="136.5"/><use href="#t_o" x="143"/><use href="#t_m" x="149.5"/><use href="#t_e" x="156"/><use href="#t_t" x="162.5"/><use href="#t_h" x="169"/><use href="#t_i" x="175.5"/><use href="#t_n" x="182"/><use href="#t_g" x="188.5"/><use href="#t_i" x="201.5"/><use href="#t_s" x="208"/><use href="#t_r" x="221"/><use href="#t_e" x="227.5"/><use href="#t_d" x="234"/></g><g transform="translate(149,223) scale(2)"><use href="#t_t"/><use href="#t_h" x="6.5"/><use href="#t_e" x="13"/><use href="#t_r" x="26"/><use href="#t_e" x="32.5"/><use href="#t_p" x="39"/><use href="#t_a" x="45.5"/><use href="#t_i" x="52"/><use href="#t_r" x="58.5"/><use href="#t_w" x="71.5"/><use href="#t_o" x="78"/><use href="#t_r" x="84.5"/><use href="#t_d" x="91"/><use href="#t_w" x="104"/><use href="#t_h" x="110.5"/><use href="#t_e" x="117"/><use href="#t_n" x="123.5"/><use href="#t_s" x="136.5"/><use href="#t_o" x="143"/><use href="#t_m" x="149.5"/><use href="#t_e" x="156"/><use href="#t_t" x="162.5"/><use href="#t_h" x="169"/><use href="#t_i" x="175.5"/><use href="#t_n" x="182"/><use href="#t_g" x="188.5"/><use href="#t_i" x="201.5"/><use href="#t_s" x="208"/><use href="#t_r" x="221"/><use href="#t_e" x="227.5"/><use href="#t_d" x="234"/></g></g>
+</svg>

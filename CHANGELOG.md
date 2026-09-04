@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- The front door tells the truth. The README says what this is and what it
+  is not, what you need, what it costs, and names the commands (`/doctor`,
+  `/setup`, `/new-content`, `/review`, `/propose`, `/sync`); a lifecycle
+  diagram (`docs/assets/lifecycle.svg`); a coding-agent table for Claude
+  Code, Cursor and Codex; no more advice to fork. `docs/README.md` is
+  grouped by reader. `docs/new-to-github.md` promises one command, once,
+  and defines diff, proposal, merge and check.
+- The check accepts ordinary input and refuses fake dashboards. A
+  capitalised project State passes; bracketed prose in a draft warns while
+  the template's own placeholders still block; a dashboard that still
+  carries the template's example numbers is refused (`data-example` on the
+  template); QMR status and project State vocabularies are cross-checked
+  against `docs/schema.json`; `python3 scripts/test_lint.py` runs every
+  test; `scripts/README.md` indexes the shell scripts, the hook and the
+  tests; seven empty folders gain READMEs; Linux paths for `gh`.
+
+## [0.1.0] - 2026-09-04
+
 - The lifecycle for people who never open a terminal: Sync. Work. Propose.
   Review. Merge. `/sync` (`scripts/sync.py`) brings in the approved copy
   and the gate's tidy-up, turns on the pre-push hook, removes branches
