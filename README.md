@@ -98,6 +98,20 @@ five:
 Expect the agent seats to dominate and everything else to be a rounding
 error.
 
+## See it filled
+
+[examples/beacon/](examples/beacon/) is a fictional company with the
+templates filled: a positioning, messaging, an ideal customer profile, one
+persona, one battlecard, a voice guide, the metric definitions, five
+keywords with a snapshot, a project with its status, a published post,
+three logged decisions, and a quarterly review with its dashboard. Start
+with [the positioning](examples/beacon/strategy/positioning.md),
+[the post](examples/beacon/content/2026-08-what-customers-want-during-an-outage/draft.md)
+and [the review](examples/beacon/reports/qmr/2026-q2/report.md); download
+the dashboard beside the review and open it in a browser. Every path
+mirrors the real one. Delete the folder when you adopt the repo; the doctor
+reminds you.
+
 ## What you get
 
 - **The hierarchy.** A folder structure for a marketing team's second brain:

@@ -36,8 +36,6 @@ connector catalogue.
       `status: published`
 - [ ] Companion `marketing-as-code-website` Astro template repo
 - [ ] Optional GitHub Pages workflow serving `reports/` at a URL
-- [ ] Demo-company branch: a fictional company with every folder filled,
-      for screenshots and the article
 - [ ] Claude Code plugin or skill-marketplace packaging of the skill set
 
 Not planned by the maintainers: monday.com, Zoom, HubSpot, PostHog, GA4,

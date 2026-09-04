@@ -455,6 +455,26 @@ class TestScriptsIndex(LintCase):
         self.assertIn("| [hooks/pre-push](hooks/pre-push) | Refuses a push to main. |", block)
 
 
+class TestExample(LintCase):
+    """examples/beacon/ mirrors the real tree; overlaid on the fixture it must pass every check."""
+
+    def test_beacon_passes_every_check(self):
+        src = ROOT / "examples" / "beacon"
+        if not src.is_dir():
+            self.skipTest("no examples/beacon in this checkout")
+        overlaid = []
+        for path in src.rglob("*"):
+            if path.is_file():
+                rel = path.relative_to(src).as_posix()
+                write(self.root, rel, path.read_bytes())
+                overlaid.append(rel)
+        self.assertGreater(len(overlaid), 20)
+        found = [f for f in self.findings() if f.level != lint.INFO and f.check != "context-stale"]
+        self.assertEqual([], [(f.path, f.message) for f in found])
+        self.assertEqual([], [f.path for f in self.findings("template") if f.path in overlaid])
+        self.assertTrue(any(f.path.startswith("reports/qmr/") for f in self.findings("report-example")) is False)
+
+
 class TestClassify(unittest.TestCase):
     def test_bookkeeping_globs(self):
         globs = SCHEMA["bookkeeping"]["globs"]

@@ -564,7 +564,7 @@ def check_reports(ctx):
             out.append(Finding(WARNING, rel, "ad hoc reports live in adhoc/YYYY-MM-DD-<question>/", "report-naming"))
         elif kind == "qmr" and not re.match(n["report_qmr"], parts[2]):
             out.append(Finding(WARNING, rel, "QMRs live in qmr/<year>-q<n>/", "report-naming"))
-        if rel.endswith(".md"):
+        if rel.endswith(".md") and name != "data-checklist.md":
             text = ctx.text(rel)
             qmr_states = ctx.schema.get("reports", {}).get("qmr_states", [])
             sm = re.search(r"^- \*\*Status:\*\* (.+)$", text, re.M) if kind == "qmr" and name == "report.md" else None

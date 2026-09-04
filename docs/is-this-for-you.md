@@ -168,7 +168,7 @@ in six months.
   both exist. Set the date before you start.
 - **First impressions.** An unfilled ontology makes agents ask instead of
   answer, by design. To a skeptic that looks like failure. Run `/setup`
-  before anyone sees a demo.
+  before anyone sees a demo, and show `examples/beacon/` in the meantime.
 
 ### What to do about it
 
