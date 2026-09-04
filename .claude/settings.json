@@ -32,5 +32,19 @@
       "Bash(git push * --force*)"
     ],
     "disableBypassPermissionsMode": "disable"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/doctor.py\" --brief",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
   }
 }

@@ -18,8 +18,9 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#what-this-is-and-what-it-is-not">What this is</a> ·
   <a href="docs/is-this-for-you.md">Is this for you?</a> ·
+  <a href="docs/week-one.md">Week one</a> ·
   <a href="#which-coding-agent">Which agent?</a> ·
-  <a href="#a-blueprint-not-a-product">Make it yours</a> ·
+  <a href="docs/make-it-yours.md">Make it yours</a> ·
   <a href="docs/new-to-github.md">New to GitHub?</a>
 </p>
 
@@ -97,6 +98,20 @@ five:
 Expect the agent seats to dominate and everything else to be a rounding
 error.
 
+## See it filled
+
+[examples/beacon/](examples/beacon/) is a fictional company with the
+templates filled: a positioning, messaging, an ideal customer profile, one
+persona, one battlecard, a voice guide, the metric definitions, five
+keywords with a snapshot, a project with its status, a published post,
+three logged decisions, and a quarterly review with its dashboard. Start
+with [the positioning](examples/beacon/strategy/positioning.md),
+[the post](examples/beacon/content/2026-08-what-customers-want-during-an-outage/draft.md)
+and [the review](examples/beacon/reports/qmr/2026-q2/report.md); download
+the dashboard beside the review and open it in a browser. Every path
+mirrors the real one. Delete the folder when you adopt the repo; the doctor
+reminds you.
+
 ## What you get
 
 - **The hierarchy.** A folder structure for a marketing team's second brain:
@@ -151,8 +166,8 @@ technical parts for you.
 3. **Say `/doctor`.** It names the one thing to set up on this computer, a
    GitHub login, once, and tells you when you are ready.
 4. **Say `/setup`.** The interview fills the strategy, voice and metric
-   templates from your answers and connects only the tools you use. Four
-   rounds are enough for day one.
+   templates from your answers and connects only the tools you use. Rounds
+   1 to 5 and round 10 are enough for day one.
 5. **Do one real piece of work.** `/new-content` drafts a piece in your
    voice, `/review` checks it against your strategy, `/propose` opens the
    proposal, and you read the diff and click Merge. Or drop a transcript in
@@ -163,7 +178,9 @@ technical parts for you.
    and `/add-integration` builds it by
    [the guide](integrations/adding-an-integration.md).
 
-That loop is the whole ritual ([docs/workflow.md](docs/workflow.md)):
+The full first week, in order, one command per step:
+[docs/week-one.md](docs/week-one.md). That loop is the whole ritual
+([docs/workflow.md](docs/workflow.md)):
 
 <p align="center">
   <img src="docs/assets/lifecycle.svg" alt="The lifecycle as pixel-art panels under a sign reading ONE LOOP: Sync (get the latest), Work (ask the agent), Propose (open the proposal), Review (read the diff), Merge (click merge), and a red Doctor panel below: the repair word when something is red" width="720">
@@ -205,6 +222,10 @@ MCP server first, its CLI second, a small script last.
 Nothing here needs a server. Work runs where a person is typing to a coding
 agent, or on a schedule in GitHub Actions.
 [docs/operating-model.md](docs/operating-model.md) lays out the trade-off.
+
+What to rename, replace and delete when you adopt it, and how to take
+later improvements from the template without touching your own files, is
+in [docs/make-it-yours.md](docs/make-it-yours.md).
 
 ## Four kinds of files
 

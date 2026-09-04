@@ -49,7 +49,7 @@ jobs:
           gh pr create --title "Housekeeping: $date" --base "$BASE" --head "$branch" --body "$(cat <<'BODY'
           The weekly tidy-up: the safe fixes from `python3 scripts/lint.py --fix` applied to the approved copy (regenerated roster tables, missing `.gitkeep` files, line endings, file names).
 
-          Nothing here changes what the team knows; it keeps the wiring straight. If the checks are green the gate merges this proposal. If you would rather look first, read the diff; it is short.
+          Nothing here changes what the team knows; it keeps the wiring straight. If the checks are green the gate merges this proposal. If you would rather look first, read the diff; it is short. First time seeing one of these? docs/operating-model.md says what runs on a schedule and how to turn it off.
           BODY
           )"
           gh workflow run check.yml --ref "$branch"

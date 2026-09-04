@@ -115,3 +115,16 @@ Whatever the mode, these need a person every time (AGENTS.md rule 3,
 When you add an integration or a workflow, add its row here. The checklist
 in [integrations/adding-an-integration.md](../integrations/adding-an-integration.md)
 asks for it.
+
+## Turning a workflow off
+
+Two scheduled workflows run in every copy of this repo whether or not you
+asked: `housekeeping.yml` opens a tidy-up proposal on Mondays, which
+merges itself once the check is green, and `transcripts-cron.yml` runs
+daily and does nothing until a Granola key exists. The first Monday's
+"Housekeeping" proposal is expected; it is short, read it once.
+
+To stop one: on GitHub, Actions tab, pick the workflow, the "..." menu,
+"Disable workflow". The file stays and you can turn it back on. To remove
+it for good, delete the file under `.github/workflows/` and its row in the
+table above, in a proposal.

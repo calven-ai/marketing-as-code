@@ -6,8 +6,11 @@ owner:
 
 # Voice and tone
 
-> **Template: unfilled.** Agents: if the placeholders are still here, ask
-> the team (or run `/setup`) before writing anything an outsider will see.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. In the frontmatter, `last_reviewed` is a date (YYYY-MM-DD)
+> and `source` stays `repo` unless you connect a context layer. Agents: if the
+> placeholders are still here, ask the team (or run `/setup`) before writing
+> anything an outsider will see.
 
 ## The voice in three adjectives
 

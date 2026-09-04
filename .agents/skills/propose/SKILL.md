@@ -42,5 +42,7 @@ title, the description, the fixes the script cannot make).
 - Never run `git push --force`, `gh pr merge`, `gh pr review`, or push to
   `main`. The script does not either.
 - Content goes through `/review` before it is proposed as `in-review` or
-  `published`; suggest it when the proposal holds a draft.
+  `published`; suggest it when the proposal holds a draft. A draft that
+  flips to `published` in this proposal must carry `published` (the date)
+  and `published_url`; confirm both before running.
 - Never include credentials or a customer's personal data.

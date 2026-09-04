@@ -13,6 +13,27 @@ All notable changes to this project are documented here. The format follows
   Code, Cursor and Codex; no more advice to fork. `docs/README.md` is
   grouped by reader. `docs/new-to-github.md` promises one command, once,
   and defines diff, proposal, merge and check.
+- The worked example: `examples/beacon/`, a fictional company with the
+  templates filled, mirroring the real paths; the check's tests overlay it
+  onto a fixture repository so it passes every rule. The README's "See it
+  filled" links into it; the doctor asks for its removal once your own
+  templates are filled.
+- Week one: `docs/week-one.md`, the first week in order, one command per
+  step; `new-content` and `review` state what they need and `review` stops
+  on an unfilled repo; a `battlecard` skill, with battlecards carrying
+  `last_reviewed` and `owner` and covered by the freshness rule; every
+  template marker speaks to the person first and says what to fill first;
+  the strategy notes say the headings match a context layer's documents
+  and may change; the publish step is written down.
+- Safe adoption: `docs/make-it-yours.md`, the checklist of what to rename,
+  replace and delete, and how to take later improvements from the
+  template; an `adoption` check that lists the residue in the doctor;
+  `repo.private` ships true and `review.self_merge` false, with the
+  `REVIEW_SELF_MERGE` repository variable for a repository that keeps the
+  file as shipped; `/setup` gains a competitors round and a "make the repo
+  real" round and seeds the tables; a `SessionStart` hook prints the
+  doctor's lines; the maintainer's decisions leave the decision log; the
+  scheduled workflows are explained with an off switch.
 - The check accepts ordinary input and refuses fake dashboards. A
   capitalised project State passes; bracketed prose in a draft warns while
   the template's own placeholders still block; a dashboard that still

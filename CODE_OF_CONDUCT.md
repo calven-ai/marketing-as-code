@@ -1,5 +1,8 @@
 # Contributor Covenant Code of Conduct
 
+> In your own copy of this template, replace the contact address under
+> Enforcement with your team's (docs/make-it-yours.md).
+
 ## Our Pledge
 
 We as members, contributors, and leaders pledge to make participation in our

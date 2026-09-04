@@ -51,6 +51,10 @@ this skill is the procedure, that file is the reasoning and the contract.
    description. Tell the human, in a short list, what they must do that you
    cannot: the OAuth grant on first use, the key to put in `.env`, the
    repository secret to add, the scope to grant in the vendor's settings.
+   Then say, in one paragraph, what they will be asked to review: a
+   registry row, `.env.example` lines, and either an MCP entry or a
+   script. They read the row and the description; the check reads the
+   code.
 
 ## Rules
 

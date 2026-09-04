@@ -67,10 +67,13 @@ or Pro the checks are enforced; on Free they advise
 ([github-settings.md](github-settings.md)).
 
 One maintainer? GitHub never lets an author approve their own proposal,
-so set `review.self_merge` to `true` in `docs/schema.json`. The gate then
-passes a needs-review proposal and your merge is the approval. Nothing
-merges on its own, and you still read the diff. Set it back to `false`
-the day a second person joins.
+so set `review.self_merge` to `true` in `docs/schema.json` (`/setup` asks
+how many people merge and sets it). The gate then passes a needs-review
+proposal and your merge is the approval. Nothing merges on its own, and
+you still read the diff. The template ships `false`; set it back to
+`false` the day a second person joins. A repository that must keep the
+file as shipped (the template itself) sets the Actions variable
+`REVIEW_SELF_MERGE` to `true` instead, which has the same effect.
 
 ## Review rhythm
 

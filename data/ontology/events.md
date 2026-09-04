@@ -1,7 +1,8 @@
 # Event taxonomy
 
-> **Template: unfilled.** Agents: never guess what an event name means or
-> which system emits it.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. Agents: never guess what an event name means or which system
+> emits it.
 
 One row per tracked event that matters to marketing.
 

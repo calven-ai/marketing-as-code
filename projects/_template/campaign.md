@@ -20,6 +20,6 @@ projects each keep their own `brief.md`.
 
 ## Projects in this campaign
 
-| Project | Owner | Status |
+| Project | Owner | Brief |
 | --- | --- | --- |
-| `webinar/` (link its `brief.md`) | | |
+| `webinar/` | [owner] | [link its `brief.md`; its status lives in its own `status.md`] |

@@ -1,6 +1,7 @@
 # Funnel and lifecycle stages
 
-> **Template: unfilled.** Agents: ask rather than assume stage semantics.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. Agents: ask rather than assume stage semantics.
 
 ## Stages, in order
 

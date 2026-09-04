@@ -7,13 +7,18 @@ owner:
 
 # Positioning
 
-> **Template: unfilled.** Agents: if the placeholders below are still here,
-> ask the team (or run `/setup`) instead of assuming a positioning.
+> **Template: unfilled.** Type over the brackets, or say `/setup` and answer a
+> few questions. In the frontmatter, `last_reviewed` is a date (YYYY-MM-DD),
+> `source` stays `repo` unless you connect a context layer, and `document`
+> stays as it is. Agents: if the placeholders below are still here, ask the
+> team (or run `/setup`) instead of assuming a positioning.
 
-The eight sections below mirror the Positioning document a marketing context
-layer serves over MCP (see
-[integrations/context-layer.md](../integrations/context-layer.md)). Keep the
-headings as they are; fill the bodies.
+The eight sections below match the Positioning document a marketing context
+layer serves (see
+[integrations/context-layer.md](../integrations/context-layer.md)), so
+connecting one later restructures nothing. Fill the bodies; drop a section
+that does not fit your company. The statement and the alternatives first;
+the rest can wait for the first campaign.
 
 ## Positioning Statement
 

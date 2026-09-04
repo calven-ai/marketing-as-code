@@ -6,6 +6,7 @@ CI runs it before the lint itself, so a broken check never guards a repo.
 """
 
 import json
+import os
 import shutil
 import sys
 import tempfile
@@ -56,6 +57,8 @@ def make_repo(root):
     write(root, ".agents/skills/review/SKILL.md",
           "---\nname: review\ndescription: Review a draft. Use when asked.\nmetadata:\n  kind: workflow\n  needs: nothing\n---\n\n# Review\n")
     for rel in SCHEMA["context_files"]:
+        if "*" in rel:
+            continue
         write(root, rel, FRONT.replace("source: repo", "document: x\nsource: repo") if rel.startswith("strategy") else FRONT)
     return root
 
@@ -328,11 +331,12 @@ class TestRepoHygiene(LintCase):
         self.assertEqual({"memory/knowledge/notes.md"}, paths)
 
     def test_pii_level_follows_privacy(self):
-        write(self.root, "data/accounts/snapshots/2026-01-01-apify-people.csv", "name,email\nA,a@corp.io\n")
-        self.assertTrue(self.findings("pii", lint.WARNING))
-        private = dict(SCHEMA, repo={"private": True})
-        ctx = lint.Ctx(root=self.root, schema=private)
-        self.assertTrue([f for f in lint.check_pii(ctx) if f.level == lint.INFO])
+        write(self.root, "data/crm/snapshots/2026-01-01-hubspot-contacts.csv", "email\nana@gmail.com\n")
+        self.assertTrue(self.findings("pii", lint.INFO))  # the template ships repo.private: true
+        public = json.loads(json.dumps(SCHEMA))
+        public["repo"]["private"] = False
+        found = [f for f in lint.run_checks(lint.Ctx(root=self.root, schema=public)) if f.check == "pii"]
+        self.assertEqual([lint.WARNING], [f.level for f in found])
 
 
 class TestConfigs(LintCase):
@@ -393,6 +397,51 @@ class TestSkillsAndDocs(LintCase):
         self.assertIn("| Agent | What it does | Needs |", (self.root / "agents/README.md").read_text())
 
 
+class TestCompetitive(LintCase):
+    def test_battlecards_carry_frontmatter_and_age(self):
+        write(self.root, "strategy/competitive/README.md", "# competitive\n")
+        write(self.root, "strategy/competitive/_battlecard-template.md", "# [Competitor]\n")
+        self.assertClean()
+        write(self.root, "strategy/competitive/acme.md", "# Acme\n")
+        self.assertTrue(self.findings("frontmatter", lint.ERROR))
+        write(self.root, "strategy/competitive/acme.md", "---\nlast_reviewed: 2020-01-01\nowner: Ana\n---\n\n# Acme\n")
+        self.assertFalse(self.findings("frontmatter"))
+        self.assertTrue(self.findings("context-stale", lint.WARNING))
+
+
+class TestAdoption(LintCase):
+    def test_clean_fixture_has_no_residue(self):
+        self.assertFalse(self.findings("adoption"))
+
+    def test_each_marker_is_reported(self):
+        write(self.root, ".github/CODEOWNERS", "strategy/ @owner-placeholder\n")
+        write(self.root, "SECURITY.md", "# Security\n\nhttps://github.com/calven-ai/marketing-as-code/security\n")
+        write(self.root, "CODE_OF_CONDUCT.md", "# Conduct\n\noss@calven.ai\n")
+        write(self.root, "memory/decision-log.md", "# Log\n\n---\n\n## 2026-09-01: x\n\n- **Decided by:** Ana (repository maintainer)\n"
+              "- **Source:** a\n- **Context:** b\n- **Follow-ups:** none\n")
+        write(self.root, "data/seo/keywords.csv", "keyword,intent,target_url,difficulty,volume,current_rank,last_checked,notes\n"
+              "x,commercial,/x,1,1,1,2026-01-01,example row: replace me\n")
+        found = self.findings("adoption")
+        self.assertEqual(5, len(found))
+        self.assertTrue(all(f.level == lint.INFO and "make-it-yours" in f.message for f in found))
+
+    def test_example_company_is_flagged_once_templates_are_filled(self):
+        write(self.root, "examples/beacon/strategy/positioning.md", "# Beacon\n")
+        self.assertTrue(any(f.path == "examples" for f in self.findings("adoption")))
+        for rel in SCHEMA["templates"]:
+            if not rel.startswith("_"):
+                write(self.root, rel, "# t\n\n> **" + SCHEMA["templates"][rel] + ".**\n")
+        self.assertFalse(any(f.path == "examples" for f in self.findings("adoption")))
+
+    def test_public_repo_with_personal_data(self):
+        write(self.root, "data/accounts/target-accounts.csv", "company,domain,tier,owner,status,notes\nAcme,acme.com,1,,prospect,\n")
+        self.assertFalse(self.findings("adoption"))  # ships private: true
+        public = json.loads(json.dumps(SCHEMA))
+        public["repo"]["private"] = False
+        found = [f for f in lint.run_checks(lint.Ctx(root=self.root, schema=public)) if f.check == "adoption"]
+        self.assertTrue(any("repo.private" in f.message for f in found))
+
+
 class TestScriptsIndex(LintCase):
     def test_scripts_block_lists_shell_hooks_and_tests(self):
         write(self.root, "scripts/doctor.py", '"""Health check.\n\nMore."""\n')
@@ -404,6 +453,26 @@ class TestScriptsIndex(LintCase):
         self.assertIn("| [test_lint.py](test_lint.py) | Tests for lint. |", block)
         self.assertIn("| [with_env.sh](with_env.sh) | Start a command with .env loaded. |", block)
         self.assertIn("| [hooks/pre-push](hooks/pre-push) | Refuses a push to main. |", block)
+
+
+class TestExample(LintCase):
+    """examples/beacon/ mirrors the real tree; overlaid on the fixture it must pass every check."""
+
+    def test_beacon_passes_every_check(self):
+        src = ROOT / "examples" / "beacon"
+        if not src.is_dir():
+            self.skipTest("no examples/beacon in this checkout")
+        overlaid = []
+        for path in src.rglob("*"):
+            if path.is_file():
+                rel = path.relative_to(src).as_posix()
+                write(self.root, rel, path.read_bytes())
+                overlaid.append(rel)
+        self.assertGreater(len(overlaid), 20)
+        found = [f for f in self.findings() if f.level != lint.INFO and f.check != "context-stale"]
+        self.assertEqual([], [(f.path, f.message) for f in found])
+        self.assertEqual([], [f.path for f in self.findings("template") if f.path in overlaid])
+        self.assertTrue(any(f.path.startswith("reports/qmr/") for f in self.findings("report-example")) is False)
 
 
 class TestClassify(unittest.TestCase):
@@ -455,6 +524,15 @@ class TestReviewGate(unittest.TestCase):
         self.assertEqual("action_required", v({}, "ana", [], [])[0])  # absent means a team
         self.assertTrue(review_gate.self_merge_allowed(SCHEMA) in (True, False))
 
+    def test_repository_variable_overrides_the_file(self):
+        team = {"review": {"self_merge": False}}
+        os.environ["REVIEW_SELF_MERGE"] = "true"
+        try:
+            self.assertTrue(review_gate.self_merge_allowed(team))
+            self.assertEqual("success", review_gate.needs_review_verdict(team, "ana", [], [])[0])
+        finally:
+            os.environ.pop("REVIEW_SELF_MERGE", None)
+        self.assertFalse(review_gate.self_merge_allowed(team))
     def test_rule_changing_proposals_are_not_tidied(self):
         self.assertTrue(review_gate.tidy_allowed(["memory/decision-log.md", "projects/x/status.md"]))
         self.assertFalse(review_gate.tidy_allowed(["scripts/lint.py", "scripts/README.md"]))
