@@ -80,6 +80,19 @@ def environment_settings(repo):
     return out
 
 
+def brief(ctx, findings=None):
+    """The three lines the session-start hook and /sync print: problems, stale context, unfilled templates."""
+    findings = lint.run_checks(ctx) if findings is None else findings
+    errors = [f for f in findings if f.level == lint.ERROR]
+    warnings = [f for f in findings if f.level == lint.WARNING]
+    unfilled = [f.path for f in findings if f.check == "template"]
+    stale = [f.path for f in warnings if f.check == "context-stale"]
+    return [f"doctor: {len(errors)} problems, {len(warnings)} warnings"
+            + ("; run python3 scripts/doctor.py" if errors or warnings else ""),
+            f"stale context: {', '.join(stale) if stale else 'none'}",
+            f"unfilled templates: {len(unfilled)}" + (" (run /setup)" if unfilled else "")]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Health check for this checkout.")
     ap.add_argument("--fix", action="store_true", help="apply the safe fixes first")
@@ -104,10 +117,7 @@ def main(argv=None):
               if ctx.exists(rel) and (ctx.fm(rel) or {}).get("source") == "context-layer"]
 
     if args.brief:
-        print(f"doctor: {len(errors)} problems, {len(warnings)} warnings"
-              + ("; run python3 scripts/doctor.py" if errors or warnings else ""))
-        print(f"stale context: {', '.join(stale) if stale else 'none'}")
-        print(f"unfilled templates: {len(unfilled)}" + (" (run /setup)" if unfilled else ""))
+        print("\n".join(brief(ctx, findings)))
         return 1 if errors else 0
 
     if fixed:

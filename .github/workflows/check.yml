@@ -57,7 +57,7 @@ jobs:
           echo "proposal: ${n:-none (main)}"
 
       - name: Test the lint itself
-        run: python3 -m unittest scripts/test_lint.py
+        run: python3 -m unittest scripts/test_lint.py scripts/test_lifecycle.py
 
       - name: Run the health check
         id: doctor

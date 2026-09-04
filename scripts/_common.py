@@ -152,7 +152,11 @@ GH_CANDIDATES = ("/opt/homebrew/bin/gh", "/usr/local/bin/gh", "/usr/bin/gh",
 
 
 def find_gh():
-    """The GitHub CLI executable, or None. Looks past PATH because the desktop app's shell may lack it."""
+    """The GitHub CLI executable, or None. Looks past PATH because the desktop app's shell may lack it.
+    GH_EXE pins it (tests point it at a fake, or at a path that does not exist to mean "no gh")."""
+    pinned = os.environ.get("GH_EXE")
+    if pinned is not None:
+        return pinned if Path(pinned).is_file() else None
     found = shutil.which("gh")
     if found:
         return found
@@ -180,7 +184,8 @@ ORIGIN_RE = re.compile(r"(?:github\.com[:/])([^/\s]+)/([^/\s]+?)(?:\.git)?/?$")
 
 def origin_repo(cwd=None):
     """'owner/name' parsed from the origin URL (ssh or https), or None without a GitHub origin."""
-    url = run(["git", "remote", "get-url", "origin"], cwd=cwd, check=False).stdout.strip()
+    # The configured value, not get-url's rewritten one: an insteadOf rule must not hide GitHub.
+    url = run(["git", "config", "--get", "remote.origin.url"], cwd=cwd, check=False).stdout.strip()
     m = ORIGIN_RE.search(url)
     return f"{m.group(1)}/{m.group(2)}" if m else None
 
