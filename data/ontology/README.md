@@ -9,6 +9,7 @@ writing `data/` loads this folder first** (AGENTS.md ground rule 2).
 | [funnel.md](funnel.md) | Lifecycle and pipeline stages, and what each transition means |
 | [events.md](events.md) | The event taxonomy: names, properties, emitting system |
 | [naming.md](naming.md) | UTM and campaign naming conventions |
+| `scoring.md` (optional) | Lead scoring, routing rules and the MQL-to-SDR handoff SLA; written by the `lead-lifecycle-spec` skill when the team defines them; absent until then |
 
 If a definition is still a template placeholder, agents **ask the team**
 instead of assuming an industry-standard meaning. "MQL" means something

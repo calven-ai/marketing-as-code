@@ -1,0 +1,13 @@
+{
+  "_doc": "Which vendor each integration category is bound to in this repo. scripts/wire_integration.py edits it; scripts/lint.py renders it into integrations/README.md and checks that .mcp.json agrees. Skills name a category in metadata.needs; this file says which vendor fills it here. custom_servers lists .mcp.json servers that are not in the catalog, each with a one-line reason.",
+  "wired": {
+    "seo-data": {"vendor": "dataforseo", "variant": "local", "routes": ["mcp", "script"], "writes": "n/a", "since": "2026-08-31"},
+    "ai-visibility": {"vendor": "dataforseo", "variant": "local", "routes": ["mcp"], "writes": "n/a", "since": "2026-08-31"},
+    "scraping-search": {"vendor": "apify", "variant": "oauth", "routes": ["mcp"], "writes": "allowed", "since": "2026-08-31"},
+    "context-layer": {"vendor": "calven", "variant": "key", "routes": ["mcp"], "writes": "n/a", "since": "2026-08-31"},
+    "transcripts": {"vendor": "granola", "routes": ["script"], "writes": "n/a", "since": "2026-08-31"},
+    "chat": {"vendor": "slack", "routes": ["script"], "writes": "allowed", "since": "2026-08-31"},
+    "tasks": {"vendor": null, "routes": ["manual"], "note": "in-repo checklists, the fallback in integrations/tasks.md; /setup binds the team's tool"}
+  },
+  "custom_servers": {}
+}
