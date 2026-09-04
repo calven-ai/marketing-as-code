@@ -21,6 +21,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _lifecycle  # noqa: E402
+import doctor  # noqa: E402
 import propose  # noqa: E402
 import sync  # noqa: E402
 from test_lint import SCHEMA, draft, make_repo, write  # noqa: E402
@@ -45,7 +46,8 @@ case "$1 $2" in
     else echo '[]'; fi;;
   "pr create") echo "https://github.com/ana/repo/pull/7";;
   "pr checks") exit 0;;
-  "api") case "$3" in user) echo '{"login":"ana","id":1}';; *) echo '{}';; esac;;
+  "api user") echo '{"login":"ana","id":1}';;
+  "api "*) echo '{}';;
 esac
 exit 0
 '''
@@ -347,6 +349,33 @@ class TestSync(LifecycleCase):
         code, out = self.sync("--dry-run")
         self.assertIn("Would bring in 1 changes from the approved copy.", out["lines"])
         self.assertNotEqual(git(self.work, "rev-parse", "HEAD"), self.origin_rev("main"))
+
+
+class TestDoctorMachine(LifecycleCase):
+    def test_fix_sets_hook_and_identity_from_github(self):
+        (self.tmp / "gitconfig").write_text(f"[url \"{self.tmp / 'origin.git'}\"]\n\tinsteadOf = {REPO_URL}\n")
+        notes, fixed = doctor.local_setup(self.work, fix=True)
+        self.assertEqual([], notes)
+        self.assertEqual(2, len(fixed), fixed)
+        self.assertEqual("ana", git(self.work, "config", "user.name"))
+        self.assertEqual("1+ana@users.noreply.github.com", git(self.work, "config", "user.email"))
+        self.assertEqual("scripts/hooks", git(self.work, "config", "core.hooksPath"))
+        self.assertIn("auth setup-git", self.gh_log())
+
+    def test_without_fix_it_only_reports(self):
+        notes, fixed = doctor.local_setup(self.work, fix=False)
+        self.assertEqual([], fixed)
+        self.assertTrue(any("pre-push hook is off" in n for n in notes), notes)
+        self.assertEqual("", sh(self.work, "config", "core.hooksPath").stdout.strip())
+
+    def test_no_gh_and_logged_out(self):
+        os.environ["GH_EXE"] = str(self.tmp / "no-such-gh")
+        notes, _ = doctor.local_setup(self.work)
+        self.assertIn(doctor.NO_GH, notes)
+        os.environ["GH_EXE"] = str(self.tmp / "bin" / "gh")
+        os.environ["GH_FAKE_LOGGED_OUT"] = "1"
+        notes, _ = doctor.local_setup(self.work)
+        self.assertIn(doctor.NOT_LOGGED_IN, notes)
 
 
 class TestPureParts(unittest.TestCase):

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Health check for a marketing-as-code checkout: runs every check in
 scripts/lint.py against docs/schema.json, then reports unfilled templates,
-context files past their review date, and whether an .env exists. --fix
-applies the safe fixes first; --strict fails on warnings too (CI on main);
---brief prints three lines for the session-start hook; --github checks the
-repository settings through gh. Exit 1 only on real breakage.
+context files past their review date, whether an .env exists, and whether
+this machine is ready to propose (git, your name, the pre-push hook, the
+GitHub CLI and its login). --fix applies the safe fixes first, turns the
+hook on and sets your name from your GitHub login; --strict fails on
+warnings too (CI on main); --brief prints three lines for the session-start
+hook; --github checks the repository settings through gh. Exit 1 only on
+real breakage.
 
 Run from the repo root:  python3 scripts/doctor.py
 
@@ -15,13 +18,14 @@ green doctor here means a green check there.
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lint  # noqa: E402
-from _common import find_gh, origin_repo, run  # noqa: E402
+from _common import find_gh, gh_ready, origin_repo, run  # noqa: E402
 
 ROOT = lint.ROOT
 
@@ -80,6 +84,66 @@ def environment_settings(repo):
     return out
 
 
+NO_GH = "GitHub CLI is not installed. Download it from cli.github.com, then say /doctor again."
+NOT_LOGGED_IN = "Not logged in to GitHub. Run: gh auth login --web (it opens your browser and shows a code)."
+
+
+def local_setup(root=ROOT, fix=False):
+    """'Your machine' notes: what stops /propose from working here, and what --fix set right.
+    Returns (notes, fixed). Never asks for or prints a key."""
+    notes, fixed = [], []
+    if shutil.which("git") is None:
+        notes.append("git is not installed. On a Mac run `xcode-select --install`; on Windows install Git for "
+                     "Windows (docs/troubleshooting.md).")
+        return notes, fixed
+    if not (Path(root) / ".git").exists():
+        notes.append("this folder is not a copy of the repository yet; clone it with GitHub Desktop (docs/new-to-github.md)")
+    elif not origin_repo(root):
+        notes.append("this copy is not connected to a repository on GitHub (docs/new-to-github.md)")
+    exe = find_gh()
+    logged_in = bool(exe) and gh_ready(root)
+    name = run(["git", "config", "user.name"], cwd=root, check=False).stdout.strip()
+    email = run(["git", "config", "user.email"], cwd=root, check=False).stdout.strip()
+    if not (name and email):
+        user = None
+        if fix and logged_in:
+            try:
+                user = json.loads(run([exe, "api", "user"], cwd=root, check=False).stdout or "{}")
+            except json.JSONDecodeError:
+                user = None
+        if user and user.get("login"):
+            login = user["login"]
+            run(["git", "config", "--global", "user.name", name or login], cwd=root, check=False)
+            run(["git", "config", "--global", "user.email", email or f"{user.get('id', 0)}+{login}@users.noreply.github.com"],
+                cwd=root, check=False)
+            fixed.append("set your name and email for commits from your GitHub login")
+        else:
+            notes.append("Git does not know your name yet. Log in to GitHub (below) and run `python3 scripts/doctor.py "
+                         "--fix`, or set it once: git config --global user.name \"Your Name\" and user.email")
+    hooks = run(["git", "config", "core.hooksPath"], cwd=root, check=False).stdout.strip()
+    if hooks != "scripts/hooks" and (Path(root) / "scripts" / "hooks").is_dir():
+        if fix:
+            run(["git", "config", "core.hooksPath", "scripts/hooks"], cwd=root, check=False)
+            fixed.append("turned on the safety check that runs before anything leaves this computer")
+        else:
+            notes.append("the pre-push hook is off in this clone; turn it on once: git config core.hooksPath scripts/hooks")
+    if not exe:
+        notes.append(NO_GH)
+    elif not logged_in:
+        notes.append(NOT_LOGGED_IN)
+    else:
+        helpers = run(["git", "config", "--get-all", "credential.helper"], cwd=root, check=False).stdout
+        if not any(k in helpers for k in ("gh", "osxkeychain", "manager", "store", "cache")):
+            if fix:
+                run([exe, "auth", "setup-git"], cwd=root, check=False)
+                fixed.append("let git use your GitHub login when pushing")
+            else:
+                notes.append("git may ask for a password when pushing; run once: gh auth setup-git")
+    if sys.version_info < (3, 9):
+        notes.append(f"Python {sys.version_info.major}.{sys.version_info.minor} is old; the scripts need 3.9 or newer")
+    return notes, fixed
+
+
 def brief(ctx, findings=None):
     """The three lines the session-start hook and /sync print: problems, stale context, unfilled templates."""
     findings = lint.run_checks(ctx) if findings is None else findings
@@ -130,9 +194,15 @@ def main(argv=None):
         print("info: .env present (gitignored; keep it that way)")
     else:
         print("info: no .env; fine unless you use key-based integrations (copy .env.example)")
-    hooks = subprocess.run(["git", "config", "core.hooksPath"], capture_output=True, text=True, cwd=str(ROOT)).stdout.strip()
-    if hooks != "scripts/hooks":
-        print("info: the pre-push hook is off in this clone; turn it on once: git config core.hooksPath scripts/hooks")
+    notes, done = local_setup(ROOT, fix=args.fix)
+    for line in done:
+        print(f"fixed: {line}")
+    if notes:
+        print("\nYour machine:")
+        for n in notes:
+            print(f"  - {n}")
+    else:
+        print("info: your machine is ready to propose")
 
     if unfilled:
         print(f"\nunfilled templates ({len(unfilled)}), run /setup to fill them:")
