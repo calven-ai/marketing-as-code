@@ -1,16 +1,15 @@
 # memory/transcripts/
 
-The transcript pipeline (details in [`../README.md`](../README.md)):
+Where meeting transcripts land, and where they go once processed. The
+pipeline is in [`../README.md`](../README.md).
 
-- **`inbox/`**: new transcripts land here. Drag a file in, or let
-  `scripts/pull_transcripts.py` fetch them from Granola. Name:
-  `YYYY-MM-DD-<meeting>.md` (`.txt`/`.vtt` fine too). The daily
-  `transcripts-cron` GitHub Action runs the same script and opens a pull
-  request titled "Transcripts: <date>" when something new landed. The inbox
-  is agent-maintained, so that proposal is bookkeeping and merges itself
-  once the checks pass; then process.
-- **`processed/`**: the `chief-of-staff` skill moves transcripts here after
-  extracting decisions, project status, action items, facts, and red flags.
+- **`inbox/`**: new transcripts. Drag a file in, or let
+  `scripts/pull_transcripts.py` fetch them from Granola. The daily
+  `transcripts-cron` GitHub Action runs the same script and opens a
+  "Transcripts: <date>" pull request when something landed. That proposal is
+  bookkeeping, so it merges itself once the checks pass.
+- **`processed/`**: where the `chief-of-staff` skill moves a transcript after
+  extracting decisions, project status, action items, facts and red flags.
   Nothing is deleted.
 
 ## The inbox contract
@@ -53,13 +52,9 @@ attendees: ["Maria", "Tom"]
 **Tom:** Then we move the date and tell the speaker today.
 ```
 
-To process what's waiting, two ways, your choice per
-[docs/operating-model.md](../../docs/operating-model.md):
-
-- **A person, after the meeting** (the default): ask your agent to
-  "process the transcript inbox" (or `/chief-of-staff`). Costs nothing
-  beyond the coding-agent subscription; the person watches the run.
-- **Unattended**: `.github/workflows/transcripts-process.yml` runs the same
-  skill as an agent in GitHub Actions whenever transcripts land on `main`,
-  and opens a "Transcripts processed" PR. Opt-in: it does nothing until the
-  `ANTHROPIC_API_KEY` repository secret exists, and it bills per run.
+To process what is waiting, ask your agent to "process the transcript inbox"
+(or run `/chief-of-staff`). Unattended, `.github/workflows/transcripts-process.yml`
+runs the same skill in GitHub Actions when transcripts land on `main`; it
+does nothing until the `ANTHROPIC_API_KEY` repository secret exists, and it
+bills per run. The trade-off is in
+[docs/operating-model.md](../../docs/operating-model.md).

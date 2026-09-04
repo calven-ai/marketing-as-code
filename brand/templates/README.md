@@ -6,4 +6,4 @@ Reusable design templates:
   composes article titles onto for social-share images.
 - Social post templates, banner templates, and similar reusable frames.
 
-Binary files are sanctioned here (and only here, plus `../logos/`).
+Binary files are sanctioned here, and only here plus `../logos/`.

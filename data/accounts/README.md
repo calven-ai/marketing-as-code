@@ -25,6 +25,6 @@ enrichment outputs.
 ## Rules
 
 - Research individuals only in a B2B, account-context way, and keep personal
-  data out of any public copy (same PII rule as the rest of `data/`). A
-  snapshot with names or profile URLs belongs in a private repo only.
-- Research is read-only: no agent contacts anyone it finds here.
+  data out of any public copy (the PII rule from `data/`). A snapshot with
+  names or profile URLs belongs in a private repo only.
+- Research is read-only. No agent contacts anyone it finds here.

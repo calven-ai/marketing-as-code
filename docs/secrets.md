@@ -1,26 +1,9 @@
 # Secrets: who holds which key, and where it lives
 
-Every integration in this repo needs one of three things: nothing (OAuth,
-you sign in with your browser), a key that belongs to you, or a key that
-belongs to a bot. This page says which is which, where each one lives, and
-what the agents can and cannot do with them. Written for the person who
-sets the repo up and for everyone who works in it afterwards.
-
-## Two facts first
-
-1. **Keys in GitHub only serve unattended runs.** A secret stored in GitHub
-   (Settings → Environments, or Settings → Secrets) can be *written* by an
-   admin and *read* by nobody: not by a person, not by a script on a laptop,
-   not by a coding agent. Only a workflow running on GitHub's own machines
-   sees it. So "put the key in GitHub and let the team use it" is not a
-   thing. A person working locally needs their own key; GitHub holds the
-   keys for the daily cron and the optional agent in Actions, and nothing
-   else.
-2. **A key that lands in a commit is burned.** Rotate it at the vendor the
-   moment you notice; removing the commit is not enough, because history is
-   forever and every clone has a copy. The lint refuses to commit anything
-   shaped like a key, and the pre-push hook refuses to push it, but the rule
-   stands regardless.
+Every integration needs one of three things: nothing (OAuth, you sign in
+with your browser), a key that belongs to you, or a key that belongs to a
+bot. Your keys live on your machine. Bot keys live in GitHub. Nothing else
+holds a key, and agents never read one.
 
 ## Who holds which key
 
@@ -35,136 +18,126 @@ sets the repo up and for everyone who works in it afterwards.
 | `SLACK_*_CHANNEL_ID` | not a secret | anyone | repository Actions variables; `.env` | n/a | n/a |
 | `GITHUB_TOKEN` | automatic, per workflow job | GitHub | nowhere; it exists for the length of a job with only the permissions the job declares | automatic | n/a |
 
-Two kinds, then: **your keys**, which each person makes for themselves and
-keeps on their own machine, and **the bot keys**, which one person makes
-once and puts in GitHub. Add a row here for every integration you wire
-([integrations/adding-an-integration.md](../integrations/adding-an-integration.md)
-asks for it).
+Add a row for every integration you wire. The
+[integration guide](../integrations/adding-an-integration.md) asks for it.
 
-**One integrations owner.** Name one person (in
-`.github/CODEOWNERS`, and in `memory/decision-log.md`) who creates the bot identities, puts each bot key in
-the shared vault and in the `automation` environment, and rotates them.
-Everyone else never sees a bot key. This is the "one owner, at setup, then
-rarely" line in [is-this-for-you.md](is-this-for-you.md).
+Two facts shape the table:
+
+- **A key in GitHub only serves unattended runs.** An admin can write it.
+  Nobody can read it back: not a person, not a laptop script, not a coding
+  agent. Only a workflow on GitHub's machines sees it. So a person working
+  locally needs their own key.
+- **A key that lands in a commit is burned.** Rotate it at the vendor the
+  moment you notice. Removing the commit is not enough, because every clone
+  has a copy. The lint refuses to commit anything shaped like a key, and the
+  pre-push hook refuses to push it.
+
+**One integrations owner.** Name one person in `.github/CODEOWNERS` and in
+`memory/decision-log.md`. They create the bot identities, put each bot key
+in the shared vault and in the `automation` environment, and rotate them.
+Everyone else never sees a bot key.
 
 ## Your keys, on your machine
 
 1. Get invited to the vendor's workspace (Calven, DataForSEO, Apify) and
-   generate **your own** key there. Do not ask a teammate for theirs.
+   generate your own key there. Never borrow a teammate's.
 2. Copy `.env.example` to `.env` at the repo root and fill in only the keys
-   for tools you use. `.env` is gitignored; the lint fails if one is ever
-   tracked. Keep a copy of each key in your own 1Password item.
+   for tools you use. `.env` is gitignored, and the lint fails if one is
+   ever tracked. Keep a copy of each key in your own 1Password item.
 3. Start your coding agent with the keys in its environment. The MCP servers
    in `.mcp.json` read placeholders like `${CALVEN_MCP_KEY}` from the
-   **environment**, not from `.env`, so `.env` alone does nothing for them:
+   environment, not from `.env`, so `.env` alone does nothing for them.
    - **Terminal:** `sh scripts/with_env.sh claude` (or `cursor .`, or any
-     command). The launcher exports `.env` and starts the command; it
-     prints nothing.
-   - **Claude desktop app:** it does not read your shell, so open its
-     Local environment editor (the environment settings for local sessions)
-     and add the same variables there; they are stored encrypted on your
-     machine and apply to every local session.
+     command). The launcher exports `.env`, starts the command, and prints
+     nothing.
+   - **Claude desktop app:** it does not read your shell. Add the same
+     variables in its Local environment editor. They are stored encrypted
+     on your machine and apply to every local session.
    - **1Password CLI users:** put references in `.env` instead of values,
-     one per line, like `CALVEN_MCP_KEY=op://Private/Calven MCP/credential`.
-     The launcher sees `op://` and runs the command through `op run`, which
-     resolves the references at start and masks them in output. Scripts
-     refuse an unresolved reference with a message, never by printing it.
+     like `CALVEN_MCP_KEY=op://Private/Calven MCP/credential`. The launcher
+     sees `op://` and runs the command through `op run`, which resolves
+     the references and masks them in output.
 4. Scripts (`scripts/*.py`) read `.env` themselves, so they work either way.
 
 Never paste a key into a chat with an agent, into Slack, or into email. If
-an agent asks you for a key, tell it where the key lives instead; the
-skills are written to do exactly that.
+an agent asks for a key, tell it where the key lives. The skills are
+written to do exactly that.
 
 ## The bot keys, only in GitHub
 
 The daily transcript pull, the Slack alert when `main` is red, and the
-optional agent in Actions run with nobody watching, so they need keys that
-belong to nobody. Those three keys live in one place:
+optional agent in Actions run with nobody watching. Their keys belong to
+nobody and live in one place:
 
 **Settings → Environments → `automation` → Environment secrets.**
 `sh scripts/github_setup.sh` creates the environment and restricts it to
-the `main` branch; the click path is in
-[github-settings.md](github-settings.md). Put `ANTHROPIC_API_KEY`,
-`GRANOLA_API_KEY` and `SLACK_BOT_TOKEN` there, one secret each. Channel IDs
-go under Settings → Secrets and variables → Actions → **Variables**; they
-are not secrets.
+`main`; the click path is in [github-settings.md](github-settings.md). Put
+`ANTHROPIC_API_KEY`, `GRANOLA_API_KEY` and `SLACK_BOT_TOKEN` there, one
+secret each. Channel IDs are not secrets. They go under Settings → Secrets
+and variables → Actions → **Variables**.
 
-Why an environment and not the plain repository secrets one click away: a
-repository secret is readable by any workflow on any branch, so anyone who
-can push a branch could edit a workflow file on that branch to print it. An
-environment restricted to `main` gives its secrets only to jobs running on
-`main`, and only a merged proposal reaches `main`. The shipped workflows
-declare `environment: automation` on exactly the jobs that need a key.
-(On a private repository this restriction needs GitHub Team or Pro, the
-same plan the rulesets need; on Free the environment exists but the
-branch rule is not enforced.)
+Why an environment and not a plain repository secret: a repository secret is
+readable by any workflow on any branch, so anyone who can push a branch can
+print it. An environment restricted to `main` gives its secrets only to
+merged proposals. Which GitHub plan enforces that restriction is in
+[github-settings.md](github-settings.md).
 
 Rules for these keys:
 
-- One secret per key, named exactly as in `.env.example`; never a value in
-  a workflow file.
+- One secret per key, named exactly as in `.env.example`. Never a value in a
+  workflow file.
 - The agent in Actions (`transcripts-process.yml`) gets `ANTHROPIC_API_KEY`
-  and a short-lived GitHub token and nothing else: no shell, no network,
-  no Slack token. The Slack pointer is posted by a plain step after the
-  agent is done, from a fixed template.
+  and a short-lived GitHub token, nothing else. No shell, no network, no
+  Slack token. The Slack pointer is posted by a plain step afterwards, from
+  a fixed template.
 - Scope down at the vendor: read-only, project-scoped, a spend cap on the
   Anthropic key.
-- Cloud and Slack-started coding-agent sessions
-  ([operating-model.md](operating-model.md), mode 3) take their keys from
-  the session's own environment settings in claude.ai, configured by a
-  person; never from the repo.
+- Cloud and Slack-started coding-agent sessions take their keys from the
+  session's own environment settings in claude.ai, configured by a person.
+  Never from the repo ([operating-model.md](operating-model.md), mode 3).
 
 ## What the agent can and cannot read
 
-Agents never read `.env` and never echo key values into files, logs or
-chat. Part of that is enforced by `.claude/settings.json`, which the lint
-keeps intact (`docs/schema.json` lists the required rules), and it is
-worth knowing exactly what it does:
+Agents never read `.env` and never echo a key into files, logs or chat.
+`.claude/settings.json` enforces part of that, and the lint keeps the rules
+intact (`docs/schema.json` lists them). What the rules do:
 
-- **Stops:** the Read tool on any `.env*` file (including `.env.example`,
-  which is why the variable names are also listed in
-  `integrations/README.md`), and the file commands Claude Code recognizes
-  in Bash on those files (`cat`, `head`, `tail`, `sed`, `grep`, `less`,
-  `more`); `env`, `printenv`, `export -p` and `set`, which would print the
-  whole environment, keys included; one-liners (`python3 -c`, `node -e`)
-  that could read a file or the environment by hand; and `gh pr merge`,
-  `gh pr review`, `gh secret` and force-pushes, which are a person's
-  actions. It also switches off the "skip permissions" mode, so an agent
-  in this repo always asks before a command it has no rule for.
-- **Does not stop:** a script the agent is allowed to run, which opens
-  `.env` itself; that is why the scripts in this repo read only the
-  variables they need and never print one. Nor does it stop a person from
-  typing `cat .env` in their own terminal, which is fine: the key is
-  theirs.
-- **Cursor and Codex** read the same skills but not this settings file;
-  their guardrail is the skills' own rules, so hand a Cursor user a
+- **Stop:** the Read tool on any `.env*` file, including `.env.example`
+  (which is why `integrations/README.md` also lists the variable names);
+  `cat`, `head`, `tail`, `sed`, `grep`, `less` and `more` on those files;
+  `env`, `printenv`, `export -p` and `set`; one-liners like `python3 -c`
+  and `node -e`; and `gh pr merge`, `gh pr review`, `gh secret` and
+  force-pushes, which are a person's actions. They also switch off "skip
+  permissions" mode, so an agent here always asks before an unlisted
+  command.
+- **Do not stop:** a script the agent may run, which opens `.env` itself.
+  That is why the scripts read only the variables they need and never print
+  one. Nor do they stop a person typing `cat .env` in their own terminal.
+  That is their key to print.
+- **Cursor and Codex** read the same skills but not this settings file.
+  Their guardrail is the skills' own rules, so hand a Cursor user a
   per-person key, not a bot key.
 
-The deny rules are a seatbelt for accidents and for an agent that has been
-talked into something by a document it read (transcripts, scraped pages,
-vendor output; AGENTS.md rule 11). They are not a sandbox: a person with a
-key and a terminal can always print it, and that is their key to print.
+The deny rules are a seatbelt for accidents and for an agent talked into
+something by a document it read (AGENTS.md rule 11). They are not a sandbox.
 
 ## Sharing, rotation, leaving
 
-- **Never share a key by pasting it.** The sharing mechanism for a bot key
-  is the vault plus the `automation` environment; for a personal key it is
-  "get invited and make your own".
+- **Share** a bot key through the vault and the `automation` environment.
+  Share a personal key by getting the person invited to make their own.
 - **Rotate** a bot key when its owner changes, when someone who had it
-  leaves, when a vendor reports an incident, and on a calendar (twice a
-  year is plenty). Rotating means: new key at the vendor, update the vault
-  item, update the environment secret, revoke the old key. Nothing in the
-  repo changes.
-- **When someone leaves:** remove them from the GitHub repository, the
-  vendor workspaces and the vault; revoke their personal keys where the
-  vendor allows (Calven, Apify); rotate any bot key they held. Write the
-  date in `memory/decision-log.md`.
+  leaves, when a vendor reports an incident, and twice a year. New key at
+  the vendor, update the vault item, update the environment secret, revoke
+  the old key. Nothing in the repo changes.
+- **When someone leaves,** remove them from the repository, the vendor
+  workspaces and the vault. Revoke their personal keys where the vendor
+  allows. Rotate any bot key they held. Date it in `memory/decision-log.md`.
 
 ## If a key leaks
 
-1. Rotate it at the vendor now, before anything else.
-2. If it was in a commit, tell whoever administers the repository; they
-   decide whether to rewrite history (usually not worth it) and they check
-   the vendor's usage log for the window it was exposed.
-3. Log it in `memory/decision-log.md` with the date, the key, and what
-   changed so it does not happen again.
+1. Rotate it at the vendor now.
+2. If it was in a commit, tell whoever administers the repository. They
+   decide whether to rewrite history and check the vendor's usage log for
+   the exposed window.
+3. Log it in `memory/decision-log.md`: the date, the key, and what changed
+   so it does not happen again.

@@ -1,18 +1,76 @@
 # New to GitHub? Start here
 
-> **Status:** outline. This guide is being written for marketers who have
-> never used GitHub or a terminal. It will cover:
+You don't need a terminal to run your marketing from this repo. You need a
+GitHub account, one desktop app, and a coding agent that does the technical
+parts. This guide gets you there. Not sure the repo is for your team at
+all? Read [is-this-for-you.md](is-this-for-you.md) first.
 
-1. What a repository actually is (a shared folder with perfect memory and
-   rules about who changes what), and why plain text matters to AI agents.
-2. Creating a GitHub account and getting your own private copy of this repo.
-3. The no-terminal path: doing everything through the GitHub website, GitHub
-   Desktop, and the Claude desktop app.
-4. The five terms you will actually meet (repo, commit, branch, pull request,
-   issue) and the ones you can safely ignore.
-5. Your first change: edit one file, save it with a message, see the history.
-6. Pointing a coding agent at the repo and letting it do the technical parts.
+## What a repository is
 
-Not sure the repo is for your team at all? Read
-[is-this-for-you.md](is-this-for-you.md) first; this guide assumes you have
-decided to try.
+A repository is a shared folder with perfect memory. Every change is saved
+with a note saying who made it and why, and you can look at any earlier
+version. Nothing is ever lost by accident.
+
+It also has rules about how changes land. Nobody edits the live version
+directly. You make your change on a copy, show it as a proposal, and someone
+merges it. That review step is why agents can work here safely: they
+propose, a person approves.
+
+Everything in this repo is plain text. That is what lets AI agents read your
+positioning and write a draft in your voice. A deck locked in a drive can't
+do that.
+
+## The five words you will meet
+
+- **Repo.** The shared folder. This one.
+- **Commit.** One saved change, with a note.
+- **Branch.** A copy of the repo where you make changes without touching the
+  live version.
+- **Pull request.** A proposal to merge a branch into the live version. This
+  is where review happens.
+- **Issue.** A note to the team about something to do or fix.
+
+You can ignore everything else for now.
+
+## Get your own copy
+
+1. Create a free account at github.com if you don't have one.
+2. Open this repo and click **Use this template**, then **Create a new
+   repository**. Make it private. This is your team's copy, and it never
+   sends anything back here.
+3. Install [GitHub Desktop](https://desktop.github.com). It puts the repo on
+   your computer as a normal folder and handles the saving and syncing.
+4. In GitHub Desktop, choose **Clone a repository** and pick your new copy.
+
+## Your first change
+
+1. In GitHub Desktop, click **Current branch** and create a new branch.
+   Name it after the change, like `positioning-draft`.
+2. Open the repo folder and edit a file in any text editor. Try
+   `strategy/positioning.md`.
+3. Back in GitHub Desktop, write a one-line summary of what you changed and
+   click **Commit**. Then click **Push** to send it to GitHub.
+4. Click **Create pull request**. GitHub opens the proposal in your browser.
+   A teammate reads the change, comments, and merges it.
+
+That is the whole loop. Branch, edit, commit, pull request, merge. Every
+change in this repo, by a person or an agent, goes through it.
+
+## Let the agent do the technical parts
+
+Install [Claude Code](https://claude.com/claude-code) in the desktop app and
+open your repo folder. Then talk to it. "Set up this repo for our team."
+"Draft a blog post on X." "Process the transcript in the inbox." The agent
+reads the repo, does the work on a branch, and opens the pull request for
+you to review. You never type a command.
+
+When the agent needs something technical, like connecting your CRM or
+storing an API key, it tells you exactly what to do and where. If it asks
+for a key value in chat, that is a red flag. Keys go in a file the agent
+never reads ([secrets.md](secrets.md)).
+
+## Where to go next
+
+- [workflow.md](workflow.md): how review works here, in more detail.
+- [stages.md](stages.md): if you want to start smaller than a full repo.
+- [../README.md](../README.md): the quick start, once you are comfortable.
