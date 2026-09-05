@@ -1,0 +1,266 @@
+{
+  "id": "seo-data",
+  "title": "SEO and search data",
+  "for": "keyword volumes and difficulty, rankings, SERP features, backlinks, site audits, Search Console performance",
+  "data_domain": "data/seo",
+  "manual": {
+    "export": "Export the keyword, ranking or backlink report as CSV from the tool (Search Console: Performance > Export; Ahrefs and Semrush: the Export button on any report) and drop the file into the snapshots folder; data/seo/keywords.csv stays the canonical table.",
+    "drop": "data/seo/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "dataforseo",
+      "name": "DataForSEO",
+      "source": "dataforseo",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/dataforseo/mcp-server-typescript",
+      "capabilities": ["keywords", "serp", "backlinks", "on-page"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Wired in .mcp.json and .cursor/mcp.json today; the version is pinned at 3.1.1 and bumped on purpose in a proposal",
+        "The npx variant needs Node.js on the machine; the remote endpoint https://mcp.dataforseo.com/v3/mcp takes HTTP Basic auth (login:password base64-encoded), which .mcp.json cannot express as a ${VAR} header, so swap to it by hand and keep the credentials out of the file",
+        "Every call costs API credits; DATAFORSEO_USERNAME duplicates DATAFORSEO_LOGIN because different package versions read different names",
+        "Not in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "dataforseo",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "dataforseo-mcp-server@3.1.1"],
+            "env": {"DATAFORSEO_LOGIN": "${DATAFORSEO_LOGIN}", "DATAFORSEO_USERNAME": "${DATAFORSEO_LOGIN}", "DATAFORSEO_PASSWORD": "${DATAFORSEO_PASSWORD}"},
+            "auth": {"model": "env", "env": ["DATAFORSEO_LOGIN", "DATAFORSEO_PASSWORD"], "where": "app.dataforseo.com > API access"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": "scripts/seo_snapshot.py", "env": ["DATAFORSEO_LOGIN", "DATAFORSEO_PASSWORD"], "notes": "the scheduled refresh: search volume and difficulty for every row of data/seo/keywords.csv into data/seo/snapshots/YYYY-MM-DD-dataforseo-volume.csv; --update also refreshes the canonical table"}
+      }
+    },
+    {
+      "id": "ahrefs",
+      "name": "Ahrefs",
+      "source": "ahrefs",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.ahrefs.com/docs/mcp/reference/introduction",
+      "capabilities": ["rank-tracking", "keywords", "backlinks", "site-audit", "site-explorer"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Remote server only; the local ahrefs/ahrefs-mcp-server repo was archived in February 2026 and now points at the remote endpoint",
+        "OAuth on first use mints an MCP-scoped API key; Enterprise plans can pass an existing API key instead (header format not verified, so no key variant here)",
+        "Around 95 tools; each call consumes API units, paid plans Lite and above",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "ahrefs",
+            "transport": "http",
+            "url": "https://api.ahrefs.com/mcp/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use; Ahrefs issues an MCP-scoped API key behind it"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["AHREFS_API_KEY"], "notes": "copy scripts/seo_snapshot.py; an API key (Account settings > API keys) calls /v3/site-explorer/organic-keywords for a scheduled rankings snapshot"}
+      }
+    },
+    {
+      "id": "semrush",
+      "name": "Semrush",
+      "source": "semrush",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developer.semrush.com/api/v4/introduction/semrush-mcp/",
+      "capabilities": ["domain-analytics", "keywords", "backlinks", "traffic", "position-tracking", "site-audit"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Read-only by design; HTTP only (no stdio)",
+        "API units are billed per call; the Trends API needs its own subscription",
+        "The key variant uses the documented header Authorization: Apikey <key>",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "semrush",
+            "transport": "http",
+            "url": "https://mcp.semrush.com/v2/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "key",
+            "default": false,
+            "server": "semrush",
+            "transport": "http",
+            "url": "https://mcp.semrush.com/v2/mcp",
+            "headers": {"Authorization": "Apikey ${SEMRUSH_API_KEY}"},
+            "auth": {"model": "header", "env": ["SEMRUSH_API_KEY"], "where": "Semrush: Subscription info > API units > API key"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["SEMRUSH_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the same key calls the Analytics API v3 (domain_organic report) for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "moz",
+      "name": "Moz",
+      "source": "moz",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/metehan777/moz-mcp",
+      "capabilities": ["domain-authority", "page-authority", "links"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official Moz server; the community metehan777/moz-mcp (15 stars, stale) says itself it is not official and is not on a package registry with a version to pin, so no stdio entry",
+        "Use the manual export, the Moz Links API in a script, or DataForSEO's backlink and rank metrics instead"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["MOZ_API_TOKEN"], "notes": "copy scripts/seo_snapshot.py; the Moz API v2 token (Moz Pro > API) calls /jsonrpc data.site.metrics.fetch for a scheduled authority snapshot"}
+      }
+    },
+    {
+      "id": "google-search-console",
+      "name": "Google Search Console",
+      "source": "gsc",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/AminForou/mcp-gsc",
+      "capabilities": ["queries", "pages", "clicks", "impressions", "ctr", "position", "url-inspection", "sitemaps"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "community server maintained by AminForou (mcp-gsc, PyPI mcp-search-console, 1,485 stars, pushed 2026-07-29); judge as a script, not a vendor tool",
+        "write tool names not verified; deny the whole server (`mcp__gsc`) until checked (the writes are sitemap submission and URL inspection requests, not data changes)",
+        "Google ships no official Search Console MCP server as of August 2026",
+        "Auth is a Google service account JSON (add its email as a user on the property) at GSC_CREDENTIALS_PATH, or an OAuth client secrets file at GSC_OAUTH_CLIENT_SECRETS_FILE for a browser login; the file path is not a secret, the file is",
+        "Alternative community server ahonn/mcp-server-gsc (npm mcp-server-gsc@0.3.0, Node) if Python is unavailable"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "gsc",
+            "transport": "stdio",
+            "command": "uvx",
+            "args": ["mcp-search-console==0.3.3"],
+            "env": {"GSC_CREDENTIALS_PATH": "${GSC_CREDENTIALS_PATH}"},
+            "auth": {"model": "env", "env": ["GSC_CREDENTIALS_PATH"], "where": "Google Cloud console: a service account with the Search Console API enabled, its JSON key on disk, added as a user in Search Console > Settings > Users"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["GSC_CREDENTIALS_PATH", "GSC_SITE_URL"], "notes": "copy scripts/seo_snapshot.py; the same service account posts to searchconsole.googleapis.com/webmasters/v3/sites/{site}/searchAnalytics/query for the weekly query and page snapshot; the Search Console API is simple enough that the script is the better unattended route"}
+      }
+    },
+    {
+      "id": "similarweb",
+      "name": "Similarweb",
+      "source": "similarweb",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.similarweb.com/docs/similarweb-mcp",
+      "capabilities": ["traffic-estimates", "keywords", "audience", "competitors", "apps"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "API-only, Business and Enterprise plans; every call consumes credits",
+        "The header name api-key comes from the Similarweb API reference security scheme; confirm on the MCP page when wiring",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "similarweb",
+            "transport": "http",
+            "url": "https://mcp.similarweb.com",
+            "headers": {"api-key": "${SIMILARWEB_API_KEY}"},
+            "auth": {"model": "header", "env": ["SIMILARWEB_API_KEY"], "where": "Similarweb: Account > API management"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["SIMILARWEB_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the same key calls /v1/website/{domain}/total-traffic-and-engagement/visits for a scheduled competitor-traffic snapshot"}
+      }
+    },
+    {
+      "id": "screaming-frog",
+      "name": "Screaming Frog SEO Spider",
+      "source": "screamingfrog",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://www.screamingfrog.co.uk/blog/seo-spider-24/",
+      "capabilities": ["crawls", "bulk-exports", "screenshots"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "The MCP server is built into SEO Spider v24 and runs from the desktop app on the licensed machine; the app shows its local endpoint and the connection snippet, which differ per install, so no committed entry",
+        "Not every feature is exposed; crawls are heavy and never run on a schedule from this repo",
+        "Community headless server bzsasson/screaming-frog-mcp (82 stars) wraps the CLI crawler; judge it as a script"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": {"tool": "screamingfrogseospider", "install": "https://www.screamingfrog.co.uk/seo-spider/user-guide/general/#command-line", "notes": "screamingfrogseospider --crawl <url> --headless --export-tabs \"Internal:All\" --output-folder <dir> writes CSVs that copy into the snapshots folder"},
+        "script": null
+      }
+    },
+    {
+      "id": "bing-webmaster",
+      "name": "Bing Webmaster Tools",
+      "source": "bingwmt",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.bing.com/webmasters/help/webmaster-api-2c5f0a5c",
+      "capabilities": ["search-performance", "crawl-stats", "url-submission"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official server; community servers (isiahw1/mcp-server-bing-webmaster and others) exist but were not verified to a pinnable package version, so no stdio entry",
+        "write tool names not verified; if a community server is wired, deny it whole until checked (its writes are URL submissions)",
+        "The Webmaster API with an API key is simple enough for a script"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["BING_WEBMASTER_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the API key (Webmaster Tools > Settings > API access) calls ssl.bing.com/webmaster/api.svc/json/GetQueryStats for a scheduled snapshot"}
+      }
+    }
+  ]
+}

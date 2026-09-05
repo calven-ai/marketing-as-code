@@ -1,0 +1,348 @@
+{
+  "id": "scraping-search",
+  "title": "Scraping and search",
+  "for": "web scraping, actor runs, web and news search, page reading for ABM research and monitoring",
+  "data_domain": "data/accounts",
+  "manual": {
+    "export": "Export the actor run dataset or the search result list as CSV from the vendor console (Apify: Storage > Dataset > Export).",
+    "drop": "data/accounts/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "apify",
+      "name": "Apify",
+      "source": "apify",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.apify.com/platform/integrations/mcp",
+      "capabilities": ["search actors", "fetch actor details", "run actors (scrapers for LinkedIn, news, reviews, websites)", "read actor run output"],
+      "writes": true,
+      "write_tools": ["call-actor"],
+      "read_only_switch": null,
+      "caveats": [
+        "Already wired in .mcp.json and .cursor/mcp.json as the `apify` server; the `researcher` skill depends on it.",
+        "`call-actor` starts a run that spends Apify credits; it writes nothing outside Apify, but treat runs as spend and keep the tool behind a permission rule when in doubt.",
+        "OAuth in the browser on first use, so the MCP route cannot run unattended; the `apify` CLI with a token is the headless route."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "apify",
+            "transport": "http",
+            "url": "https://mcp.apify.com",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "apify", "install": "npm i -g apify-cli", "notes": "token-based; the headless route for actor runs"},
+        "script": null
+      }
+    },
+    {
+      "id": "firecrawl",
+      "name": "Firecrawl",
+      "source": "firecrawl",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/firecrawl/firecrawl-mcp-server",
+      "capabilities": ["scrape a page to markdown", "crawl a site", "map site URLs", "web search", "structured extraction"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Crawl and extract jobs spend Firecrawl credits per page; cap `limit` on crawls.",
+        "The hosted endpoint `https://mcp.firecrawl.dev/v2/mcp` was seen only in secondary listings and its auth header format is not verified; the pinned stdio package is the verified route.",
+        "Pinned to firecrawl-mcp 3.24.0 (npm, checked 2026-09-04); bump on purpose, in a proposal."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "stdio",
+            "default": true,
+            "server": "firecrawl",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "firecrawl-mcp@3.24.0"],
+            "env": {"FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"},
+            "auth": {"model": "env", "env": ["FIRECRAWL_API_KEY"], "where": "Firecrawl dashboard > API Keys"},
+            "headless": true,
+            "oauth_scopes": []
+          },
+          {
+            "id": "hosted",
+            "default": false,
+            "server": "firecrawl-hosted",
+            "transport": "http",
+            "url": "https://mcp.firecrawl.dev/v2/mcp",
+            "headers": {"Authorization": "Bearer ${FIRECRAWL_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["FIRECRAWL_API_KEY"], "where": "Firecrawl dashboard > API Keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "exa",
+      "name": "Exa",
+      "source": "exa",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/exa-labs/exa-mcp-server",
+      "capabilities": ["neural web search", "company research", "LinkedIn and people search", "fetch page contents", "deep research"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "The hosted server at https://mcp.exa.ai/mcp needs no key, so it is the rare remote route that runs headless without a secret; usage limits apply per Exa's terms.",
+        "The stdio package needs an Exa API key and is pinned to exa-mcp-server 3.4.1 (npm, checked 2026-09-04)."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "hosted",
+            "default": true,
+            "server": "exa",
+            "transport": "http",
+            "url": "https://mcp.exa.ai/mcp",
+            "headers": {},
+            "auth": {"model": "none", "env": [], "where": "no key needed for the hosted server"},
+            "headless": true,
+            "oauth_scopes": []
+          },
+          {
+            "id": "stdio",
+            "default": false,
+            "server": "exa-local",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "exa-mcp-server@3.4.1"],
+            "env": {"EXA_API_KEY": "${EXA_API_KEY}"},
+            "auth": {"model": "env", "env": ["EXA_API_KEY"], "where": "Exa dashboard > API Keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "tavily",
+      "name": "Tavily",
+      "source": "tavily",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/tavily-ai/tavily-mcp",
+      "capabilities": ["web search with news topic", "extract page content", "crawl", "map site URLs"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "The hosted server carries the API key in the URL query (`?tavilyApiKey=`), so the whole URL is a secret; the stdio package keeps the key in the environment and is the default here.",
+        "Pinned to tavily-mcp 0.2.22 (npm, checked 2026-09-04).",
+        "Search credits are billed per call; free tier is limited."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "stdio",
+            "default": true,
+            "server": "tavily",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "tavily-mcp@0.2.22"],
+            "env": {"TAVILY_API_KEY": "${TAVILY_API_KEY}"},
+            "auth": {"model": "env", "env": ["TAVILY_API_KEY"], "where": "Tavily dashboard > API Keys"},
+            "headless": true,
+            "oauth_scopes": []
+          },
+          {
+            "id": "hosted",
+            "default": false,
+            "server": "tavily-hosted",
+            "transport": "http",
+            "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}",
+            "headers": {},
+            "auth": {"model": "env", "env": ["TAVILY_API_KEY"], "where": "Tavily dashboard > API Keys; the key rides in the URL query"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "brave-search",
+      "name": "Brave Search",
+      "source": "brave",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/brave/brave-search-mcp-server",
+      "capabilities": ["web search", "news search", "local business search", "image and video search", "AI summarizer"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Local stdio server only; no hosted endpoint in the survey.",
+        "Pinned to @brave/brave-search-mcp-server 2.1.3 (npm, checked 2026-09-04).",
+        "The news search tool is the closest thing to media monitoring the catalog has without a PR tool."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "stdio",
+            "default": true,
+            "server": "brave-search",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@brave/brave-search-mcp-server@2.1.3"],
+            "env": {"BRAVE_API_KEY": "${BRAVE_API_KEY}"},
+            "auth": {"model": "env", "env": ["BRAVE_API_KEY"], "where": "Brave Search API dashboard > API Keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "perplexity",
+      "name": "Perplexity",
+      "source": "perplexity",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/perplexityai/modelcontextprotocol",
+      "capabilities": ["answer-engine search with citations", "web research", "reasoning over sources"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Hosted URL https://api.perplexity.ai/mcp is from the vendor repo; the bearer header follows the Perplexity API convention, confirm on first connection.",
+        "Pinned to @perplexity-ai/mcp-server 1.2.1 (npm, checked 2026-09-04).",
+        "Every call is billed as Sonar API usage."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "hosted",
+            "default": true,
+            "server": "perplexity",
+            "transport": "http",
+            "url": "https://api.perplexity.ai/mcp",
+            "headers": {"Authorization": "Bearer ${PERPLEXITY_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["PERPLEXITY_API_KEY"], "where": "Perplexity > Settings > API"},
+            "headless": true,
+            "oauth_scopes": []
+          },
+          {
+            "id": "stdio",
+            "default": false,
+            "server": "perplexity-local",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@perplexity-ai/mcp-server@1.2.1"],
+            "env": {"PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"},
+            "auth": {"model": "env", "env": ["PERPLEXITY_API_KEY"], "where": "Perplexity > Settings > API"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "jina-reader",
+      "name": "Jina Reader",
+      "source": "jina",
+      "verified": "unverified",
+      "checked": "2026-09-04",
+      "source_url": "https://jina.ai/reader",
+      "capabilities": ["read a URL as clean markdown", "web search"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "A hosted server at mcp.jina.ai appears in search results only; the URL and auth could not be verified on a vendor page, so no MCP entry is listed.",
+        "Community server wong2/mcp-jina-reader exists; judge it as a script, not a vendor tool.",
+        "The plain Reader API (https://r.jina.ai/<url>, API key) works from a script without any MCP."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "bright-data",
+      "name": "Bright Data",
+      "source": "brightdata",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/brightdata/brightdata-mcp",
+      "capabilities": ["search engine results", "scrape as markdown", "structured web data feeds (LinkedIn, Amazon, social)", "browser automation in pro mode"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "5,000 free requests per month, then paid; unblocker and browser traffic are metered separately.",
+        "`PRO_MODE=true` adds browser-control tools (navigate, click, type) that can submit forms; leave it off unless a person is watching.",
+        "The hosted server takes the token in the URL query (`?token=`), so the URL is a secret; the stdio package keeps it in the environment.",
+        "Pinned to @brightdata/mcp 2.11.1 (npm, checked 2026-09-04)."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "hosted",
+            "default": true,
+            "server": "brightdata",
+            "transport": "http",
+            "url": "https://mcp.brightdata.com/mcp?token=${BRIGHTDATA_API_TOKEN}",
+            "headers": {},
+            "auth": {"model": "env", "env": ["BRIGHTDATA_API_TOKEN"], "where": "Bright Data control panel > Account settings > API token; the token rides in the URL query"},
+            "headless": true,
+            "oauth_scopes": []
+          },
+          {
+            "id": "stdio",
+            "default": false,
+            "server": "brightdata-local",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@brightdata/mcp@2.11.1"],
+            "env": {"API_TOKEN": "${BRIGHTDATA_API_TOKEN}"},
+            "auth": {"model": "env", "env": ["BRIGHTDATA_API_TOKEN"], "where": "Bright Data control panel > Account settings > API token"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "browserbase",
+      "name": "Browserbase",
+      "source": "browserbase",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/browserbase/mcp-server-browserbase",
+      "capabilities": ["cloud browser sessions", "navigate and extract from pages"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "The GitHub repo was archived in July 2026; the hosted server at https://mcp.browserbase.com/mcp (API key) is the only supported route and is not listed here until a person confirms it on the vendor page.",
+        "Browser automation can submit forms and post; it is a scraping tool only while a person watches.",
+        "Prefer Apify or Bright Data for the same jobs; both have maintained servers."
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

@@ -1,9 +1,14 @@
 ---
 name: make-dashboard
-description: Turn data into a self-contained HTML dashboard saved beside its report. Use when asked for a dashboard, chart, or visual view of marketing data, or when a report's answer is multidimensional enough that prose can't carry it.
+description: Turn data into a self-contained HTML dashboard saved beside its report, or a spec for the team's BI tool. Use when asked for a dashboard, chart, or visual view of marketing data, when a report's answer is multidimensional enough that prose can't carry it, or to spec the HubSpot or Looker dashboard.
+license: MIT
 metadata:
   kind: workflow
-  needs: nothing
+  area: core
+  needs: []
+  optional: [warehouse-bi]
+  writes: repo
+  runs: person
 ---
 
 # Make a dashboard
@@ -32,6 +37,17 @@ contract; never break it by adding external references.
    refuses a dashboard that still carries the template's numbers.
 4. **List sources**: the footer's data-sources line gets the exact snapshot
    paths used, same as a report's "Data used" section.
+
+## BI mode
+
+With a `warehouse-bi` integration wired (the Wired table in
+`integrations/README.md`), also write a spec the team can build in its BI
+tool: one section per dashboard in `memory/knowledge/dashboards.md`, created the first time and updated in place later.
+Each section lists the metrics by their `data/ontology/metrics.md` names,
+the filters (period, segment, channel), and for every metric the snapshot
+and column it comes from today, so the warehouse model maps to the same
+definitions. Never build in the BI tool itself: the spec is the proposal,
+and a person builds it or approves it.
 
 ## Rules
 

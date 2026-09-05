@@ -1,0 +1,341 @@
+{
+  "id": "transcripts",
+  "title": "Meeting transcripts and conversation intelligence",
+  "for": "meeting transcripts, call summaries, action items into memory/transcripts/inbox/",
+  "data_domain": "memory/transcripts",
+  "manual": {
+    "export": "Open the meeting in the tool, copy or download the transcript as text, and save it as one Markdown file per meeting in the inbox contract (memory/transcripts/README.md) with the date and a slug in the filename.",
+    "drop": "memory/transcripts/inbox/YYYY-MM-DD-<slug>.md"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "granola",
+      "name": "Granola",
+      "source": "granola",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://mcp.granola.ai/mcp",
+      "capabilities": ["meetings", "transcripts", "notes"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "OAuth-only, so the MCP cannot run headless; scripts/pull_transcripts.py carries the unattended daily pull",
+        "Paid Granola plans only",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "granola",
+            "transport": "http",
+            "url": "https://mcp.granola.ai/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": "scripts/pull_transcripts.py", "env": ["GRANOLA_API_KEY"], "notes": "the unattended path; daily via .github/workflows/transcripts-cron.yml"}
+      }
+    },
+    {
+      "id": "gong",
+      "name": "Gong",
+      "source": "gong",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://help.gong.io/docs/about-gong-mcp",
+      "capabilities": ["account-insights", "deal-insights", "briefs"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Three tools (ask_account, ask_deal, generate_brief) return AI-generated insights over a time range; the server does not hand back raw transcripts, so the inbox pull needs the Gong REST API in a script",
+        "A Gong technical admin creates the MCP integration (Company Settings > Ecosystem > API > Integrations > Create Integration > MCP) and issues the client id and secret used in the OAuth flow",
+        "Not in the Claude connectors directory; add as a custom connector",
+        "Community server cedricziel/gong-mcp reads calls and transcripts with GONG_ACCESS_KEY and GONG_ACCESS_KEY_SECRET; judge it as a script, not a vendor tool"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "gong",
+            "transport": "http",
+            "url": "https://mcp.gong.io/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant with the client id and secret a Gong admin created for MCP"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["GONG_ACCESS_KEY", "GONG_ACCESS_KEY_SECRET"], "notes": "copy scripts/pull_transcripts.py; the API access key pair (Company Settings > Ecosystem > API) reads /v2/calls/transcript into the inbox with source: gong"}
+      }
+    },
+    {
+      "id": "fireflies",
+      "name": "Fireflies.ai",
+      "source": "fireflies",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.fireflies.ai/mcp-tools/overview",
+      "capabilities": ["transcripts", "summaries", "search"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "OAuth-only; a scheduled inbox pull uses the GraphQL API with an API key",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "fireflies",
+            "transport": "http",
+            "url": "https://api.fireflies.ai/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["FIREFLIES_API_KEY"], "notes": "copy scripts/pull_transcripts.py; the API key (Settings > Developer settings) queries the GraphQL transcripts endpoint into the inbox with source: fireflies"}
+      }
+    },
+    {
+      "id": "fathom",
+      "name": "Fathom",
+      "source": "fathom",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.fathom.ai/mcp-docs",
+      "capabilities": ["recordings", "transcripts", "action-items"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "OAuth-only; a scheduled inbox pull uses the REST API with an API key",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "fathom",
+            "transport": "http",
+            "url": "https://api.fathom.ai/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["FATHOM_API_KEY"], "notes": "copy scripts/pull_transcripts.py; the API key (Settings > API) reads /external/v1/meetings with transcripts into the inbox with source: fathom"}
+      }
+    },
+    {
+      "id": "otter",
+      "name": "Otter.ai",
+      "source": "otter",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://claude.com/connectors/otter-ai",
+      "capabilities": ["meetings", "transcripts", "search"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "OAuth with per-meeting permissions; read-only",
+        "The endpoint is known from the Claude connector listing, not an Otter developer page; confirm before wiring",
+        "No public API for a scheduled pull; the manual export is the unattended route"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "otter",
+            "transport": "http",
+            "url": "https://mcp.otter.ai/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "grain",
+      "name": "Grain",
+      "source": "grain",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.grain.com/mcp",
+      "capabilities": ["meetings", "notes", "transcripts", "deals", "scorecards"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "OAuth through the Claude Integrations flow; read-only, with built-in report prompts",
+        "A scheduled inbox pull uses the Grain public API with a personal access token"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "grain",
+            "transport": "http",
+            "url": "https://api.grain.com/_/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["GRAIN_API_TOKEN"], "notes": "copy scripts/pull_transcripts.py; a personal access token (Settings > Integrations > Public API) reads /_/public-api/recordings into the inbox with source: grain"}
+      }
+    },
+    {
+      "id": "avoma",
+      "name": "Avoma",
+      "source": "avoma",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://help.avoma.com/avoma-mcp-server-user-guide",
+      "capabilities": ["meetings", "transcripts", "meeting-classification", "outcomes"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__avoma`) until checked",
+        "Avoma says the server is supported only with Claude Desktop, and the user guide does not print an endpoint URL; no .mcp.json entry until a person reads it from the guide while signed in",
+        "Writes classify meetings and log outcomes"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["AVOMA_API_KEY"], "notes": "copy scripts/pull_transcripts.py; the API key (Settings > Integrations > API) reads /v1/transcriptions into the inbox with source: avoma"}
+      }
+    },
+    {
+      "id": "tldv",
+      "name": "tl;dv",
+      "source": "tldv",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/tldv-public/tldv-mcp-server",
+      "capabilities": ["meetings", "summaries", "transcripts"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Local server only (tldv-public/tldv-mcp-server, 14 stars, last push 2025-12-12); the repo's package.json declares no bin and the npm package `tldv-mcp` carries no repository link, so no pinned stdio entry could be written; clone the repo and run it from a built checkout if wanted",
+        "Reads across Meet, Zoom and Teams recordings with a tl;dv API key",
+        "Low maintenance activity; judge as a script"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["TLDV_API_KEY"], "notes": "copy scripts/pull_transcripts.py; the API key (Settings > API) reads /v1alpha1/meetings and transcripts into the inbox with source: tldv"}
+      }
+    },
+    {
+      "id": "zoom",
+      "name": "Zoom",
+      "source": "zoom",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/zoom/mcp-registry",
+      "capabilities": ["ai-summaries", "transcripts", "recordings", "docs", "tasks"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__zoom`) until checked",
+        "Zoom publishes several servers: /mcp/zoom/streamable (workspace), /mcp/meeting/streamable, /mcp/docs/streamable, /mcp/chat/streamable, /mcp/tasks/streamable; the meeting server is wired here for transcripts and summaries",
+        "Auth and admin requirements are not in the registry metadata; verify in the Zoom App Marketplace before wiring",
+        "Not in the Claude connectors directory",
+        "The unattended inbox pull is a Server-to-Server OAuth app, as the worked example in integrations/adding-an-integration.md describes"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "zoom",
+            "transport": "http",
+            "url": "https://mcp.zoom.us/mcp/meeting/streamable",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "oauth-workspace",
+            "default": false,
+            "server": "zoom-workspace",
+            "transport": "http",
+            "url": "https://mcp.zoom.us/mcp/zoom/streamable",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["ZOOM_ACCOUNT_ID", "ZOOM_CLIENT_ID", "ZOOM_CLIENT_SECRET"], "notes": "copy scripts/pull_transcripts.py; a Server-to-Server OAuth app (Zoom App Marketplace) reads /v2/users/me/recordings and the transcript files into the inbox with source: zoom"}
+      }
+    },
+    {
+      "id": "google-meet",
+      "name": "Google Meet (Gemini notes via Workspace MCP)",
+      "source": "googlemeet",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://workspacemcp.googleapis.com/mcp/v1",
+      "capabilities": ["drive-docs", "meet-notes", "gmail", "calendar"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__google-workspace`) until checked",
+        "Public Developer Preview; a Workspace admin must allow-list the MCP client",
+        "Meet transcripts and Gemini notes live as Drive documents, so the server reads them through Drive and Docs tools, not a Meet-specific tool",
+        "Community alternative aaronsb/google-workspace-mcp; judge it as a script"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "google-workspace",
+            "transport": "http",
+            "url": "https://workspacemcp.googleapis.com/mcp/v1",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "Google account browser grant, after the Workspace admin allow-lists the client"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["GOOGLE_APPLICATION_CREDENTIALS"], "notes": "copy scripts/pull_transcripts.py; a service account with domain-wide delegation lists the Meet Recordings folder through the Drive API and exports each notes doc into the inbox with source: googlemeet"}
+      }
+    }
+  ]
+}

@@ -40,7 +40,8 @@ one place, where agents read all of it and write into it. The repo is the
 floor. The agents are the point.
 
 This repository is that floor, pre-built. A roster of agents and skills
-([agents/README.md](agents/README.md)). Five integrations wired. No server.
+for every marketing function ([agents/README.md](agents/README.md)). Five
+integrations wired and a catalog of the rest, one command each. No server.
 Start from it, make it yours, and run your marketing from here.
 
 ## What this is, and what it is not
@@ -213,11 +214,14 @@ from exported CSVs. Try that part first.
 What you make yours: the **integrations** (your CRM, task tool, meeting
 recorder, analytics), the **structure** where it doesn't match your team,
 and the **agents**, which are Markdown files you edit. Five integrations ship
-wired as worked examples. The rest of your stack is a job for your coding
-agent, not for this repo's maintainers. Tell it "We use Zoom for meetings.
-Automate reading the transcripts into the inbox." and it builds the
-connector by [the guide](integrations/adding-an-integration.md): the vendor's
-MCP server first, its CLI second, a small script last.
+wired as worked examples. For the rest of your stack, the catalog in
+[integrations/catalog/](integrations/catalog/README.md) holds the routes for
+the common vendors in every category (CRM, marketing automation, analytics,
+ads, social, CMS, enrichment, and so on), and your coding agent wires one
+with `python3 scripts/wire_integration.py <vendor>`; skills name the
+category, not the vendor, so nothing else changes. A tool the catalog does
+not know it builds by [the guide](integrations/adding-an-integration.md):
+the vendor's MCP server first, its CLI second, a small script last.
 
 Nothing here needs a server. Work runs where a person is typing to a coding
 agent, or on a schedule in GitHub Actions.

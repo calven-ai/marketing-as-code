@@ -1,9 +1,13 @@
 ---
 name: prototype-builder
 description: Build a disposable prototype in playgrounds/ from a one-sentence idea. Use when someone wants to bring a prototype to a meeting instead of a deck - a landing page mock, campaign concept page, email sequence preview, ad variant board, or storyboard.
+license: MIT
 metadata:
-  kind: role
-  needs: nothing
+  kind: workflow
+  area: core
+  needs: []
+  writes: repo
+  runs: person
 ---
 
 # Prototype builder

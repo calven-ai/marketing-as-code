@@ -4,7 +4,9 @@
       "Bash(python3 scripts/sync.py*)",
       "Bash(python3 scripts/propose.py*)",
       "Bash(python3 scripts/doctor.py*)",
-      "Bash(python3 scripts/lint.py*)"
+      "Bash(python3 scripts/lint.py*)",
+      "Bash(python3 scripts/sync_skills.py*)",
+      "Bash(python3 scripts/wire_integration.py*)"
     ],
     "deny": [
       "Read(./.env)",

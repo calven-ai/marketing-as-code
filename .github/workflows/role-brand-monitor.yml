@@ -1,0 +1,28 @@
+name: role-brand-monitor
+
+# The shipped example of a role caller: brand-monitor once a month through
+# role-run.yml, with the DataForSEO server (key-based, so it runs headless).
+# Does nothing until ANTHROPIC_API_KEY, DATAFORSEO_LOGIN and
+# DATAFORSEO_PASSWORD are set in the `automation` environment. Copy this
+# file to run another role: change the name, the schedule, the skill and the
+# servers; the check refuses a skill that cannot run unattended.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 1 * *"
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    uses: ./.github/workflows/role-run.yml
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    with:
+      skill: brand-monitor
+      servers: dataforseo
+    secrets: inherit

@@ -103,6 +103,7 @@ because they define what the agents may reach.
 | What was decided and why | `memory/decision-log.md`, `memory/knowledge/` |
 | Meeting transcripts | `memory/transcripts/` |
 | Which integrations exist and how to use them | `integrations/README.md` |
+| Which vendor fills an integration category (`crm`, `web-analytics`, `ads`, ...), and the vendors a team can pick from | `integrations/README.md` (the Wired table), `integrations/catalog/` |
 | Keeping strategy current, stale or contradictory context | `integrations/context-layer.md` |
 | Whether this approach fits a team, or how to start smaller | `docs/is-this-for-you.md`, then `docs/stages.md` |
 | Adding an integration, a script, or a skill | `integrations/adding-an-integration.md`, then `agents/README.md` |
@@ -141,7 +142,9 @@ missing one because nothing about it looks wrong.
 
 1. **Check the date.** Before you build on a strategy or brand file, read its
    `last_reviewed`. Older than 90 days: say so in your answer and offer to
-   review it with the team. Never silently treat it as current.
+   review it with the team. Never silently treat it as current. The
+   `context-freshness` role makes this pass monthly and names which
+   refresh skill to run.
 2. **A connected context layer wins.** If `integrations/README.md` marks a
    context layer as connected, or a file says `source: context-layer`, read
    positioning, messaging, ICP, product brief, personas and competitors

@@ -34,6 +34,50 @@ def write(root, rel, text=""):
     return path
 
 
+SKILL = ("---\nname: review\ndescription: Review a draft. Use when asked.\nlicense: MIT\nmetadata:\n  kind: workflow\n"
+         "  area: core\n  needs: [seo-data]\n  writes: repo\n  runs: person\n---\n\n# Review\n")
+
+
+def catalog_entry(**over):
+    """A minimal, valid catalog vendor (DataForSEO, stdio, pinned); keyword arguments override fields."""
+    vendor = {
+        "id": "dataforseo", "name": "DataForSEO", "source": "dataforseo", "verified": "vendor", "checked": TODAY,
+        "source_url": "https://example.com/dataforseo", "capabilities": ["keywords"], "writes": False,
+        "write_tools": [], "read_only_switch": None, "caveats": [],
+        "routes": {"mcp": [{"id": "local", "default": True, "server": "dataforseo", "transport": "stdio",
+                            "command": "npx", "args": ["-y", "dataforseo-mcp-server@3.1.1"],
+                            "env": {"DATAFORSEO_LOGIN": "${DATAFORSEO_LOGIN}",
+                                    "DATAFORSEO_PASSWORD": "${DATAFORSEO_PASSWORD}"},
+                            "auth": {"model": "env", "env": ["DATAFORSEO_LOGIN", "DATAFORSEO_PASSWORD"],
+                                     "where": "the DataForSEO dashboard"},
+                            "headless": True, "oauth_scopes": []}],
+                   "cli": None, "script": None}}
+    vendor.update(over)
+    return vendor
+
+
+def catalog_category(cid="seo-data", vendors=None, **over):
+    data = {"id": cid, "title": cid, "for": "keywords and ranks", "data_domain": "data/seo",
+            "manual": {"export": "export the CSV", "drop": "data/seo/snapshots/YYYY-MM-DD-<source>-<what>.csv"},
+            "bridges": ["generic"], "vendors": [catalog_entry()] if vendors is None else vendors}
+    data.update(over)
+    return data
+
+
+WIRED = {"wired": {"seo-data": {"vendor": "dataforseo", "variant": "local", "routes": ["mcp"],
+                                "writes": "n/a", "since": "2026-08-31"}}, "custom_servers": {}}
+
+
+def render_generated(root, rels=None):
+    """Write every generated block the schema expects into the fixture's files (they must match to be clean)."""
+    ctx = lint.Ctx(root=root, schema=SCHEMA)
+    for rel, blocks in SCHEMA["generated"].items():
+        if rel.startswith("_") or rel not in ctx.files or (rels and rel not in rels):
+            continue
+        for block in blocks:
+            lint._write_block(ctx, rel, block)
+
+
 def make_repo(root):
     """The smallest tree that passes every check."""
     for rel in SCHEMA["required_files"]:
@@ -43,23 +87,27 @@ def make_repo(root):
     write(root, "content/_template/draft.md", draft("brief"))
     write(root, ".gitignore", ".env\n.env.*\n!.env.example\n")
     write(root, ".env.example", "DATAFORSEO_LOGIN=\nDATAFORSEO_PASSWORD=\n")
-    mcp = {"mcpServers": {"dataforseo": {"command": "npx", "env": {"DATAFORSEO_LOGIN": "${DATAFORSEO_LOGIN}"}}}}
-    write(root, ".mcp.json", json.dumps(mcp))
-    write(root, ".cursor/mcp.json", json.dumps(mcp).replace("${", "${env:"))
+    server = {"command": "npx", "args": ["-y", "dataforseo-mcp-server@3.1.1"],
+              "env": {"DATAFORSEO_LOGIN": "${DATAFORSEO_LOGIN}", "DATAFORSEO_PASSWORD": "${DATAFORSEO_PASSWORD}"}}
+    write(root, ".mcp.json", json.dumps({"mcpServers": {"dataforseo": {"type": "stdio", **server}}}))
+    write(root, ".cursor/mcp.json", json.dumps({"mcpServers": {"dataforseo": server}}).replace("${", "${env:"))
     write(root, ".claude/settings.json", json.dumps({"permissions": {
         "deny": list(SCHEMA["settings"]["required_deny"]), "disableBypassPermissionsMode": "disable"}}))
-    write(root, "integrations/README.md", "# integrations\n\n`DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD`\n")
+    write(root, "integrations/README.md", "# integrations\n")
+    write(root, "integrations/catalog/README.md", "# catalog\n")
+    write(root, "integrations/catalog/seo-data.json", json.dumps(catalog_category()))
+    write(root, "integrations/wired.json", json.dumps(WIRED))
     write(root, "memory/decision-log.md", "# Decision log\n\nFormat.\n\n---\n")
-    write(root, "content/README.md", "# content\n\n  status: idea | brief | draft | in-review | published | evergreen\n"
-          "  channel: blog | email | linkedin | webinar | ad | case-study | other\n")
+    enums = SCHEMA["frontmatter"]["content/*/draft.md"]["enums"]
+    write(root, "content/README.md", "# content\n\n" + "".join(f"  {k}: " + " | ".join(v) + "\n" for k, v in enums.items()))
     write(root, "docs/README.md", "# docs\n\n- [schema.json](schema.json)\n")
     write(root, "docs/schema.json", json.dumps(SCHEMA))
-    write(root, ".agents/skills/review/SKILL.md",
-          "---\nname: review\ndescription: Review a draft. Use when asked.\nmetadata:\n  kind: workflow\n  needs: nothing\n---\n\n# Review\n")
+    write(root, ".agents/skills/review/SKILL.md", SKILL)
     for rel in SCHEMA["context_files"]:
         if "*" in rel:
             continue
         write(root, rel, FRONT.replace("source: repo", "document: x\nsource: repo") if rel.startswith("strategy") else FRONT)
+    render_generated(root)
     return root
 
 
@@ -372,13 +420,28 @@ class TestConfigs(LintCase):
 class TestSkillsAndDocs(LintCase):
     def test_skill_name_and_metadata(self):
         write(self.root, ".agents/skills/review/SKILL.md", "---\nname: reviewer\ndescription: x\n---\n")
-        found = self.findings("skill")
-        self.assertTrue(any(f.level == lint.ERROR for f in found))
-        self.assertTrue(any(f.level == lint.WARNING for f in found))
+        messages = [f.message for f in self.findings("skill", lint.ERROR)]
+        self.assertTrue(any("`name:`" in m for m in messages))
+        self.assertTrue(any("metadata" in m for m in messages))
+
+    def test_skill_metadata_rules(self):
+        def skill(meta):
+            write(self.root, ".agents/skills/review/SKILL.md", f"---\nname: review\ndescription: x\nmetadata:\n{meta}---\n")
+            return [f.message for f in self.findings("skill")]
+        self.assertTrue(any("inline list" in m for m in skill("  kind: workflow\n  area: core\n  needs: DataForSEO MCP\n")))
+        self.assertTrue(any("`nope`" in m for m in skill("  kind: workflow\n  area: core\n  needs: [nope]\n")))
+        self.assertTrue(any("bridge" in m for m in skill("  kind: workflow\n  area: core\n  needs: [generic]\n")))
+        self.assertTrue(any("`metadata.area`" in m for m in skill("  kind: workflow\n  needs: []\n")))
+        self.assertTrue(any("`metadata.kind`" in m for m in skill("  kind: agent\n  area: core\n  needs: []\n")))
+        self.assertTrue(any("cadence" in m for m in skill("  kind: role\n  area: core\n  needs: []\n")))
+        self.assertTrue(any("never runs unattended" in m for m in
+                            skill("  kind: workflow\n  area: core\n  needs: []\n  writes: external\n  runs: either\n")))
+        self.assertTrue(any("typo" in m for m in skill("  kind: workflow\n  area: core\n  needs: []\n  cost: high\n")))
+        self.assertEqual([], skill("  kind: role\n  area: seo\n  needs: [seo-data]\n  optional: [crm]\n  cadence: weekly\n"
+                                   "  writes: repo\n  runs: either\n"))
 
     def test_paths_and_links(self):
-        write(self.root, ".agents/skills/review/SKILL.md",
-              "---\nname: review\ndescription: x\nmetadata:\n  kind: workflow\n  needs: nothing\n---\n\n"
+        write(self.root, ".agents/skills/review/SKILL.md", SKILL +
               "Run `scripts/nope.py` and read `strategy/positioning.md`. See [x](../../../docs/nope.md).\n\n"
               "## Worked example\n\nEdit `projects/q4/status.md`.\n")
         paths = [f for f in self.findings("path")]
@@ -387,14 +450,215 @@ class TestSkillsAndDocs(LintCase):
         self.assertTrue(self.findings("link", lint.ERROR))
 
     def test_generated_block_and_docs_index(self):
-        write(self.root, "agents/README.md", "# Roster\n\n<!-- generated:skills-roles -->\nstale\n<!-- /generated:skills-roles -->\n")
+        write(self.root, "agents/README.md", "# Roster\n\n<!-- generated:skills-core -->\nstale\n<!-- /generated:skills-core -->\n")
         write(self.root, "docs/extra.md", "# Extra doc\n")
         found = self.findings("generated") + self.findings("docs-index")
-        self.assertEqual(3, len([f for f in found if f.fixable]))  # two blocks, one index entry
+        self.assertTrue(all(f.fixable for f in found))
+        blocks = {m.group(1) for m in (__import__("re").search(r"`([a-z-]+)`", f.message) for f in found) if m}
+        self.assertIn("skills-core", blocks)
+        self.assertIn("skills-leadership", blocks)
         self.fix()
         self.assertFalse(self.findings("generated") + self.findings("docs-index"))
         self.assertIn("extra.md", (self.root / "docs/README.md").read_text())
-        self.assertIn("| Agent | What it does | Needs |", (self.root / "agents/README.md").read_text())
+        roster = (self.root / "agents/README.md").read_text()
+        self.assertIn("| Skill | Kind | What it does | Needs |", roster)
+        self.assertIn("[review](../.agents/skills/review/SKILL.md) | workflow | Review a draft | "
+                      "[seo-data](../integrations/catalog/README.md#seo-data)", roster)
+
+    def test_roster_area_block(self):
+        write(self.root, ".agents/skills/pipeline-report/SKILL.md", SKILL.replace("name: review", "name: pipeline-report")
+              .replace("area: core", "area: ops").replace("kind: workflow", "kind: role\n  cadence: weekly")
+              .replace("needs: [seo-data]", "needs: [seo-data]\n  optional: [crm]"))
+        block = lint.render_block(self.ctx(), "skills-ops")
+        self.assertIn("| role (weekly) |", block)
+        self.assertIn("(optional: [crm](../integrations/catalog/README.md#crm))", block)
+        self.assertNotIn("[review]", block)
+        with self.assertRaises(ValueError):
+            lint.render_block(self.ctx(), "skills-nope")
+
+
+class TestCatalog(LintCase):
+    def put(self, cid="seo-data", **over):
+        write(self.root, f"integrations/catalog/{cid}.json", json.dumps(catalog_category(cid, **over)))
+        return [f for f in self.findings("catalog")]
+
+    def test_fixture_catalog_is_clean(self):
+        self.assertFalse(self.findings("catalog"))
+
+    def test_invalid_json_and_unknown_category(self):
+        write(self.root, "integrations/catalog/crm.json", "{not json")
+        self.assertTrue(any("not valid JSON" in f.message for f in self.findings("catalog", lint.ERROR)))
+        write(self.root, "integrations/catalog/crm.json", json.dumps(catalog_category("nope")))
+        self.assertTrue(any("`id` must equal" in f.message for f in self.findings("catalog", lint.ERROR)))
+
+    def test_manual_route_is_required(self):
+        found = self.put(manual={})
+        self.assertTrue(any("`manual`" in f.message for f in found))
+
+    def test_unpinned_and_undeclared_placeholder_and_oauth_headless(self):
+        loose = catalog_entry()
+        loose["routes"]["mcp"][0]["args"] = ["-y", "dataforseo-mcp-server"]
+        self.assertTrue(any("not pinned" in f.message for f in self.put(vendors=[loose])))
+        undeclared = catalog_entry()
+        undeclared["routes"]["mcp"][0]["auth"]["env"] = ["DATAFORSEO_LOGIN"]
+        self.assertTrue(any("`auth.env`" in f.message for f in self.put(vendors=[undeclared])))
+        oauth = catalog_entry()
+        oauth["routes"]["mcp"][0].update({"transport": "http", "url": "https://mcp.example.com", "env": {},
+                                          "auth": {"model": "oauth", "env": [], "where": "browser"}, "headless": True})
+        self.assertTrue(any("cannot run headless" in f.message for f in self.put(vendors=[oauth])))
+
+    def test_two_defaults_and_stale_check(self):
+        two = catalog_entry()
+        second = dict(two["routes"]["mcp"][0], id="remote")
+        two["routes"]["mcp"].append(second)
+        self.assertTrue(any("exactly one" in f.message for f in self.put(vendors=[two])))
+        old = catalog_entry(checked="2020-01-01")
+        found = self.put(vendors=[old])
+        self.assertEqual([lint.WARNING], [f.level for f in found])
+        self.assertIn("re-verify", found[0].message)
+
+    def test_verified_enum_source_token_and_placeholder_url(self):
+        self.assertTrue(any("`verified`" in f.message for f in self.put(vendors=[catalog_entry(verified="maybe")])))
+        self.assertTrue(any("`source`" in f.message for f in self.put(vendors=[catalog_entry(source="data-for-seo")])))
+        hosted = catalog_entry()
+        hosted["routes"]["mcp"][0].update({"transport": "http", "url": "${DATAFORSEO_MCP_URL}", "env": {},
+                                           "auth": {"model": "env", "env": ["DATAFORSEO_MCP_URL"], "where": "the account"}})
+        self.assertFalse(self.put(vendors=[hosted]))
+        hosted["routes"]["mcp"][0]["url"] = ""
+        self.assertTrue(any("needs a `url`" in f.message for f in self.put(vendors=[hosted])))
+
+    def test_missing_script_path(self):
+        v = catalog_entry()
+        v["routes"]["script"] = {"path": "scripts/nope.py", "env": [], "notes": ""}
+        self.assertTrue(any("does not exist" in f.message for f in self.put(vendors=[v])))
+
+
+class TestWired(LintCase):
+    def test_fixture_is_bound(self):
+        self.assertFalse(self.findings("wired"))
+
+    def test_wired_server_missing_from_mcp_json(self):
+        write(self.root, ".mcp.json", json.dumps({"mcpServers": {}}))
+        write(self.root, ".cursor/mcp.json", json.dumps({"mcpServers": {}}))
+        found = self.findings("wired", lint.ERROR)
+        self.assertTrue(any("not in .mcp.json" in f.message for f in found))
+
+    def test_unbound_server_warns_unless_custom(self):
+        mcp = json.loads((self.root / ".mcp.json").read_text())
+        mcp["mcpServers"]["other"] = {"type": "http", "url": "https://x.example.com"}
+        write(self.root, ".mcp.json", json.dumps(mcp))
+        cursor = json.loads((self.root / ".cursor/mcp.json").read_text())
+        cursor["mcpServers"]["other"] = {"url": "https://x.example.com"}
+        write(self.root, ".cursor/mcp.json", json.dumps(cursor))
+        self.assertTrue(any("`other`" in f.message for f in self.findings("wired", lint.WARNING)))
+        wired = json.loads(json.dumps(WIRED))
+        wired["custom_servers"] = {"other": "the team's own server"}
+        write(self.root, "integrations/wired.json", json.dumps(wired))
+        self.assertFalse(self.findings("wired"))
+
+    def test_denied_writes_need_rules_and_fix_adds_them(self):
+        write(self.root, "integrations/catalog/crm.json", json.dumps(catalog_category(
+            "crm", data_domain="data/crm", vendors=[catalog_entry(
+                id="hubspot", name="HubSpot", source="hubspot", writes=True, write_tools=["create_contact"],
+                routes={"mcp": [{"id": "oauth", "default": True, "server": "hubspot", "transport": "http",
+                                 "url": "https://mcp.example.com", "headers": {},
+                                 "auth": {"model": "oauth", "env": [], "where": "browser"},
+                                 "headless": False, "oauth_scopes": []}], "cli": None, "script": None})])))
+        wired = json.loads(json.dumps(WIRED))
+        wired["wired"]["crm"] = {"vendor": "hubspot", "variant": "oauth", "routes": ["mcp"], "writes": "denied",
+                                 "since": TODAY}
+        write(self.root, "integrations/wired.json", json.dumps(wired))
+        for rel in (".mcp.json", ".cursor/mcp.json"):
+            data = json.loads((self.root / rel).read_text())
+            data["mcpServers"]["hubspot"] = {"url": "https://mcp.example.com"}
+            if rel == ".mcp.json":
+                data["mcpServers"]["hubspot"]["type"] = "http"
+            write(self.root, rel, json.dumps(data))
+        write(self.root, ".agents/skills/review/SKILL.md", SKILL.replace("needs: [seo-data]", "needs: [seo-data, crm]"))
+        render_generated(self.root)
+        found = self.findings("wired", lint.ERROR)
+        self.assertTrue(found and found[0].fixable and "mcp__hubspot__create_contact" in found[0].message)
+        self.fix()
+        self.assertFalse(self.findings("wired"))
+        deny = json.loads((self.root / ".claude/settings.json").read_text())["permissions"]["deny"]
+        self.assertIn("mcp__hubspot__create_contact", deny)
+
+    def test_unknown_vendor_or_variant(self):
+        wired = json.loads(json.dumps(WIRED))
+        wired["wired"]["seo-data"]["variant"] = "remote"
+        write(self.root, "integrations/wired.json", json.dumps(wired))
+        self.assertTrue(any("variant" in f.message for f in self.findings("wired", lint.ERROR)))
+        wired["wired"]["seo-data"].update({"vendor": "nope", "variant": "local"})
+        write(self.root, "integrations/wired.json", json.dumps(wired))
+        self.assertTrue(any("not in integrations/catalog" in f.message for f in self.findings("wired", lint.ERROR)))
+
+
+class TestCoverage(LintCase):
+    def test_unused_category_warns_and_missing_file_errors(self):
+        write(self.root, "integrations/catalog/crm.json", json.dumps(catalog_category("crm", data_domain="data/crm", vendors=[])))
+        found = self.findings("catalog-coverage")
+        self.assertEqual([lint.WARNING], [f.level for f in found])
+        self.assertEqual("integrations/catalog/crm.json", found[0].path)
+        write(self.root, ".agents/skills/review/SKILL.md", SKILL.replace("needs: [seo-data]", "needs: [seo-data, crm, ads]"))
+        found = self.findings("catalog-coverage")
+        self.assertEqual([lint.ERROR], [f.level for f in found])
+        self.assertIn("integrations/catalog/ads.json", found[0].message)
+
+
+class TestRoleWorkflows(LintCase):
+    def caller(self, skill):
+        write(self.root, ".github/workflows/role-x.yml", f"on: schedule\njobs:\n  run:\n    uses: ./.github/workflows/role-run.yml\n    with:\n      skill: {skill}\n")
+        write(self.root, "docs/operating-model.md", "# op\n\nrole-x.yml\n")
+        return self.findings("role-workflow")
+
+    def test_headless_role_passes_and_oauth_or_external_fails(self):
+        write(self.root, ".agents/skills/brand-monitor/SKILL.md", SKILL.replace("name: review", "name: brand-monitor")
+              .replace("kind: workflow", "kind: role\n  cadence: monthly").replace("runs: person", "runs: either"))
+        self.assertFalse(self.caller("brand-monitor"))
+        self.assertTrue(any("does not exist" in f.message for f in self.caller("nope")))
+        write(self.root, ".agents/skills/publish/SKILL.md", SKILL.replace("name: review", "name: publish")
+              .replace("writes: repo", "writes: external"))
+        self.assertTrue(any("external systems" in f.message for f in self.caller("publish")))
+        oauth = catalog_entry()
+        oauth["routes"]["mcp"][0].update({"transport": "http", "url": "https://mcp.example.com", "env": {},
+                                          "auth": {"model": "oauth", "env": [], "where": "browser"}, "headless": False})
+        write(self.root, "integrations/catalog/seo-data.json", json.dumps(catalog_category(vendors=[oauth])))
+        render_generated(self.root)
+        self.assertTrue(any("key-based" in f.message for f in self.caller("brand-monitor")))
+
+
+class TestThirdParty(LintCase):
+    def test_reference_header_needs_registry_row_and_license(self):
+        header = "<!-- source: https://github.com/x/y | license: MIT | fetched: 2026-09-04 -->\n\n# Notes\n"
+        write(self.root, ".agents/skills/review/references/y.md", header)
+        write(self.root, ".agents/skills/review/SKILL.md", SKILL.replace("license: MIT\n", ""))
+        found = self.findings("third-party")
+        self.assertEqual({lint.ERROR, lint.WARNING}, {f.level for f in found})
+        write(self.root, "THIRD_PARTY.md", "# Third-party\n\n| `.agents/skills/review/references/y.md` | https://github.com/x/y | MIT |\n")
+        write(self.root, ".agents/skills/review/SKILL.md", SKILL)
+        self.assertFalse(self.findings("third-party"))
+        write(self.root, ".agents/skills/review/references/own.md", "# Our own notes\n")
+        self.assertFalse(self.findings("third-party"))
+
+
+class TestMcpShape(LintCase):
+    def test_unpinned_and_untyped_url_and_cursor_placeholder(self):
+        write(self.root, ".mcp.json", json.dumps({"mcpServers": {
+            "dataforseo": {"type": "stdio", "command": "npx", "args": ["-y", "dataforseo-mcp-server"]},
+            "x": {"url": "https://x.example.com"}}}))
+        write(self.root, ".cursor/mcp.json", json.dumps({"mcpServers": {
+            "dataforseo": {"type": "stdio", "command": "npx", "args": ["-y", "dataforseo-mcp-server@1.0.0"]},
+            "x": {"url": "https://x.example.com", "headers": {"Authorization": "Bearer ${X_KEY}"}}}}))
+        messages = [f.message for f in self.findings("mcp")]
+        self.assertTrue(any("pinned" in m for m in messages))
+        self.assertTrue(any('"type": "http"' in m for m in messages))
+        self.assertTrue(any("Cursor entries carry no" in m for m in messages))
+        self.assertTrue(any("${env:VAR}" in m for m in messages))
+
+    def test_secrets_doc_row(self):
+        write(self.root, "docs/secrets.md", "# Secrets\n\n| `DATAFORSEO_LOGIN` |\n")
+        found = self.findings("mcp-env", lint.WARNING)
+        self.assertTrue(any(f.path == "docs/secrets.md" and "DATAFORSEO_PASSWORD" in f.message for f in found))
 
 
 class TestCompetitive(LintCase):

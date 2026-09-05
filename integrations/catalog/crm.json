@@ -1,0 +1,272 @@
+{
+  "id": "crm",
+  "title": "CRM",
+  "for": "pipeline, contacts, companies, deals, lifecycle stages",
+  "data_domain": "data/crm",
+  "manual": {
+    "export": "Export the deals or contacts view as CSV from the CRM's list page (HubSpot: Contacts/Deals > Export; Salesforce: a report > Export) and drop the file into the snapshots folder.",
+    "drop": "data/crm/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "hubspot",
+      "name": "HubSpot",
+      "source": "hubspot",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server",
+      "capabilities": ["contacts", "companies", "deals", "engagements", "crm-sql-query", "campaigns", "campaign-attribution"],
+      "writes": true,
+      "write_tools": ["manage_crm_objects", "manage_marketing_email", "manage_landing_page", "manage_blog_post", "manage_campaign_objects"],
+      "read_only_switch": null,
+      "caveats": [
+        "OAuth is user-level: the server can do whatever the signed-in HubSpot user can, so deny the manage_* tools (mcp__hubspot__manage_*) in .claude/settings.json unless writes are wanted",
+        "The vendor page documents https://mcp.hubspot.com; Claude Code examples elsewhere use https://mcp.hubspot.com/anthropic; confirm which path your client needs on the day you wire it",
+        "Custom Sensitive Data properties are not exposed",
+        "Works on any HubSpot tier including Free; the Claude connector needs a paid Claude plan",
+        "The same server serves marketing-automation (marketing email, landing pages, blog, campaigns); one .mcp.json entry covers both categories",
+        "The local developer MCP (hs mcp setup) is for CMS and app development, not CRM data"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "hubspot",
+            "transport": "http",
+            "url": "https://mcp.hubspot.com",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use; scopes follow the HubSpot user's permissions"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "hs", "install": "npm i -g @hubspot/cli", "notes": "developer tooling for CMS themes, projects and apps; it does not export CRM data, so scheduled pipeline snapshots need a script"},
+        "script": {"path": null, "env": ["HUBSPOT_ACCESS_TOKEN"], "notes": "copy scripts/seo_snapshot.py; a private-app token (Settings > Integrations > Private apps) with read scopes calls the CRM v3 search API for a scheduled pipeline snapshot"}
+      }
+    },
+    {
+      "id": "salesforce",
+      "name": "Salesforce",
+      "source": "salesforce",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developer.salesforce.com/docs/ai/agentforce/guide/mcp.html",
+      "capabilities": ["soql-query", "records", "opportunities", "leads", "reports", "metadata"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__salesforce`) until checked",
+        "Hosted MCP Servers are GA (Apr 2026) for Enterprise Edition and above plus Developer Edition; the hosted URL pattern comes from third-party write-ups because the vendor page returned 403; a person confirms it in Setup before wiring",
+        "Sandbox orgs use https://api.salesforce.com/platform/mcp/v1/sandbox/",
+        "The DX server (@salesforce/mcp) authenticates through the sf CLI's org login, so `sf org login web` must have run on the machine; its data toolset can run DML, so scope --toolsets to what the workflow needs",
+        "Field-level security and sharing rules apply to every call in both variants",
+        "Community alternative tsmztech/mcp-server-salesforce exists; judge it as a script, not a vendor tool"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "remote",
+            "default": true,
+            "server": "salesforce",
+            "transport": "http",
+            "url": "https://api.salesforce.com/platform/mcp/v1/platform/",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant as the Salesforce user; an admin enables Hosted MCP Servers in Setup first"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "local",
+            "default": false,
+            "server": "salesforce-dx",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@salesforce/mcp@0.30.15", "--orgs", "DEFAULT_TARGET_ORG", "--toolsets", "orgs,data"],
+            "env": {},
+            "auth": {"model": "none", "env": [], "where": "reuses the sf CLI's stored org auth (sf org login web); nothing goes in .env"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "sf", "install": "npm i -g @salesforce/cli", "notes": "sf data query --query \"SELECT ...\" --result-format csv for scheduled exports and bulk work; sf data export bulk for large tables"},
+        "script": {"path": null, "env": [], "notes": "usually unnecessary: call the sf CLI from a workflow step and save its CSV as a snapshot"}
+      }
+    },
+    {
+      "id": "pipedrive",
+      "name": "Pipedrive",
+      "source": "pipedrive",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.pipedrive.com/en/features/mcp-server",
+      "capabilities": ["deals", "contacts", "leads", "activities", "pipeline-queries"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__pipedrive`) until checked",
+        "The endpoint URL is not printed on the feature page; it comes from a secondary listing. Confirm in Pipedrive's Marketplace or docs before wiring",
+        "Available on all plans; MCP usage counts against the plan's AI token limits"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "pipedrive",
+            "transport": "http",
+            "url": "https://mcp.pipedrive.ai/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["PIPEDRIVE_API_TOKEN"], "notes": "copy scripts/seo_snapshot.py; the personal API token (Settings > Personal preferences > API) reads /v2/deals for a scheduled pipeline snapshot"}
+      }
+    },
+    {
+      "id": "close",
+      "name": "Close",
+      "source": "close",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://developer.close.com/mcp",
+      "capabilities": ["leads", "contacts", "opportunities", "activities"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": {"kind": "header", "name": "Close-Scope", "value": "mcp.read"},
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__close`) until checked, or use the key variant with Close-Scope: mcp.read which exposes no write tools",
+        "Close-Scope takes mcp.read, mcp.write_safe or mcp.write_destructive; the key variant below pins mcp.read, change it on purpose in a proposal",
+        "Listed in the Claude connectors directory (claude.com/connectors/close)"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "close",
+            "transport": "http",
+            "url": "https://mcp.close.com/mcp",
+            "headers": {"Close-API-Key": "${CLOSE_API_KEY}", "Close-Scope": "mcp.read"},
+            "auth": {"model": "header", "env": ["CLOSE_API_KEY"], "where": "Close: Settings > Developer > API Keys"},
+            "headless": true,
+            "oauth_scopes": []
+          },
+          {
+            "id": "oauth",
+            "default": false,
+            "server": "close",
+            "transport": "http",
+            "url": "https://mcp.close.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (dynamic client registration)"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["CLOSE_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the same API key reads /api/v1/opportunity/ for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "attio",
+      "name": "Attio",
+      "source": "attio",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.attio.com/mcp/overview",
+      "capabilities": ["records", "notes", "tasks", "lists", "reporting", "sql-query"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__attio`) until checked",
+        "37 tools; write tools ask for confirmation in the session, which does not help a non-interactive run",
+        "OAuth only, so no headless path; a scheduled pull needs the REST API with an API key",
+        "Rate limits by tier: reads 100/s, writes 25/s, query-particle-sql 2/s (SQL on some tiers only)",
+        "Listed in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "attio",
+            "transport": "http",
+            "url": "https://mcp.attio.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["ATTIO_API_KEY"], "notes": "copy scripts/seo_snapshot.py; a workspace API key (Settings > Developers) queries /v2/objects/deals/records for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "zoho-crm",
+      "name": "Zoho CRM",
+      "source": "zohocrm",
+      "verified": "unverified",
+      "checked": "2026-09-04",
+      "source_url": "https://www.zoho.com/crm/developer/mcp.html",
+      "capabilities": ["leads", "deals", "pipeline-queries", "modules", "workflows"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__zohocrm`) until checked",
+        "Zoho ships four pre-built servers (Data Insights is read-only; Data Operations does CRUD; Modules; Workflow) but the endpoint URLs are not on the public page and the signup path is enterprise-only; no MCP entry until a person reads the URL from their Zoho admin console",
+        "Prefer the Data Insights server for questions; it exposes no writes"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["ZOHOCRM_CLIENT_ID", "ZOHOCRM_CLIENT_SECRET", "ZOHOCRM_REFRESH_TOKEN"], "notes": "copy scripts/seo_snapshot.py; a self-client OAuth app (api-console.zoho.com) with a refresh token reads /crm/v7/Deals for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "dynamics-365",
+      "name": "Microsoft Dynamics 365",
+      "source": "dynamics365",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://learn.microsoft.com/en-us/dynamics365/sales/connect-agents-to-model-context-protocol",
+      "capabilities": ["leads", "opportunities", "dataverse-tables"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__dynamics-dataverse`) until checked",
+        "Microsoft documents the servers for Copilot Studio and VS Code and says Claude Desktop is not supported at this time; the Entra ID grant may not complete from Claude Code, so treat the entry as a lead until a person tests it",
+        "A Power Platform admin must allow external MCP clients before any connection works",
+        "The URL embeds the org host (for example org12345.crm4.dynamics.com), taken from DYNAMICS_ORG_HOST in the environment",
+        "The Sales MCP server (agent365.svc.cloud.microsoft/mcp/environments/<EnvID>/servers/msdyn_SalesMCPServer) consumes Copilot Studio credits and needs an environment id; not wired here"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "remote",
+            "default": true,
+            "server": "dynamics-dataverse",
+            "transport": "http",
+            "url": "https://${DYNAMICS_ORG_HOST}/api/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": ["DYNAMICS_ORG_HOST"], "where": "Entra ID browser sign-in; DYNAMICS_ORG_HOST is the org hostname from Power Platform admin center, not a secret"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "pac", "install": "dotnet tool install --global Microsoft.PowerApps.CLI.Tool", "notes": "pac auth create, then pac env fetch --sql for scheduled table exports; the Dataverse Web API is the script fallback"},
+        "script": {"path": null, "env": ["DYNAMICS_ORG_HOST", "DYNAMICS_CLIENT_ID", "DYNAMICS_CLIENT_SECRET", "DYNAMICS_TENANT_ID"], "notes": "copy scripts/seo_snapshot.py; an Entra app registration with client credentials reads /api/data/v9.2/opportunities for a scheduled snapshot"}
+      }
+    }
+  ]
+}

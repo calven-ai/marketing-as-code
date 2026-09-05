@@ -1,0 +1,87 @@
+{
+  "id": "chat",
+  "title": "Chat",
+  "for": "the team's chat tool: digests, alerts and red flags out; reading threads and requests in",
+  "data_domain": null,
+  "manual": {
+    "export": "the digest is printed for a person to paste into the channel by hand",
+    "drop": "the channel itself; the repo keeps its copy in reports/ or memory/decision-log.md with the permalink"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "slack",
+      "name": "Slack",
+      "source": "slack",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.slack.dev/ai/slack-mcp-server/",
+      "capabilities": ["search", "read channels and threads", "send messages", "canvases", "lists"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "workspace admin must approve; only directory or internal apps",
+        "write tool names not verified; deny the whole server (`mcp__slack`) until checked",
+        "read and write are gated by the OAuth scopes granted; keep `oauth.scopes` minimal in the .mcp.json entry",
+        "this repo already posts through its own bot (scripts/slack_post.py); use the MCP for search and reading in a session, keep sending on the script"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "slack",
+            "transport": "http",
+            "url": "https://mcp.slack.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use, as the person's Slack user"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {
+          "path": "scripts/slack_post.py",
+          "env": ["SLACK_BOT_TOKEN", "SLACK_REQUESTS_CHANNEL_ID", "SLACK_TEAM_CHANNEL_ID", "SLACK_LEADERSHIP_CHANNEL_ID"],
+          "notes": "the team's own Slack app (integrations/slack/); outbound posts only"
+        }
+      }
+    },
+    {
+      "id": "microsoft-teams",
+      "name": "Microsoft Teams",
+      "source": "teams",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/",
+      "capabilities": ["chats", "channels"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Work IQ Teams MCP is an Agent 365 preview; Microsoft documents Copilot Studio and VS Code as clients, not Claude; confirm it accepts an external MCP client before wiring",
+        "write tool names not verified; deny the whole server (`mcp__microsoft-teams`) until checked",
+        "the URL carries the tenant id (`TEAMS_TENANT_ID`, not a secret); the sign-in is Entra ID in the browser",
+        "seen only in a secondary listing; confirm the endpoint on Microsoft Learn on the day you wire it"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "microsoft-teams",
+            "transport": "http",
+            "url": "https://agent365.svc.cloud.microsoft/agents/tenants/${TEAMS_TENANT_ID}/servers/mcp_TeamsServer",
+            "headers": {},
+            "auth": {"model": "oauth", "env": ["TEAMS_TENANT_ID"], "where": "Entra ID sign-in in the browser; a tenant admin must allow external MCP clients"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    }
+  ]
+}

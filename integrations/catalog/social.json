@@ -1,0 +1,271 @@
+{
+  "id": "social",
+  "title": "Social media publishing and listening",
+  "for": "scheduling and publishing posts, post performance, mentions and listening on X, LinkedIn, Threads, Bluesky",
+  "data_domain": "data/social",
+  "manual": {
+    "export": "Export the post performance or analytics report as CSV from the scheduling tool or the network's own analytics (LinkedIn Page > Analytics > Export; X Analytics > Export data) and drop the file into the snapshots folder.",
+    "drop": "data/social/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic", "scraping-search"],
+  "vendors": [
+    {
+      "id": "x",
+      "name": "X (Twitter)",
+      "source": "x",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://github.com/xdevplatform/xmcp",
+      "capabilities": ["search", "users", "engagement", "trends", "bookmarks", "articles"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__x`) until checked (the known writes are bookmarks and article publishing; posting via MCP is not confirmed)",
+        "The hosted server at https://api.x.com/mcp (announced June 2026) authenticates with the user's own X developer credentials; API tier limits apply to every call, and full-archive search needs a paid tier",
+        "The open-source xdevplatform/xmcp server runs locally with X_BEARER_TOKEN, X_OAUTH_CONSUMER_KEY and X_OAUTH_CONSUMER_SECRET but is not published as a versioned package, so no stdio entry; clone it if the hosted endpoint does not fit",
+        "The hosted URL comes from the X developer community announcement, not the API reference; confirm before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "x",
+            "transport": "http",
+            "url": "https://api.x.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant with an X Developer Platform app"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["X_BEARER_TOKEN"], "notes": "copy scripts/seo_snapshot.py; the app bearer token (developer.x.com > Keys and tokens) reads api.x.com/2/users/{id}/tweets with public_metrics for a scheduled performance snapshot"}
+      }
+    },
+    {
+      "id": "buffer",
+      "name": "Buffer",
+      "source": "buffer",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://buffer.com/mcp",
+      "capabilities": ["create-posts", "schedule", "ideas", "analytics", "channels"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__buffer`) until checked",
+        "Buffer parks MCP-created posts as drafts or scheduled items (\"you're the last step\"), which fits the humans-decide rule; still, scheduling is a publish action",
+        "The vendor page confirms the server and OAuth or personal API key auth but does not print the endpoint URL; no .mcp.json entry until a person reads it from the Buffer settings page",
+        "Eleven channels including LinkedIn, X, Threads and Bluesky; every plan including Free; not in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["BUFFER_ACCESS_TOKEN"], "notes": "copy scripts/seo_snapshot.py; the personal access token (Buffer > Settings > API) reads the GraphQL API for a scheduled post-performance snapshot"}
+      }
+    },
+    {
+      "id": "hootsuite",
+      "name": "Hootsuite",
+      "source": "hootsuite",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://www.hootsuite.com/integrations/mcp",
+      "capabilities": ["publishing", "inbox", "listening", "analytics"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole servers (`mcp__hootsuite-publish`, `mcp__hootsuite-inbox`) until checked",
+        "Three servers: perch (publishing), nest (inbox), lumen (listening); wire only the ones a workflow needs, listening is read-only",
+        "Publishing through perch is a user-visible action; humans decide",
+        "Not in the Claude connectors directory"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth-listening",
+            "default": true,
+            "server": "hootsuite-listen",
+            "transport": "http",
+            "url": "https://mcp.hootsuite.com/lumen",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "oauth-publishing",
+            "default": false,
+            "server": "hootsuite-publish",
+            "transport": "http",
+            "url": "https://mcp.hootsuite.com/perch",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "oauth-inbox",
+            "default": false,
+            "server": "hootsuite-inbox",
+            "transport": "http",
+            "url": "https://mcp.hootsuite.com/nest",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["HOOTSUITE_ACCESS_TOKEN"], "notes": "copy scripts/seo_snapshot.py; an OAuth token from a Hootsuite developer app reads platform.hootsuite.com/v1/messages for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "sprout-social",
+      "name": "Sprout Social",
+      "source": "sproutsocial",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://mcp.sproutsocial.com/mcp",
+      "capabilities": ["analytics", "listening", "publishing"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__sproutsocial`) until checked (publishing over MCP is reported but not confirmed)",
+        "The endpoint comes from a secondary listing; Sprout's own page was not found, confirm before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "sproutsocial",
+            "transport": "http",
+            "url": "https://mcp.sproutsocial.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["SPROUT_API_TOKEN"], "notes": "copy scripts/seo_snapshot.py; an API token (Settings > API) reads api.sproutsocial.com/v1/{customer_id}/analytics/posts for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "typefully",
+      "name": "Typefully",
+      "source": "typefully",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://support.typefully.com/en/articles/13128440-typefully-mcp-server",
+      "capabilities": ["drafts", "schedule", "x", "linkedin", "threads", "bluesky", "mastodon"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__typefully`) until checked",
+        "Creating a draft is the safe write; scheduling publishes at the set time, so keep scheduling behind human approval"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "typefully",
+            "transport": "http",
+            "url": "https://mcp.typefully.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["TYPEFULLY_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the API key (Settings > Integrations) reads api.typefully.com/v1/drafts/recently-published for a scheduled snapshot"}
+      }
+    },
+    {
+      "id": "taplio",
+      "name": "Taplio",
+      "source": "taplio",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://mcp.taplio.com",
+      "capabilities": ["linkedin-drafts", "schedule", "publish", "linkedin-analytics"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__taplio`) until checked (publishing to LinkedIn is among the writes)",
+        "The endpoint comes from a secondary listing and the exact path was not confirmed; confirm before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "taplio",
+            "transport": "http",
+            "url": "https://mcp.taplio.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "linkedin-organic",
+      "name": "LinkedIn (organic pages and profiles)",
+      "source": "linkedin",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/posts-api",
+      "capabilities": ["page-posts", "page-analytics"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "No official LinkedIn MCP server; post and read pages through Buffer, Hootsuite, Typefully or Taplio above, or export Page analytics by hand",
+        "Community LinkedIn servers use unofficial APIs or browser automation and breach LinkedIn's terms; do not wire them",
+        "Public profile and company research goes through the Apify actors already wired (researcher skill), which is the scraping-search bridge"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["LINKEDIN_ACCESS_TOKEN", "LINKEDIN_ORG_ID"], "notes": "copy scripts/seo_snapshot.py; a Community Management API token (app with the Community Management product, partner approval) reads api.linkedin.com/rest/organizationalEntityShareStatistics for a scheduled page-performance snapshot"}
+      }
+    },
+    {
+      "id": "ayrshare",
+      "name": "Ayrshare",
+      "source": "ayrshare",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://www.ayrshare.com/docs/mcp",
+      "capabilities": ["docs-search", "multi-network-posting"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server until checked",
+        "The public server at https://www.ayrshare.com/docs/mcp is a read-only documentation search; the separate Action MCP that posts to 14+ networks with an API key is mentioned in the docs but its URL was not on the page read, so no .mcp.json entry",
+        "Posting through the Action server is a user-visible action; humans decide"
+      ],
+      "routes": {
+        "mcp": [],
+        "cli": null,
+        "script": {"path": null, "env": ["AYRSHARE_API_KEY"], "notes": "copy scripts/seo_snapshot.py; the API key (Ayrshare dashboard > API Key) reads app.ayrshare.com/api/analytics/post for a scheduled snapshot"}
+      }
+    }
+  ]
+}

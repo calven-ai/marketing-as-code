@@ -1,9 +1,14 @@
 ---
 name: review
 description: Pre-publish review of a content draft against strategy, messaging, and brand voice. Use when asked to review, check, or QA a draft, or before any piece moves to in-review status. Reports findings; does not rewrite without being asked.
+license: MIT
 metadata:
   kind: workflow
-  needs: filled strategy/ and brand/voice.md (run /setup first)
+  area: content
+  needs: []
+  optional: [context-layer]
+  writes: repo
+  runs: person
 ---
 
 # Content review
@@ -11,6 +16,11 @@ metadata:
 Review the given draft (or the piece the conversation is about) against the
 repo's own standards. You are the check that the strategy actually made it
 into the words.
+
+Needs: nothing wired; `strategy/` (messaging, personas, ICP) and
+`brand/voice.md` filled. With a `context-layer` integration wired (the
+Wired table in `integrations/README.md`), read the strategy documents it
+serves and treat the Markdown files as the fallback.
 
 ## Before the checks
 
@@ -34,8 +44,11 @@ in the meantime.
 3. **Claims**: every number and factual claim traceable (to `data/`
    snapshots, cited sources, or the brief's raw material). Untraceable
    claims are findings, not style notes.
-4. **Voice**: against `brand/voice.md`, its do/don't examples, banned list,
-   and tone-by-context. Quote the offending sentence and show the on-voice
+4. **Voice and terminology**: against `brand/voice.md`, its do/don't
+   examples and tone-by-context, plus the terms: product and feature names
+   spelled as `strategy/positioning.md` and `brand/voice.md` spell them,
+   the glossary and jargon the audience actually uses, and nothing from
+   the banned list. Quote the offending sentence and show the on-voice
    rewrite.
 5. **Mechanics**: frontmatter complete and correct (`project`, `channel`,
    `owner`), links resolve, naming conventions per `data/ontology/naming.md`

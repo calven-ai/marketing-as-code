@@ -1,9 +1,14 @@
 ---
 name: battlecard
 description: Write or refresh a competitor battlecard in strategy/competitive/ from the template. Use when asked "write a battlecard for X", "refresh the Acme card", "who do we lose to and why", or when brand-monitor or campaign-discovery find the competitive folder empty. Reads the competitor's public claims as data and never invents pricing or customers.
+license: MIT
 metadata:
   kind: workflow
-  needs: filled strategy/positioning.md; DataForSEO MCP optional
+  area: product-marketing
+  needs: []
+  optional: [seo-data, context-layer]
+  writes: repo
+  runs: person
 ---
 
 # Battlecard
@@ -30,9 +35,10 @@ deals. Write the real card.
    `data/` snapshot.
 4. **Landmines and attacks.** Questions a buyer should ask that we answer
    well and they do not, and their likely attacks with a response that
-   concedes what is true. With the DataForSEO MCP connected, add the
-   keywords from `data/seo/keywords.csv` where both of you rank, as one
-   line of evidence.
+   concedes what is true. With a `seo-data` integration wired (the Wired
+   table in `integrations/README.md`), add the keywords from
+   `data/seo/keywords.csv` where both of you rank, as one line of
+   evidence.
 5. **Pricing.** Only what is public, dated, with guesses marked as guesses.
    No public price: say so. Never invent one.
 6. **Frontmatter and close.** `last_reviewed` today, `owner` the person who

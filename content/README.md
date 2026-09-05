@@ -17,7 +17,7 @@ studies are content *types* here. They don't get their own top-level folders.
   ```yaml
   project: projects/q4-launch/webinar   # the project that produced it ("" if none)
   status: idea | brief | draft | in-review | published | evergreen
-  channel: blog | email | linkedin | webinar | ad | case-study | other
+  channel: blog | email | linkedin | webinar | ad | case-study | web | social | outbound | sales | pr | talk | partner | community | analyst | other
   owner: name
   published: ""                         # YYYY-MM-DD, set when status flips to published
   published_url: ""                     # once live

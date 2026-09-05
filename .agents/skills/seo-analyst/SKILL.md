@@ -1,9 +1,14 @@
 ---
 name: seo-analyst
-description: Keyword and ranking analysis against data/seo/keywords.csv using the DataForSEO MCP. Use when asked about search volumes, keyword difficulty, current ranks, SERP competitors, keyword ideas, or "how are our rankings doing". Saves every pull as a dated snapshot and writes the analysis to reports/.
+description: Keyword and ranking analysis against data/seo/keywords.csv through the wired seo-data integration. Use when asked about search volumes, keyword difficulty, current ranks, SERP competitors, keyword ideas, or "how are our rankings doing". Saves every pull as a dated snapshot and writes the analysis to reports/.
+license: MIT
 metadata:
   kind: role
-  needs: DataForSEO MCP
+  area: seo
+  needs: [seo-data]
+  cadence: weekly
+  writes: repo
+  runs: either
 ---
 
 # SEO analyst
@@ -12,15 +17,22 @@ You answer keyword and ranking questions with fresh, saved evidence. The
 canonical keyword table is `data/seo/keywords.csv`; every number you pull
 lands in `data/seo/snapshots/` first, and your analysis in `reports/`.
 
-Needs: the DataForSEO MCP server (`dataforseo` in `.mcp.json`, credentials
-`DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD` in `.env`, which you never
-read yourself). Without it, say exactly which CSV export the human should
-drop into `data/seo/snapshots/` and stop.
+Needs: a wired `seo-data` integration. Which vendor fills it here is the
+Wired table in `integrations/README.md` (DataForSEO in the template);
+`references/<vendor>.md` in this folder has the tool names, the location
+and language rules, and the mapping from the vendor's fields to the
+snapshot columns (`references/dataforseo.md` today). Without it, say
+exactly which CSV export to drop into
+`data/seo/snapshots/YYYY-MM-DD-<vendor>-<what>.csv` (the manual route in
+`integrations/catalog/seo-data.json`: the keyword or ranking report
+exported from the tool) and stop. Never estimate.
 
-Two run modes, the team's choice (`docs/operating-model.md`): the routine
+Run mode, the team's choice (`docs/operating-model.md`): the routine
 refresh is a script (`scripts/seo_snapshot.py`) a person runs on Monday or
-a cron step runs for them; everything else is a question asked in a
-session and answered through the MCP, which cannot run unattended.
+a cron step runs for them; that stays the cheap path. Everything else is a
+question asked in a session and answered through the MCP. The server is
+key-based, so a copy of `.github/workflows/role-run.yml` can run the MCP
+part unattended too, once the team opts in.
 
 ## Procedure
 
@@ -28,20 +40,18 @@ session and answered through the MCP, which cannot run unattended.
    here) and `data/seo/README.md`. Read `keywords.csv`: these are the
    keywords the team cares about. Do not add rows on your own; propose
    additions in the report.
-2. **Check what exists.** The newest `data/seo/snapshots/*-dataforseo-*.csv`
+2. **Check what exists.** The newest `data/seo/snapshots/*-<vendor>-*.csv`
    answers a weekly question; a "right now" question needs a fresh pull.
 3. **Pull.** For the routine volume and difficulty refresh, run
    `python3 scripts/seo_snapshot.py` (add `--update` to refresh the
    canonical table); it saves the snapshot for you. For everything else,
-   **pull with the DataForSEO MCP**, keeping calls small and stated:
-   - volumes and difficulty: keyword overview / search volume tools for the
-     keyword list, one location and language (from the ontology, else ask);
-   - current ranks: ranked keywords for our domain, or a live SERP check
-     for the few keywords that matter most;
-   - SERP competitors: the SERP competitors tool for the keyword set;
-   - ideas: keyword ideas or suggestions when asked to expand.
+   pull through the wired vendor's MCP, keeping calls small and stated.
+   `references/<vendor>.md` names the tool family for each question
+   (volumes and difficulty, current ranks, SERP competitors, keyword
+   ideas) and how its fields map to the snapshot columns. One location
+   and language per pull, from the ontology, else ask.
 4. **Save the pull** before analysing it:
-   `data/seo/snapshots/YYYY-MM-DD-dataforseo-<what>.csv`, header row,
+   `data/seo/snapshots/YYYY-MM-DD-<vendor>-<what>.csv`, header row,
    stable columns (`keyword,volume,difficulty,rank,url,checked`). Never
    edit an old snapshot.
 5. **Update the canonical table** only for existing rows: `volume`,
@@ -76,7 +86,8 @@ session and answered through the MCP, which cannot run unattended.
 
 - Every number in a report traces to a snapshot path. A missing pull is a
   gap, never an estimate.
-- Say how many API calls you made and roughly what they cost; DataForSEO
-  bills per request.
+- Say how many API calls you made and roughly what they cost; SEO data
+  vendors bill per request or per row, and `references/<vendor>.md` says
+  which.
 - Location and language come from the ontology or the human, not from a
   default you picked.

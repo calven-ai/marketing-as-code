@@ -1,0 +1,126 @@
+{
+  "id": "billing",
+  "title": "Billing",
+  "for": "subscriptions, revenue, renewals, MRR and churn for PLG and self-serve reporting",
+  "data_domain": "data/crm",
+  "manual": {
+    "export": "Export customers, subscriptions or MRR movements as CSV from the billing dashboard (Stripe: Billing > Subscriptions > Export; ChartMogul: Data > Export).",
+    "drop": "data/crm/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "stripe",
+      "name": "Stripe",
+      "source": "stripe",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://docs.stripe.com/mcp",
+      "capabilities": ["customers", "subscriptions", "invoices", "products and prices", "payment links", "refunds and disputes", "balance", "analytics and metrics (preview)", "Stripe docs search"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": {"kind": "header", "name": "Authorization", "value": "Bearer <restricted key with stripe_api_read only>"},
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__stripe`) until checked",
+        "Writes are gated by the key's `stripe_api_write` permission; a restricted key with `stripe_api_read` only makes the server read-only for scheduled pulls.",
+        "OAuth access is revocable per environment in the Stripe dashboard; admins manage which users may connect MCP clients.",
+        "A local stdio alternative exists (@stripe/mcp 0.3.3 on npm) and takes the key as an argument; the remote server is preferred."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "stripe",
+            "transport": "http",
+            "url": "https://mcp.stripe.com",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          },
+          {
+            "id": "key",
+            "default": false,
+            "server": "stripe",
+            "transport": "http",
+            "url": "https://mcp.stripe.com",
+            "headers": {"Authorization": "Bearer ${STRIPE_RESTRICTED_KEY}"},
+            "auth": {"model": "bearer", "env": ["STRIPE_RESTRICTED_KEY"], "where": "Stripe dashboard > Developers > API keys > restricted key"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": {"tool": "stripe", "install": "brew install stripe/stripe-cli/stripe", "notes": "`stripe get /v1/subscriptions --api-key <restricted key>` for scripted, headless pulls; JSON output"},
+        "script": null
+      }
+    },
+    {
+      "id": "chartmogul",
+      "name": "ChartMogul",
+      "source": "chartmogul",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://mcp.chartmogul.com",
+      "capabilities": ["MRR, ARR, churn and LTV metrics", "customers and subscriptions", "plans", "cohorts"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Read-only by design.",
+        "The local server repo (chartmogul/chartmogul-mcp-server) is archived; the remote OAuth server replaced it, so there is no headless MCP route. Use the ChartMogul API from a script for scheduled pulls."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "chartmogul",
+            "transport": "http",
+            "url": "https://mcp.chartmogul.com",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "paddle",
+      "name": "Paddle",
+      "source": "paddle",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://mcp.paddle.com/mcp",
+      "capabilities": ["customers", "subscriptions", "transactions", "products and prices", "reports"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__paddle`) until checked",
+        "Endpoint and API-key auth seen in secondary listings only; the bearer header follows the Paddle API convention, confirm on the developer docs before wiring.",
+        "A sandbox endpoint exists for testing; point the URL at it while a workflow is being built."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "paddle",
+            "transport": "http",
+            "url": "https://mcp.paddle.com/mcp",
+            "headers": {"Authorization": "Bearer ${PADDLE_API_KEY}"},
+            "auth": {"model": "bearer", "env": ["PADDLE_API_KEY"], "where": "Paddle dashboard > Developer tools > Authentication > API keys"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    }
+  ]
+}

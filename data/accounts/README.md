@@ -25,7 +25,14 @@ enrichment outputs.
   row per person, with the actor ID that found them (`researcher` skill)
 - `2026-08-31-apify-linkedin-activity.csv`: scraped social activity for
   target accounts (`researcher` skill)
-- `2026-08-31-enrichment-firmographics.csv`
+- `2026-08-31-apollo-firmographics.csv`: enrichment output, named after
+  the vendor that produced it
+- `2026-08-31-repo-engagement.csv`: engagement per target account, computed
+  in-repo from the other domains (`account-signals` skill)
+- `2026-08-31-repo-partner-candidates.csv`: accounts that look like partners
+  rather than buyers, computed in-repo
+- `2026-08-31-web-competitor-changes.csv`: what changed on competitor
+  websites since the last pull (`competitor-watch` skill)
 
 ## Rules
 

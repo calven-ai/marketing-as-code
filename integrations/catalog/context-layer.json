@@ -1,0 +1,48 @@
+{
+  "id": "context-layer",
+  "title": "Context layer",
+  "for": "positioning, messaging, ICP, product brief, personas, competitors and customer voice served live to every agent",
+  "data_domain": "strategy",
+  "manual": {
+    "export": "Keep the strategy documents as hand-edited Markdown and bump last_reviewed when the team reviews them.",
+    "drop": "strategy/*.md maintained by hand with last_reviewed dates"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "calven",
+      "name": "Calven",
+      "source": "calven",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://calven.ai/mcp",
+      "capabilities": ["get_workspace_overview", "get_strategy_document", "list_records", "get_persona", "get_competitor"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "Calven maintains this repository (disclosed in integrations/context-layer.md)",
+        "Already wired in .mcp.json and .cursor/mcp.json as the `calven` server; the repo works without it.",
+        "Each person has one active key, shown once; it goes in .env as CALVEN_MCP_KEY and never in a committed file.",
+        "A document that has not been written is reported as not written, never invented; fall back to strategy/*.md and state its last_reviewed date when the MCP is unreachable."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "key",
+            "default": true,
+            "server": "calven",
+            "transport": "http",
+            "url": "https://app.calven.ai/api/mcp",
+            "headers": {"Authorization": "Bearer ${CALVEN_MCP_KEY}"},
+            "auth": {"model": "bearer", "env": ["CALVEN_MCP_KEY"], "where": "Calven: Settings > Integrations > MCP"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    }
+  ]
+}

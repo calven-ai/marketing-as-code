@@ -39,11 +39,13 @@ yours", and `/setup` does the first three items for you. In order:
     `_battlecard-template.md`. `/setup` round 4 starts them; the `battlecard`
     skill fills them.
 12. **`.mcp.json` and `.cursor/mcp.json`.** Remove the servers you do not
-    use, from both files together (the check requires that they agree), and
-    the matching lines in `.env.example` and in the Env vars column of
-    `integrations/README.md`.
-13. **`integrations/README.md`.** The Wired table is now yours. Mark what you
-    actually connected.
+    use with `python3 scripts/wire_integration.py --unwire <vendor>`, which
+    edits both files together and the binding; then wire your own stack,
+    one vendor per category, with `python3 scripts/wire_integration.py
+    <vendor>` (`--list` shows the catalog).
+13. **`integrations/wired.json`.** The bindings are now yours; the Wired
+    table in `integrations/README.md` renders from them
+    (`python3 scripts/lint.py --fix`).
 14. **`.env`.** Copy `.env.example` to `.env` yourself and fill only what you
     use. The agent cannot read either file, by design
     ([secrets.md](secrets.md)).

@@ -1,9 +1,13 @@
 ---
 name: sync
 description: Bring in the latest approved copy and say what is waiting on you. Use at the start of a session, when asked to "sync", "get the latest", "where am I", "what's waiting on me", or to look again while a proposal is checking.
+license: MIT
 metadata:
   kind: workflow
-  needs: nothing; the GitHub CLI to list proposals
+  area: core
+  needs: []
+  writes: repo
+  runs: person
 ---
 
 # Sync

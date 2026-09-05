@@ -1,7 +1,8 @@
 # data/crm/
 
-Pipeline, signup and email-performance pulls from the CRM (HubSpot or
-equivalent). See `integrations/README.md`.
+Pipeline, signup, contact and company pulls from the CRM (HubSpot or
+equivalent). See `integrations/README.md`. Email performance lives in
+`data/email/`, event attendee lists in `data/events/`.
 
 ## Snapshots
 
@@ -10,9 +11,11 @@ equivalent). See `integrations/README.md`.
 - `2026-08-31-hubspot-pipeline.csv`: deals by stage (stages defined in
   `data/ontology/funnel.md`)
 - `2026-08-31-hubspot-new-contacts.csv`
-- `2026-08-31-hubspot-email-performance.csv`
-- `2026-09-15-hubspot-event-x-attendees.csv`: event attendee exports land
-  here too
+- `2026-08-31-hubspot-closed-deals.csv`: won and lost, with close reason
+- `2026-08-31-hubspot-customers.csv`: the customer base, one row per
+  account
+- `2026-08-31-hubspot-contacts.csv` and `2026-08-31-hubspot-companies.csv`:
+  full exports the `data-hygiene-audit` skill reads
 
 ## Rules
 

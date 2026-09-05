@@ -6,6 +6,26 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- The foundation set: 99 skills across eighteen marketing areas (product
+  marketing, content, organic search, AI visibility, social, paid, email,
+  pipeline and ABM, events, PR, partner, community, customer marketing,
+  marketing operations, web, brand, leadership), 22 of them recurring
+  roles, in `agents/README.md` one table per area. Skills bind to
+  integration categories (`crm`, `web-analytics`, `ads`, twenty-five in
+  all), never to vendors: `integrations/wired.json` says which vendor
+  fills each category, `integrations/catalog/<category>.json` holds every
+  vendor route the maintainers surveyed with how and when it was verified,
+  and `python3 scripts/wire_integration.py <vendor>` wires one into
+  `.mcp.json`, `.cursor/mcp.json` and `.env.example` with the server's
+  write tools denied until the team lifts that. The check validates the
+  catalog, the bindings, skill metadata and the category coverage in both
+  directions, and renders the registry and the roster. Six new data
+  domains (`ads`, `email`, `social`, `events`, `pr`, `reviews`), thirteen
+  recurring-report folders, a grown content channel list, the authoring
+  contract in `docs/skill-authoring.md` with two templates, third-party
+  reference material attributed in `THIRD_PARTY.md`, and
+  `.github/workflows/role-run.yml`, the opt-in runner for any role whose
+  categories are wired to key-based servers.
 - The front door tells the truth. The README says what this is and what it
   is not, what you need, what it costs, and names the commands (`/doctor`,
   `/setup`, `/new-content`, `/review`, `/propose`, `/sync`); a lifecycle

@@ -1,0 +1,231 @@
+{
+  "id": "intent",
+  "title": "Intent",
+  "for": "intent and signal data: which target accounts are in market, joined to data/accounts",
+  "data_domain": "data/accounts",
+  "manual": {
+    "export": "export the account list with its intent score or buying stage from the tool as CSV (one row per account, with the company domain)",
+    "drop": "data/accounts/snapshots/YYYY-MM-DD-<source>-<what>.csv"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "commonroom",
+      "name": "Common Room",
+      "source": "commonroom",
+      "verified": "vendor",
+      "checked": "2026-09-04",
+      "source_url": "https://www.commonroom.io/docs/using-common-room/mcp-server/",
+      "capabilities": ["signals", "segments", "activities", "contacts and organisations"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__commonroom`) until checked (4 tools, two of them upsert contacts and organisations)",
+        "paid plans only"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "commonroom",
+            "transport": "http",
+            "url": "https://mcp.commonroom.io/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (OAuth 2.1)"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "demandbase",
+      "name": "Demandbase",
+      "source": "demandbase",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developer.demandbase.com/docs/claude",
+      "capabilities": ["accounts", "people", "intent", "engagement"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "endpoint seen in a secondary listing; confirm on the developer page before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "demandbase",
+            "transport": "http",
+            "url": "https://gateway.demandbase.com/mcp/servers/db-mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "sixsense",
+      "name": "6sense",
+      "source": "sixsense",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://support.6sense.com/docs/6sense-model-context-protocol-mcp-1",
+      "capabilities": ["account insights", "6QA and buying stage", "keyword intent", "ad performance"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "an official server exists (open beta, GA planned Aug 2026), OAuth with dynamic client registration where the client supports it, and all operations are read-only by design",
+        "the endpoint is not on the public pages; it is issued in the 6sense setup guide for Revenue Marketing customers, so wire it only after a person reads it there",
+        "not in the Claude connectors directory"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "g2",
+      "name": "G2 Buyer Intent",
+      "source": "g2",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://documentation.g2.com/docs/g2-mcp-server",
+      "capabilities": ["buyer intent signals (0-100)", "reviews", "product catalog", "categories", "research boards"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__g2`) until checked (the docs name create, update and delete on research boards; G2 data itself is read-only)",
+        "in the Claude connectors directory; endpoint read on the vendor docs page today, the survey marks it as a secondary listing",
+        "the same server covers reviews (customer voice)"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "g2",
+            "transport": "http",
+            "url": "https://mcp.g2.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use (OAuth 2.0)"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "warmly",
+      "name": "Warmly",
+      "source": "warmly",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.warmly.ai/launches/warmly-mcp-and-api-are-live",
+      "capabilities": ["website visitor signals", "warm accounts"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "read-only by design: `list_warm_visitors`, `list_warm_accounts`, `get_credits_remaining`",
+        "250 free credits a month",
+        "endpoint read on the vendor launch page today; the survey marks it as a secondary listing"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "warmly",
+            "transport": "http",
+            "url": "https://opps-api.getwarmly.com/api/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "rb2b",
+      "name": "RB2B",
+      "source": "rb2b",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.npmjs.com/package/@rb2b/rb2b-apis-mcp",
+      "capabilities": ["IP to company resolution", "LinkedIn profile resolution"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "the npm package is published under the vendor's scope; the environment variable it reads is not verified, confirm it in the package README at the pinned version before wiring",
+        "a stdio server runs on the machine with the key in its environment; pin the version and bump it on purpose"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "rb2b",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@rb2b/rb2b-apis-mcp@1.1.7"],
+            "env": {"RB2B_API_KEY": "${RB2B_API_KEY}"},
+            "auth": {"model": "env", "env": ["RB2B_API_KEY"], "where": "RB2B app > Settings > API"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "bombora",
+      "name": "Bombora",
+      "source": "bombora",
+      "verified": "unverified",
+      "checked": "2026-09-04",
+      "source_url": "https://bombora.com/",
+      "capabilities": ["company surge intent"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "no official server confirmed; only a `bombora-wp-mcp` listing was seen and it is unverified",
+        "use the manual route: export the Company Surge report as CSV"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "vector",
+      "name": "Vector",
+      "source": "vector",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.vector.co/blog/we-built-an-mcp-for-marketing-heres-what-it-actually-does",
+      "capabilities": ["campaigns", "buyer activity"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "an official server is announced on the vendor blog; the endpoint and auth were not published there, wire it only after reading the setup instructions"
+      ],
+      "routes": {"mcp": [], "cli": null, "script": null}
+    }
+  ]
+}

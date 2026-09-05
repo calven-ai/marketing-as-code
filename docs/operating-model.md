@@ -101,11 +101,13 @@ Whatever the mode, these need a person every time (AGENTS.md rule 3,
 | Pull transcripts into the inbox | `python3 scripts/pull_transcripts.py` | `transcripts-cron.yml`, daily, opens a PR (shipped) |
 | Process the inbox | `/chief-of-staff` after the meeting (the default) | `transcripts-process.yml`, on merge of an inbox PR, opens a PR (opt-in, needs `ANTHROPIC_API_KEY`) |
 | Refresh keyword volumes and difficulty | `python3 scripts/seo_snapshot.py --update` | A cron step running the same script, yours to add |
-| Rankings, SERP questions, keyword ideas | `/seo-analyst` (DataForSEO MCP) | Not headless; the script covers the scheduled part |
-| AI answer-engine mentions | `/brand-monitor` | An agent-in-Actions workflow on a schedule, yours to add, or by hand |
+| Rankings, SERP questions, keyword ideas | `/seo-analyst` (the wired `seo-data` server) | Not headless; the script covers the scheduled part |
+| Run a role unattended | never directly | `role-run.yml`, reusable, called by a `role-<skill>.yml` with a schedule: filters `.mcp.json` to the servers the caller names, hands the run only their keys, opens a PR (opt-in, needs `ANTHROPIC_API_KEY` plus those keys in `automation`) |
+| AI answer-engine mentions | `/brand-monitor` | `role-brand-monitor.yml`, monthly, through `role-run.yml` (shipped, dormant until the keys exist) |
+| Pipeline, web, ads, email, social, reviews, PR, community, account and churn reports; content decay, competitor watch, status roundup, context freshness, the weekly report | `/<skill>` from the roster in `agents/README.md` | A `role-<skill>.yml` caller copied from `role-brand-monitor.yml`, yours to add once the role's categories are wired to a key-based server or a script; the check refuses a caller whose skill needs an OAuth server or writes to external systems |
 | Quarterly review | `/qmr` | By hand: it needs the team's judgment and the exports it asks for |
-| Account research | `/researcher` (Apify MCP, OAuth) | Not headless |
-| Campaign discovery, content, review, prototypes, projects | Always a person | Never |
+| Account research | `/researcher` (the wired `scraping-search` server, OAuth) | Not headless |
+| Every workflow skill: discovery, plans, briefs, drafts, reviews, audits, prototypes, projects | Always a person | Never |
 | Slack digests and alerts | `python3 scripts/slack_post.py` from a skill | Scheduled workflows calling the same script, yours to add; the message table is in `integrations/slack/README.md` |
 | Health check | `/doctor`, `python3 scripts/doctor.py` | `check.yml` on every proposal and on `main`: tests the lint, annotates, keeps the sticky comment current; read-only, no secrets (shipped) |
 | Review gate | `python3 scripts/review_gate.py --pr N --dry-run` | `gate.yml` after every check run, from `main`: classifies, pushes the safe fixes as a Tidy commit, labels, publishes `review-gate`, merges green bookkeeping proposals (shipped) |

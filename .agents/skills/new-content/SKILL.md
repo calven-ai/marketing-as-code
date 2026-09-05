@@ -1,9 +1,13 @@
 ---
 name: new-content
 description: Scaffold a new piece of content in content/. Use when asked to start, draft, or create a blog post, email, LinkedIn post, case study, webinar asset, or any content piece. Creates the folder, brief, and draft skeleton with wired frontmatter.
+license: MIT
 metadata:
   kind: workflow
-  needs: filled strategy/ and brand/voice.md (run /setup first)
+  area: core
+  needs: []
+  writes: repo
+  runs: person
 ---
 
 # New content piece

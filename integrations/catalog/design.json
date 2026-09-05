@@ -1,0 +1,115 @@
+{
+  "id": "design",
+  "title": "Design",
+  "for": "design and creative tools: reading design context, exporting assets, filling brand templates",
+  "data_domain": null,
+  "manual": {
+    "export": "a person exports the asset and drops it under brand/ or content/<x>/",
+    "drop": "brand/ (logos, templates) or content/<piece>/ (assets for one piece)"
+  },
+  "bridges": ["generic"],
+  "vendors": [
+    {
+      "id": "figma",
+      "name": "Figma",
+      "source": "figma",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://developers.figma.com/docs/figma-mcp-server/",
+      "capabilities": ["design context", "asset export", "create frames and components", "FigJam"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__figma`) until checked",
+        "in the Claude connectors directory; endpoint seen in a secondary listing, confirm on the developer docs before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "figma",
+            "transport": "http",
+            "url": "https://mcp.figma.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "canva",
+      "name": "Canva",
+      "source": "canva",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.canva.dev/docs/mcp/",
+      "capabilities": ["create designs", "autofill brand templates", "export PDF, image and video"],
+      "writes": true,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "write tool names not verified; deny the whole server (`mcp__canva`) until checked",
+        "a separate Canva Dev MCP serves SDK docs only; this entry is the design server",
+        "in the Claude connectors directory; endpoint seen in a secondary listing, confirm on canva.dev before wiring"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "canva",
+            "transport": "http",
+            "url": "https://mcp.canva.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    },
+    {
+      "id": "adobe-express",
+      "name": "Adobe Express",
+      "source": "adobeexpress",
+      "verified": "listing",
+      "checked": "2026-09-04",
+      "source_url": "https://www.npmjs.com/package/@adobe/express-developer-mcp",
+      "capabilities": ["developer documentation search only"],
+      "writes": false,
+      "write_tools": [],
+      "read_only_switch": null,
+      "caveats": [
+        "docs-only server for add-on developers, not a creative-operations server: it cannot open, edit or export a design",
+        "for the assets themselves use the manual route",
+        "no auth; runs locally"
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "local",
+            "default": true,
+            "server": "adobe-express",
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "@adobe/express-developer-mcp@1.0.0"],
+            "env": {},
+            "auth": {"model": "none", "env": [], "where": "no credentials"},
+            "headless": true,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": null
+      }
+    }
+  ]
+}

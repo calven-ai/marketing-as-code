@@ -1,9 +1,14 @@
 ---
 name: qmr
 description: Assemble the Quarterly Marketing Review. Use when asked to prepare, start, or update the QMR, quarterly review, or quarterly report. Drives the data checklist, gathers snapshots (via integrations or human exports), computes deltas vs last quarter, and fills the report and dashboard.
+license: MIT
 metadata:
   kind: workflow
-  needs: integrations help, not required
+  area: leadership
+  needs: []
+  optional: [crm, web-analytics, ads, marketing-automation, seo-data]
+  writes: repo
+  runs: person
 ---
 
 # QMR: the quarterly marketing review
@@ -11,6 +16,14 @@ metadata:
 You assemble the quarter's evidence and narrative skeleton; the team brings
 the judgment. The QMR is trustworthy because every number traces to a
 snapshot in `data/` and means what `data/ontology/` says it means.
+
+Needs: nothing wired; `data/ontology/metrics.md` and `funnel.md` filled.
+It does more with `crm`, `web-analytics`, `ads`, `marketing-automation`
+and `seo-data` wired (which vendor fills each is the Wired table in
+`integrations/README.md`; the checklist maps every item to its category),
+and for each category that is not, it names the export and the
+`data/<domain>/snapshots/` path to drop it at. A missing snapshot is a
+gap in the report, never an estimate.
 
 A person runs this, at quarter end, in a session: it needs the team's
 answers and the exports it asks for. The snapshot pulls it depends on may
@@ -27,12 +40,14 @@ run on a schedule instead (`docs/operating-model.md`).
    QMR needs, its expected path, and how to get it. For each item:
    - Already in `data/*/snapshots/` and covering the quarter → check it off
      with the path.
-   - Integration connected (`integrations/README.md`) → pull it, save it
-     under the expected snapshot name, check it off.
-   - No integration → give the human the exact export instruction from the
-     checklist ("In HubSpot: … export as CSV, drop it at
-     `data/crm/snapshots/<name>.csv`") and leave the item open. **Batch all
-     the export asks into one list**; nobody wants seven interruptions.
+   - Category wired (the Wired table in `integrations/README.md`) → pull
+     it through `snapshot-pull`, which saves it under the expected
+     snapshot name; check it off with the path.
+   - Category not wired → give the human the exact export instruction from
+     the checklist, the category's manual route ("In the CRM: … export as
+     CSV, drop it at `data/crm/snapshots/<name>.csv`"), and leave the item
+     open. **Batch all the export asks into one list**; nobody wants seven
+     interruptions.
 
 3. **Compute.** With the snapshots in hand: quarter's headline metrics vs
    targets, funnel conversion by stage, deltas vs the previous quarter's QMR
