@@ -11,13 +11,21 @@
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
       "Read(./.git/**)",
       "Read(//proc/**)",
       "Bash(env)",
       "Bash(env *)",
+      "Bash(/usr/bin/env*)",
       "Bash(printenv*)",
+      "Bash(export)",
       "Bash(export -p*)",
+      "Bash(declare -p*)",
       "Bash(set)",
+      "Bash(sh -c *)",
+      "Bash(bash -c *)",
+      "Bash(zsh -c *)",
       "Bash(python3 -c *)",
       "Bash(python -c *)",
       "Bash(node -e *)",
@@ -33,7 +41,8 @@
       "Bash(git push * -f*)",
       "Bash(git push * --force*)"
     ],
-    "disableBypassPermissionsMode": "disable"
+    "disableBypassPermissionsMode": "disable",
+    "disableAutoMode": "disable"
   },
   "hooks": {
     "SessionStart": [

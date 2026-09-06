@@ -49,16 +49,24 @@ Everyone else never sees a bot key.
 3. Start your coding agent with the keys in its environment. The MCP servers
    in `.mcp.json` read placeholders like `${CALVEN_MCP_KEY}` from the
    environment, not from `.env`, so `.env` alone does nothing for them.
+   - **1Password CLI users, the recommended way:** put references in
+     `.env` instead of values, like
+     `CALVEN_MCP_KEY=op://Private/Calven MCP/credential`. The launcher
+     below sees `op://` and runs the command through `op run`, which
+     resolves the references at start and masks the values wherever they
+     would be printed. A key the agent cannot echo is the only kind the
+     deny rules below cannot be talked around.
    - **Terminal:** `sh scripts/with_env.sh claude` (or `cursor .`, or any
-     command). The launcher exports `.env`, starts the command, and prints
-     nothing.
+     command). The launcher exports only the variables the MCP servers in
+     `.mcp.json` reference, starts the command, and prints nothing. Those
+     variables are then in the agent's environment and in every MCP
+     server's process: the deny rules stop the usual ways of printing an
+     environment, and a person still approves each command the agent
+     runs, but nothing stops an `echo` once approved. Keep that in mind
+     when a command you did not expect asks to run.
    - **Claude desktop app:** it does not read your shell. Add the same
      variables in its Local environment editor. They are stored encrypted
      on your machine and apply to every local session.
-   - **1Password CLI users:** put references in `.env` instead of values,
-     like `CALVEN_MCP_KEY=op://Private/Calven MCP/credential`. The launcher
-     sees `op://` and runs the command through `op run`, which resolves
-     the references and masks them in output.
 4. Scripts (`scripts/*.py`) read `.env` themselves, so they work either way.
 
 Never paste a key into a chat with an agent, into Slack, or into email. If
@@ -104,27 +112,37 @@ Agents never read `.env` and never echo a key into files, logs or chat.
 `.claude/settings.json` enforces part of that, and the lint keeps the rules
 intact (`docs/schema.json` lists them). What the rules do:
 
-- **Stop:** the Read tool on any `.env*` file, including `.env.example`
-  (which is why `integrations/README.md` also lists the variable names);
-  `cat`, `head`, `tail`, `sed`, `grep`, `less` and `more` on those files;
-  `env`, `printenv`, `export -p` and `set`; one-liners like `python3 -c`
+- **Stop:** the Read tool on any `.env*` file at any depth, including
+  `.env.example` (which is why `integrations/README.md` also lists the
+  variable names) and a prototype's own `.env` under `playgrounds/`;
+  through the same Read rules, `cat`, `head`, `tail`, `sed` and `< .env`
+  redirections on those files, plus `grep`, `less` and `more` by name;
+  `env`, `printenv`, `export`, `declare -p` and `set`; a shell inside the
+  shell (`sh -c`, `bash -c`, `zsh -c`) and one-liners like `python3 -c`
   and `node -e`; and `gh pr merge`, `gh pr review`, `gh secret` and
-  force-pushes, which are a person's actions. They also switch off "skip
-  permissions" mode, so an agent here always asks before an unlisted
-  command.
-- **Do not stop:** a script the agent may run, which opens `.env` itself.
-  That is why the scripts read only the variables they need and never print
-  one. Nor do they stop a person typing `cat .env` in their own terminal.
-  That is their key to print. The lifecycle scripts (`scripts/sync.py`,
-  `scripts/propose.py`, `scripts/doctor.py`) run git for you and are
-  allowed to run without a prompt; by design they never push to `main`,
-  force-push or merge, and `scripts/test_lifecycle.py` proves it.
+  force-pushes, which are a person's actions. They also switch off the
+  two permission modes where nobody reads the prompt ("skip permissions"
+  and auto mode's classifier), so an agent here always asks a person
+  before an unlisted command.
+- **Do not stop:** a script the agent may run, which opens `.env` itself;
+  that is why the scripts read only the variables they need and never
+  print one. Nor `awk`, `xargs`, `cp`, `base64` or a Python file the
+  agent wrote, since the Read rules recognise a fixed set of file
+  commands; those still prompt, so a person reads the command first. Nor
+  a person typing `cat .env` in their own terminal: that is their key to
+  print. The lifecycle scripts (`scripts/sync.py`, `scripts/propose.py`,
+  `scripts/doctor.py`) run git for you and are allowed to run without a
+  prompt; by design they never push to `main`, force-push or merge, and
+  `scripts/test_lifecycle.py` proves it.
 - **Cursor and Codex** read the same skills but not this settings file.
   Their guardrail is the skills' own rules, so hand a Cursor user a
   per-person key, not a bot key.
 
 The deny rules are a seatbelt for accidents and for an agent talked into
-something by a document it read (AGENTS.md rule 11). They are not a sandbox.
+something by a document it read (AGENTS.md rule 11). They are not a
+sandbox: the prompt a person reads is the real guard, and `op run` (above)
+is what keeps a value out of the agent's reach altogether. The pre-push
+hook is the same kind of seatbelt; `git push --no-verify` skips it.
 
 ## Sharing, rotation, leaving
 
