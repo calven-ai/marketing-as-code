@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Something is red in your own copy
+    url: https://github.com/calven-ai/marketing-as-code/blob/main/docs/troubleshooting.md
+    about: Say /doctor first. This page lists every message the lifecycle prints, with the one thing to do.
+  - name: A question about using the template
+    url: https://github.com/calven-ai/marketing-as-code/discussions
+    about: Whether it fits your team, how a skill is meant to be used, which integration route to pick.
+  - name: A security concern
+    url: https://github.com/calven-ai/marketing-as-code/security/advisories/new
+    about: Report it privately. Never as a public issue.

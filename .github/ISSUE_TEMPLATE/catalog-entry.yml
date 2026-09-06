@@ -1,0 +1,45 @@
+name: Catalog entry out of date
+description: A vendor route in integrations/catalog/ no longer matches what the vendor ships, or a vendor is missing.
+labels: [needs-review]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The catalog is a list of routes with a verification date, not a set of connectors the
+        maintainers run. A corrected entry as a pull request is even better than an issue:
+        edit `integrations/catalog/<category>.json` in the shape of a neighbour, run
+        `python3 scripts/lint.py --fix`, and propose it.
+  - type: input
+    id: vendor
+    attributes:
+      label: Vendor and category
+      placeholder: hubspot, in crm
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong
+      options:
+        - The MCP server endpoint, transport or auth changed
+        - The CLI or its command changed
+        - The vendor is missing from the catalog
+        - The entry names a write tool or a scope it does not need
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: route
+    attributes:
+      label: The correct route, as the vendor documents it
+      description: Endpoint or command, the auth model, the environment variables it needs, whether it can run headless.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Where you verified it
+      description: The vendor's own documentation page or repository, and the date.
+      placeholder: https://developers.example.com/mcp, checked 2026-09-06
+    validations:
+      required: true

@@ -499,9 +499,10 @@
     }
   },
   "binaries": {
-    "_doc": "Plain text first (AGENTS.md rule 4). brand/ is the one sanctioned binary zone; playgrounds/ is tolerated with a warning.",
+    "_doc": "Plain text first (AGENTS.md rule 4). brand/ is the one sanctioned binary zone, plus the template's own pictures under docs/assets/; playgrounds/ is tolerated with a warning.",
     "allowed_dirs": [
-      "brand/"
+      "brand/",
+      "docs/assets/"
     ],
     "tolerated_dirs": [
       "playgrounds/"
