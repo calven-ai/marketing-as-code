@@ -6,9 +6,11 @@ never-bookkeeping list in scripts/lint.py) or needs-review, applies the
 safe fixes as a Tidy commit, labels it, publishes the `review-gate` check
 on its head commit, and merges a bookkeeping proposal itself once the
 health check succeeded on that exact commit. A needs-review proposal
-passes only when someone other than the author has approved it, unless
-docs/schema.json sets review.self_merge (one maintainer): then the
-author's own merge is the approval.
+passes only when a person other than the author has approved it (a bot's
+approval never counts), unless docs/schema.json sets review.self_merge
+(one maintainer): then the author's own merge is the approval. A proposal
+from a fork, or one an agent opened unattended (transcripts-process.yml,
+role-run.yml), is needs-review whatever files it touches.
 
 Usage, from a checkout of main (gate.yml calls it):
     python3 scripts/review_gate.py --pr 12 --head-sha <sha> --doctor success
@@ -66,11 +68,37 @@ def codeowners_for(paths):
 
 def approvals(pr):
     data = json.loads(gh("pr", "view", str(pr), "--json", "author,reviews,latestReviews"))
+    return approvals_from(data)
+
+
+def is_bot(login):
+    """GitHub apps and Actions review as `<name>[bot]`; only a person's approval counts."""
+    return login.endswith("[bot]") or login in ("github-actions", "dependabot")
+
+
+def approvals_from(data):
+    """(author, approvers): approvals by someone who is not the author and not a bot. A workflow
+    that runs a proposal's own code holds a token that can review, so a bot's approval proves nothing."""
     author = data.get("author", {}).get("login", "")
     latest = data.get("latestReviews") or data.get("reviews") or []
     approved = sorted({r["author"]["login"] for r in latest
-                       if r.get("state") == "APPROVED" and r.get("author", {}).get("login") != author})
+                       if r.get("state") == "APPROVED" and r.get("author", {}).get("login") != author
+                       and not is_bot(r.get("author", {}).get("login", ""))})
     return author, approved
+
+
+# Proposals an agent opened with nobody watching (transcripts-process.yml,
+# role-run.yml). Their files may all be bookkeeping, but the agent read
+# untrusted text to write them, so a person reads the diff before it becomes
+# context every later agent trusts (AGENTS.md rules 1, 8 and 11).
+UNATTENDED_BRANCHES = ("transcripts-processed/", "role/")
+
+
+def kind_of(kind, head_branch, fork=False):
+    """The kind the gate acts on: a fork or an unattended agent's branch is never bookkeeping."""
+    if fork or head_branch.startswith(UNATTENDED_BRANCHES):
+        return "needs-review"
+    return kind
 
 
 def self_merge_allowed(schema):
@@ -109,15 +137,19 @@ def publish(repo, sha, conclusion, title, summary, url=""):
     print(f"{CHECK}: {conclusion}. {title}")
 
 
-# A proposal that changes the rules themselves is not tidied by main's lint:
-# main's fixes would fight the proposal's own (a regenerated table in the old
-# format, a default the proposal just changed) and the two would ping-pong.
-RULE_FILES = ("scripts/lint.py", "docs/schema.json")
+# A proposal that changes the machinery is not tidied by main's lint. For the
+# rules themselves (scripts/lint.py, docs/schema.json) main's fixes would fight
+# the proposal's own and the two would ping-pong; for the rest of scripts/ and
+# .github/, the tidy step runs main's lint against the proposal's files, and
+# the less of a proposal's machinery that run can touch or be steered by, the
+# smaller the gate's trust boundary. Both lists are needs-review anyway.
+NO_TIDY = ("scripts/**", ".github/**", "docs/schema.json")
+RULE_FILES = ("scripts/lint.py", "docs/schema.json")  # named in the gate's message
 
 
 def tidy_allowed(paths):
-    """Main's lint may push safe fixes only to a proposal that leaves the rules alone."""
-    return not any(p in RULE_FILES for p in paths)
+    """Main's lint may push safe fixes only to a proposal that leaves the machinery alone."""
+    return not any(lint.match_glob(p, g) for p in paths for g in NO_TIDY)
 
 
 def tidy(pr, head_branch, head_sha):
@@ -172,9 +204,9 @@ def main(argv=None):
         git("fetch", "-q", "origin", base, f"pull/{args.pr}/head")  # a fork's commits, without its remote
     ctx = lint.Ctx()  # main's schema and checks, whatever the proposal did to its own copies
     kind, paths = lint.classify(ctx, f"origin/{base}", head_sha)
-    if fork:
-        kind = "needs-review"
-    print(f"proposal #{args.pr}: {kind} ({len(paths)} files{', from a fork' if fork else ''})")
+    kind = kind_of(kind, head_branch, fork)
+    why = ", from a fork" if fork else (", an unattended run" if head_branch.startswith(UNATTENDED_BRANCHES) else "")
+    print(f"proposal #{args.pr}: {kind} ({len(paths)} files{why})")
     for p in paths:
         print(f"  {p}")
 
@@ -189,7 +221,7 @@ def main(argv=None):
         return 0
 
     if not fork and not args.no_tidy and not tidy_allowed(paths):
-        print("the proposal changes the rules (scripts/lint.py or docs/schema.json); main's lint does not tidy it")
+        print("the proposal changes the machinery (scripts/, .github/ or docs/schema.json); main's lint does not tidy it")
     elif not fork and not args.no_tidy and tidy(args.pr, head_branch, head_sha):
         return 1  # the Tidy commit's own run decides
 

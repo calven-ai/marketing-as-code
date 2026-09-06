@@ -16,8 +16,11 @@ name: transcripts-process
 # pull request. Transcripts are text anyone in a meeting can put there, so
 # the agent is treated as something that may be talked into anything; the
 # blast radius is one branch that a person then reads (AGENTS.md rule 11).
-# The pull request and the Slack pointer are posted by the plain steps
-# below, from a fixed template, after the agent has finished.
+# The gate keeps that promise: a `transcripts-processed/` branch is
+# needs-review even when every file it touches is bookkeeping, so a planted
+# line in a transcript never lands in the decision log unread. The pull
+# request and the Slack pointer are posted by the plain steps below, from a
+# fixed template, after the agent has finished.
 #
 # Needs ANTHROPIC_API_KEY in the `automation` environment (Settings ->
 # Environments -> automation), which only main may use. Without it the job

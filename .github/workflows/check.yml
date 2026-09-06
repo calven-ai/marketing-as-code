@@ -2,12 +2,14 @@ name: check
 
 # The deterministic floor under every proposal (docs/workflow.md).
 #
-# This workflow runs the proposal's own code (its tests, its lint) and is
+# The `doctor` job runs the proposal's own code (its tests, its lint) and is
 # therefore untrusted: it holds a read-only token, no secrets, and cannot
-# merge, push, or label anything. It tests the lint, runs scripts/doctor.py,
-# annotates the diff and keeps one sticky comment up to date in plain words.
-# Whether the proposal may land is decided by gate.yml, which runs from
-# main after this workflow completes.
+# comment, merge, push or label anything. It tests the lint, runs
+# scripts/doctor.py, annotates the diff and hands one plain-words summary to
+# the `comment` job, which keeps the sticky comment current with a token
+# that may write comments and nothing else, and runs none of the proposal's
+# files. Whether the proposal may land is decided by gate.yml, which runs
+# from main after this workflow completes.
 #
 # Pushes to main run the same checks in --strict mode and, if they fail,
 # open an issue (or post to Slack when the `automation` environment holds
@@ -32,11 +34,13 @@ concurrency:
 
 jobs:
   doctor:
+    # The required check. Runs the proposal's code, so: read-only token, no secrets.
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
-      pull-requests: write
+    outputs:
+      pr: ${{ steps.pr.outputs.number }}
+      comment: ${{ steps.comment.outputs.body }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -51,13 +55,13 @@ jobs:
         run: |
           n="$PR_NUMBER"
           if [ -z "$n" ] && [ "$REF_NAME" != "main" ]; then
-            n="$(gh pr list --head "$REF_NAME" --state open --json number -q '.[0].number' || true)"
+            n="$(gh pr list --head "$REF_NAME" --state open --json number -q '.[0].number // empty' || true)"
           fi
           echo "number=$n" >> "$GITHUB_OUTPUT"
           echo "proposal: ${n:-none (main)}"
 
       - name: Test the lint itself
-        run: python3 -m unittest scripts/test_lint.py scripts/test_lifecycle.py scripts/test_wire_integration.py
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
 
       - name: Run the health check
         id: doctor
@@ -74,48 +78,70 @@ jobs:
           echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
           python3 scripts/lint.py --json > findings.json || true
 
-      - name: Refresh the sticky comment
+      - name: Write the sticky comment
+        id: comment
         if: always() && steps.pr.outputs.number != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR: ${{ steps.pr.outputs.number }}
-          REPO: ${{ github.repository }}
         run: |
           python3 - <<'PY'
-          import json
-          data = json.load(open("findings.json"))
-          f = data["findings"]
-          errors = [x for x in f if x["level"] == "error"]
-          warnings = [x for x in f if x["level"] == "warning"]
-          fixable = [x for x in errors + warnings if x.get("fixable")]
+          import json, os
           lines = ["<!-- doctor -->", "### Health check"]
-          if not errors and not warnings:
-              lines.append("**All checks passed.** The review gate decides separately whether this proposal "
-                           "merges itself (bookkeeping) or waits for a person; see the `review-gate` check.")
-          if errors:
-              lines.append(f"**{len(errors)} problem(s) block this proposal:**")
-              lines += [f"- `{x['path']}`" + (f" line {x['line']}" if x['line'] else "") + f": {x['message']}" for x in errors]
-              lines.append("\nFix them, or run `python3 scripts/doctor.py --fix` and push, or ask your agent to run the doctor.")
-          if warnings:
-              lines.append(f"\n<details><summary>{len(warnings)} warning(s), not blocking</summary>\n")
-              lines += [f"- `{x['path']}`: {x['message']}" for x in warnings]
-              lines.append("\n</details>")
-          if fixable:
-              lines.append(f"\n{len(fixable)} of these are safe fixes; the review gate pushes them to this proposal "
-                           "as a Tidy commit.")
+          if not os.path.exists("findings.json"):
+              lines.append("**The lint's own tests failed**, so the health check did not run. Open the job log: "
+                           "`python3 -m unittest discover -s scripts -p 'test_*.py'` says which test.")
+          else:
+              f = json.load(open("findings.json"))["findings"]
+              errors = [x for x in f if x["level"] == "error"]
+              warnings = [x for x in f if x["level"] == "warning"]
+              fixable = [x for x in errors + warnings if x.get("fixable")]
+              if not errors and not warnings:
+                  lines.append("**All checks passed.** The review gate decides separately whether this proposal "
+                               "merges itself (bookkeeping) or waits for a person; see the `review-gate` check.")
+              if errors:
+                  lines.append(f"**{len(errors)} problem(s) block this proposal:**")
+                  lines += [f"- `{x['path']}`" + (f" line {x['line']}" if x['line'] else "") + f": {x['message']}" for x in errors]
+                  lines.append("\nFix them, or run `python3 scripts/doctor.py --fix` and push, or ask your agent to run the doctor.")
+              if warnings:
+                  lines.append(f"\n<details><summary>{len(warnings)} warning(s), not blocking</summary>\n")
+                  lines += [f"- `{x['path']}`: {x['message']}" for x in warnings]
+                  lines.append("\n</details>")
+              if fixable:
+                  lines.append(f"\n{len(fixable)} of these are safe fixes; the review gate pushes them to this proposal "
+                               "as a Tidy commit.")
           lines.append("\n<sub>scripts/doctor.py, the same check you can run locally. docs/workflow.md explains proposals.</sub>")
           open("comment.md", "w").write("\n".join(lines) + "\n")
           PY
+          { echo "body<<COMMENT_EOF"; cat comment.md; echo "COMMENT_EOF"; } >> "$GITHUB_OUTPUT"
+
+      - name: Fail the job if the check failed
+        if: steps.doctor.outputs.status != '0'
+        run: exit 1
+
+  comment:
+    # Posts what `doctor` wrote. Checks out nothing and runs none of the
+    # proposal's files, which is why it may hold a token that writes comments.
+    # From a fork the token is read-only whatever this says, so the step may
+    # fail; that never turns the required check red.
+    needs: doctor
+    if: always() && needs.doctor.outputs.pr != ''
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Refresh the sticky comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ needs.doctor.outputs.pr }}
+          REPO: ${{ github.repository }}
+          BODY: ${{ needs.doctor.outputs.comment }}
+        run: |
+          printf '%s\n' "$BODY" > comment.md
           existing="$(gh api "repos/$REPO/issues/$PR/comments" --paginate -q '.[] | select(.body | startswith("<!-- doctor -->")) | .id' | head -1)"
           if [ -n "$existing" ]; then
             gh api -X PATCH "repos/$REPO/issues/comments/$existing" -F body=@comment.md > /dev/null
           else
             gh api -X POST "repos/$REPO/issues/$PR/comments" -F body=@comment.md > /dev/null
           fi
-
-      - name: Fail the job if the check failed
-        if: steps.doctor.outputs.status != '0'
-        run: exit 1
 
   alert:
     # main itself is red: tell the team. The only job with a secret, and it

@@ -103,6 +103,9 @@ def make_repo(root):
     write(root, "docs/README.md", "# docs\n\n- [schema.json](schema.json)\n")
     write(root, "docs/schema.json", json.dumps(SCHEMA))
     write(root, ".agents/skills/review/SKILL.md", SKILL)
+    link = root / ".claude" / "skills" / "review"  # what scripts/sync_skills.py keeps
+    link.parent.mkdir(parents=True, exist_ok=True)
+    link.symlink_to(Path("..") / ".." / ".agents" / "skills" / "review")
     for rel in SCHEMA["context_files"]:
         if "*" in rel:
             continue
@@ -797,10 +800,48 @@ class TestReviewGate(unittest.TestCase):
         finally:
             os.environ.pop("REVIEW_SELF_MERGE", None)
         self.assertFalse(review_gate.self_merge_allowed(team))
-    def test_rule_changing_proposals_are_not_tidied(self):
+    def test_machinery_changing_proposals_are_not_tidied(self):
         self.assertTrue(review_gate.tidy_allowed(["memory/decision-log.md", "projects/x/status.md"]))
+        self.assertTrue(review_gate.tidy_allowed(["docs/workflow.md", ".agents/skills/review/SKILL.md"]))
         self.assertFalse(review_gate.tidy_allowed(["scripts/lint.py", "scripts/README.md"]))
         self.assertFalse(review_gate.tidy_allowed(["docs/schema.json"]))
+        # The tidy step runs main's lint against the proposal's tree; nothing under scripts/ or
+        # .github/ from a proposal may take part in that run, so those proposals are left alone.
+        self.assertFalse(review_gate.tidy_allowed(["scripts/sync_skills.py"]))
+        self.assertFalse(review_gate.tidy_allowed([".github/workflows/gate.yml", "memory/decision-log.md"]))
+
+    def test_bot_approvals_never_count(self):
+        review = lambda login: {"state": "APPROVED", "author": {"login": login}}  # noqa: E731
+        data = {"author": {"login": "ana"}, "latestReviews": [
+            review("github-actions[bot]"), review("dependabot[bot]"), review("some-app[bot]"), review("ana")]}
+        self.assertEqual(("ana", []), review_gate.approvals_from(data))
+        data["latestReviews"].append(review("ben"))
+        self.assertEqual(("ana", ["ben"]), review_gate.approvals_from(data))
+
+    def test_unattended_and_fork_proposals_need_review(self):
+        kind_of = review_gate.kind_of
+        self.assertEqual("bookkeeping", kind_of("bookkeeping", "transcripts/2026-09-06"))
+        self.assertEqual("bookkeeping", kind_of("bookkeeping", "housekeeping/2026-09-08"))
+        self.assertEqual("needs-review", kind_of("bookkeeping", "transcripts-processed/2026-09-06-0630"))
+        self.assertEqual("needs-review", kind_of("bookkeeping", "role/brand-monitor/2026-09-01-0700"))
+        self.assertEqual("needs-review", kind_of("bookkeeping", "transcripts/2026-09-06", fork=True))
+        self.assertEqual("needs-review", kind_of("needs-review", "anything"))
+
+
+class TestSkillLinks(LintCase):
+    def test_the_lint_never_runs_the_checked_trees_own_script(self):
+        """The gate runs main's lint against a proposal's worktree; the proposal's scripts/ is data there."""
+        sentinel = self.root / "PWNED"
+        write(self.root, "scripts/sync_skills.py",
+              f"from pathlib import Path\nPath({str(sentinel)!r}).write_text('x')\n")
+        (self.root / ".claude" / "skills" / "review").unlink()  # drift, so the check has to act
+        found = self.findings("skill-links", lint.ERROR)
+        self.assertEqual(1, len(found), found)
+        self.assertFalse(sentinel.exists())
+        found[0].fix()
+        self.assertFalse(sentinel.exists())
+        self.assertTrue((self.root / ".claude" / "skills" / "review").is_symlink())
+        self.assertEqual([], self.findings("skill-links", lint.ERROR))
 
 
 if __name__ == "__main__":

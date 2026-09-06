@@ -5,7 +5,9 @@ Reference material reused under its own license, condensed into
 source and license on its first line
 (`<!-- source: <url> | license: <SPDX> | fetched: YYYY-MM-DD -->`), and the
 check keeps this table and those headers in agreement. The repository's
-own license is MIT (`LICENSE`); nothing here changes that.
+own license is MIT (`LICENSE`); nothing here changes that. Material under
+Apache-2.0 travels with a copy of that license, `LICENSES/Apache-2.0.txt`,
+as its section 4(a) asks; none of the sources ships a NOTICE file.
 
 | Path in this repo | Source | License | Fetched | What was kept |
 | --- | --- | --- | --- | --- |

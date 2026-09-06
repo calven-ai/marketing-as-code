@@ -662,7 +662,7 @@ def check_env_files(ctx):
     out = []
     for rel in ctx.files:
         name = Path(rel).name
-        if name.startswith(".env") and name != ".env.example":
+        if name != ".env.example" and (name == ".env" or name.startswith(".env.") or name.endswith(".env")):
             out.append(Finding(ERROR, rel, "an .env file is tracked. Remove it from git AND rotate every key "
                                "in it (docs/secrets.md)", "env-tracked"))
     gi = ctx.text(".gitignore") if ".gitignore" in ctx.files else ""
@@ -1565,16 +1565,21 @@ def _append_doc_link(ctx, rel, doc):
 
 
 def check_skill_links(ctx):
-    """.claude/skills/ mirrors .agents/skills/ (scripts/sync_skills.py)."""
-    script = ctx.path("scripts/sync_skills.py")
-    if not script.is_file():
+    """.claude/skills/ mirrors .agents/skills/ (scripts/sync_skills.py).
+
+    Always this checkout's own copy of the script, never the one under ctx.root: the
+    gate (scripts/review_gate.py) runs the lint from main against a proposal's
+    worktree, and a proposal must not get its own code executed with the gate's
+    token. The worktree is only ever the --root the script acts on."""
+    script = ROOT / "scripts" / "sync_skills.py"
+    if not script.is_file() or not ctx.path(".agents/skills").is_dir():
         return []
-    run = subprocess.run([sys.executable, str(script), "--check"], capture_output=True, text=True, cwd=str(ctx.root))
+    cmd = [sys.executable, str(script), "--root", str(ctx.root)]
+    run = subprocess.run(cmd + ["--check"], capture_output=True, text=True, cwd=str(ROOT))
     if run.returncode == 0:
         return []
     return [Finding(ERROR, ".claude/skills", "skill links out of sync: " + " ".join(run.stdout.split()),
-                    "skill-links", fix=lambda: subprocess.run([sys.executable, str(script)], check=False,
-                                                              capture_output=True, cwd=str(ctx.root)))]
+                    "skill-links", fix=lambda: subprocess.run(cmd, check=False, capture_output=True, cwd=str(ROOT)))]
 
 
 def check_adoption(ctx):

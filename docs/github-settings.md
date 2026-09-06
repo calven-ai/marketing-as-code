@@ -22,10 +22,10 @@ settings any time and says what drifted.
 | Delete branch on merge | The branch list stays empty |
 | Allow auto-merge | A person can click "merge when ready" on a proposal that is still checking |
 | Allow "update branch" | The button that brings a proposal up to date, no terminal |
-| Workflow token read-only by default; Actions may not approve pull requests | A workflow gets write access only where a job asks for it, and no automation approves on a person's behalf |
-| Environment `automation`, restricted to `main` | The bot keys live here ([secrets.md](secrets.md)); only a job on the approved copy can read them |
+| Workflow token read-only by default; Actions may create and approve pull requests | A workflow gets write access only where a job asks for it. GitHub's one toggle covers creating and approving: housekeeping, the transcript pull and the agent runs open their proposals with the workflow token, so it stays on, and the gate ignores an approval from any `[bot]` login, so the approving half buys nothing |
+| Environment `automation`, restricted to `main` | The bot keys live here ([secrets.md](secrets.md)); only a job on the approved copy can read them. A workflow that names the environment creates it, unrestricted, the first time it runs; the script restricts it, and `doctor --github` says when it is not |
 | Labels `bookkeeping`, `needs-review`, `stale` | The gate labels every proposal; housekeeping marks stale ones |
-| Ruleset `main` | A proposal is the only way onto the approved copy: pull request required, code-owner review for machinery paths, the `doctor` and `review-gate` checks green, no deleting or force-pushing. Admins can bypass in an emergency |
+| Ruleset `main` | A proposal is the only way onto the approved copy: pull request required, code-owner review for machinery paths, the `doctor` and `review-gate` checks green, no deleting or force-pushing. Admins can bypass the checks in an emergency, but only through a pull request, never with a direct push |
 
 `.github/CODEOWNERS` names who reviews each area. Replace the placeholder
 with real handles; `/setup` does it during onboarding. A repository with
@@ -64,8 +64,9 @@ line item in the whole setup.
 | The bot keys are readable only from `main` | no | yes | yes |
 
 On Free, the protection is the pre-push hook (`git config core.hooksPath
-scripts/hooks`, once per clone; the doctor reminds you), a loud check, the
-gate's classification, and a weekly housekeeping proposal. That works for
+scripts/hooks`, once per clone; the doctor reminds you, and `git push
+--no-verify` skips it, so it guards against accidents, not intent), a loud
+check, the gate's classification, and a weekly housekeeping proposal. That works for
 a careful team of two running no automation with keys. Upgrade the day a
 third person joins, the first time somebody merges red by accident, or
 before you put a bot key in the `automation` environment.
@@ -79,7 +80,9 @@ owns each key.
 - `GRANOLA_API_KEY` turns on the daily transcript pull
   (`transcripts-cron.yml`).
 - `ANTHROPIC_API_KEY` turns on the agent in Actions that processes the
-  inbox (`transcripts-process.yml`).
+  inbox (`transcripts-process.yml`) and the role runs (`role-run.yml`).
+- `DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD`, with the key above, turn
+  on the monthly brand-monitor run (`role-brand-monitor.yml`).
 - `SLACK_BOT_TOKEN` turns on the Slack message when the approved copy fails
   its check, and the "a proposal is waiting" pointer after the agent runs.
 - `SLACK_TEAM_CHANNEL_ID`, `SLACK_LEADERSHIP_CHANNEL_ID` and
@@ -110,8 +113,9 @@ a new release exists. That is the only way a SHA changes.
    then "Always suggest updating pull request branches", "Allow
    auto-merge" and "Automatically delete head branches".
 2. Settings → Actions → General → Workflow permissions: choose "Read
-   repository contents and packages permissions" and untick "Allow GitHub
-   Actions to create and approve pull requests".
+   repository contents and packages permissions" and tick "Allow GitHub
+   Actions to create and approve pull requests" (the workflows open their
+   proposals with it; the gate counts no bot approval).
 3. Settings → Environments → New environment: name it `automation`. Under
    Deployment branches and tags choose "Selected branches and tags" and
    add `main`. Add the secrets under Environment secrets.
@@ -119,5 +123,6 @@ a new release exists. That is the only way a SHA changes.
    the default branch, enable "Restrict deletions", "Block force pushes",
    "Require a pull request before merging" (0 approvals, tick "Require
    review from Code Owners"), "Require status checks to pass" with `doctor`
-   and `review-gate`, and add "Repository admin" under bypass.
+   and `review-gate`, and add "Repository admin" under bypass with "For
+   pull requests only".
 5. Issues → Labels: create `bookkeeping`, `needs-review`, `stale`.

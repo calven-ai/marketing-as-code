@@ -99,10 +99,10 @@ Whatever the mode, these need a person every time (AGENTS.md rule 3,
 | Sync a checkout with the approved copy | `/sync`, `python3 scripts/sync.py` | Never |
 | Propose a change | `/propose`, `python3 scripts/propose.py` | The workflows open their own proposals (`transcripts-cron.yml`, `housekeeping.yml`) |
 | Pull transcripts into the inbox | `python3 scripts/pull_transcripts.py` | `transcripts-cron.yml`, daily, opens a PR (shipped) |
-| Process the inbox | `/chief-of-staff` after the meeting (the default) | `transcripts-process.yml`, on merge of an inbox PR, opens a PR (opt-in, needs `ANTHROPIC_API_KEY`) |
+| Process the inbox | `/chief-of-staff` after the meeting (the default) | `transcripts-process.yml`, on merge of an inbox PR, opens a PR that a person reads: the gate never merges an unattended run's proposal (opt-in, needs `ANTHROPIC_API_KEY`) |
 | Refresh keyword volumes and difficulty | `python3 scripts/seo_snapshot.py --update` | A cron step running the same script, yours to add |
 | Rankings, SERP questions, keyword ideas | `/seo-analyst` (the wired `seo-data` server) | Not headless; the script covers the scheduled part |
-| Run a role unattended | never directly | `role-run.yml`, reusable, called by a `role-<skill>.yml` with a schedule: filters `.mcp.json` to the servers the caller names, hands the run only their keys, opens a PR (opt-in, needs `ANTHROPIC_API_KEY` plus those keys in `automation`) |
+| Run a role unattended | never directly | `role-run.yml`, reusable, called by a `role-<skill>.yml` with a schedule: filters `.mcp.json` to the servers the caller names, hands the run only their keys, opens a PR that a person reads, snapshots included (opt-in, needs `ANTHROPIC_API_KEY` plus those keys in `automation`) |
 | AI answer-engine mentions | `/brand-monitor` | `role-brand-monitor.yml`, monthly, through `role-run.yml` (shipped, dormant until the keys exist) |
 | Pipeline, web, ads, email, social, reviews, PR, community, account and churn reports; content decay, competitor watch, status roundup, context freshness, the weekly report | `/<skill>` from the roster in `agents/README.md` | A `role-<skill>.yml` caller copied from `role-brand-monitor.yml`, yours to add once the role's categories are wired to a key-based server or a script; the check refuses a caller whose skill needs an OAuth server or writes to external systems |
 | Quarterly review | `/qmr` | By hand: it needs the team's judgment and the exports it asks for |
@@ -120,11 +120,14 @@ asks for it.
 
 ## Turning a workflow off
 
-Two scheduled workflows run in every copy of this repo whether or not you
-asked: `housekeeping.yml` opens a tidy-up proposal on Mondays, which
-merges itself once the check is green, and `transcripts-cron.yml` runs
-daily and does nothing until a Granola key exists. The first Monday's
-"Housekeeping" proposal is expected; it is short, read it once.
+Four scheduled workflows run in every copy of this repo whether or not you
+asked: `housekeeping.yml` opens a tidy-up proposal on Mondays when the
+approved copy needs one; `transcripts-cron.yml` runs daily and does
+nothing until a Granola key exists; `transcripts-process.yml` runs daily
+and does nothing until an Anthropic key exists; `role-brand-monitor.yml`
+runs monthly and does nothing until that key and the DataForSEO login
+exist. The dormant three cost a few seconds of runner time. The first
+Monday's "Housekeeping" proposal is expected; it is short, read it once.
 
 To stop one: on GitHub, Actions tab, pick the workflow, the "..." menu,
 "Disable workflow". The file stays and you can turn it back on. To remove

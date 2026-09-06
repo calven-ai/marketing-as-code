@@ -25,16 +25,16 @@ _metadata:
 
 display_information:
   name: Marketing Bot
-  description: Posts marketing updates from the marketing repo and answers requests in-thread.
+  description: Posts marketing updates from the marketing repo.
   long_description: >-
-    Posts digests, merged-change announcements, and data alerts generated
-    from the marketing-as-code repository, always linking the file each
-    fact comes from. Reads the marketing requests channel so requests can
-    be answered in-thread from the repo or routed to an owner. Anything that
-    needs a human (pricing, product claims, customer quotes, written
-    competitor comparisons, launch disclosure) is handed to the named owner
-    instead of answered. Runs from scripts and GitHub Actions; it has no
-    server and never acts as a person.
+    Posts digests, proposal pointers and health alerts generated from the
+    marketing-as-code repository, always linking the file each fact comes
+    from. It only posts: reading a requests channel and answering in-thread
+    is a second stage a team adds itself, with the scopes that stage needs.
+    Anything that needs a human (pricing, product claims, customer quotes,
+    written competitor comparisons, launch disclosure) is handed to the
+    named owner instead of answered. Runs from scripts and GitHub Actions;
+    it has no server and never acts as a person.
   background_color: "#1c1c1c"
 
 features:
@@ -45,24 +45,30 @@ features:
 oauth_config:
   scopes:
     bot:
-      # Read the requests channel (public). The bot must be invited to it.
-      - channels:read
-      - channels:history
-      # Post replies (in-thread) and announcements, only in channels the bot
-      # was invited to.
+      # Post announcements, only in channels the bot was invited to. The one
+      # scope everything shipped needs: scripts/slack_post.py calls
+      # chat.postMessage and nothing else. A leaked xoxb- token with only
+      # this scope can post, not read.
       - chat:write
+      #
+      # Inbound intake (README.md next to this file, stage 2) is yours to
+      # add. When you add it, uncomment what it needs and reinstall the app:
+      #
+      # Read the requests channel (public). The bot must be invited to it.
+      # - channels:read
+      # - channels:history
       # Acknowledge a request with an emoji (eyes = seen, check = answered,
       # raised hand = needs a human).
-      - reactions:write
+      # - reactions:write
       # Attach a file to a reply (a CSV snapshot, a Markdown one-pager).
-      - files:write
+      # - files:write
       # Resolve a requester's display name for the task that gets filed
       # ("asked by <name> in #marketing-requests"). No email access.
-      - users:read
+      # - users:read
       # Only needed if the requests channel is PRIVATE. Harmless otherwise:
       # the bot still sees only private channels it is invited to.
-      - groups:read
-      - groups:history
+      # - groups:read
+      # - groups:history
 
 settings:
   org_deploy_enabled: false

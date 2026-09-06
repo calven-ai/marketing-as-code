@@ -84,7 +84,8 @@ def _api(path):
 
 def environment_settings(repo):
     """The `automation` environment holds the bot keys and only main may use it; the workflow
-    token is read-only by default and cannot approve proposals (docs/secrets.md)."""
+    token is read-only by default, and a job that asks may open a proposal: GitHub's one toggle
+    covers creating and approving, so the gate is what ignores bot approvals (docs/github-settings.md)."""
     out = []
     env = _api(f"repos/{repo}/environments/automation")
     if env is None:
@@ -99,8 +100,9 @@ def environment_settings(repo):
     if perms is not None:
         if perms.get("default_workflow_permissions") != "read":
             out.append("the workflow token defaults to write (each job should ask for what it needs)")
-        if perms.get("can_approve_pull_request_reviews"):
-            out.append("GitHub Actions may approve pull requests (an agent in Actions could approve its own proposal)")
+        if not perms.get("can_approve_pull_request_reviews"):
+            out.append("GitHub Actions may not open pull requests: housekeeping.yml, transcripts-cron.yml and the "
+                       "agent runs open theirs with the workflow token and would fail (docs/github-settings.md)")
     return out
 
 

@@ -13,23 +13,24 @@ copies instead.
 Usage, from the repo root:
     python3 scripts/sync_skills.py            # fix links
     python3 scripts/sync_skills.py --check    # report drift, exit 1 if any (CI)
+    python3 scripts/sync_skills.py --root X   # act on another checkout (the gate's
+                                              # worktree of a proposal; scripts/lint.py)
 
 Delete this script the day Claude Code reads .agents/skills/ natively.
 """
 
+import argparse
 import shutil
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-CANONICAL = ROOT / ".agents" / "skills"
-SHIM = ROOT / ".claude" / "skills"
 
 
-def canonical_skills():
-    if not CANONICAL.is_dir():
-        sys.exit(f"error: {CANONICAL} does not exist; run from a full checkout")
-    return sorted(p.name for p in CANONICAL.iterdir()
+def canonical_skills(canonical):
+    if not canonical.is_dir():
+        sys.exit(f"error: {canonical} does not exist; run from a full checkout")
+    return sorted(p.name for p in canonical.iterdir()
                   if p.is_dir() and (p / "SKILL.md").is_file())
 
 
@@ -38,9 +39,9 @@ def desired_target(name):
     return Path("..") / ".." / ".agents" / "skills" / name
 
 
-def current_state(name):
+def current_state(canonical, shim, name):
     """Return 'ok', 'missing', or a description of the drift."""
-    link = SHIM / name
+    link = shim / name
     if not link.exists() and not link.is_symlink():
         return "missing"
     if link.is_symlink():
@@ -49,24 +50,30 @@ def current_state(name):
         return f"symlink points at {link.readlink()}"
     if (link / "SKILL.md").is_file():
         # A copy (Windows fallback). Consider it ok only if identical.
-        if (link / "SKILL.md").read_bytes() == (CANONICAL / name / "SKILL.md").read_bytes():
+        if (link / "SKILL.md").read_bytes() == (canonical / name / "SKILL.md").read_bytes():
             return "ok"
         return "copy differs from canonical"
     return "not a symlink or skill copy"
 
 
 def main(argv=None):
-    check = "--check" in (sys.argv[1:] if argv is None else argv)
-    names = canonical_skills()
-    SHIM.mkdir(parents=True, exist_ok=True)
+    ap = argparse.ArgumentParser(description="Keep .claude/skills/ in step with .agents/skills/.")
+    ap.add_argument("--check", action="store_true", help="report drift and exit 1; change nothing")
+    ap.add_argument("--root", default=str(ROOT), help="the checkout to act on (default: this one)")
+    args = ap.parse_args(argv)
+    root = Path(args.root).resolve()
+    canonical, shim = root / ".agents" / "skills", root / ".claude" / "skills"
 
-    drift = {n: s for n in names if (s := current_state(n)) != "ok"}
+    names = canonical_skills(canonical)
+    shim.mkdir(parents=True, exist_ok=True)
+
+    drift = {n: s for n in names if (s := current_state(canonical, shim, n)) != "ok"}
     # Anything in the shim that has no canonical counterpart (skip Claude
     # Code's own housekeeping entries such as .system).
-    strays = [p.name for p in SHIM.iterdir()
+    strays = [p.name for p in shim.iterdir()
               if not p.name.startswith(".") and p.name not in names]
 
-    if check:
+    if args.check:
         for name, state in drift.items():
             print(f"drift: .claude/skills/{name}: {state}")
         for name in strays:
@@ -78,7 +85,7 @@ def main(argv=None):
         return
 
     for name in drift:
-        link = SHIM / name
+        link = shim / name
         if link.is_symlink() or link.is_file():
             link.unlink()
         elif link.is_dir():
@@ -87,7 +94,7 @@ def main(argv=None):
             link.symlink_to(desired_target(name))
             print(f"linked .claude/skills/{name}")
         except OSError:
-            shutil.copytree(CANONICAL / name, link)
+            shutil.copytree(canonical / name, link)
             print(f"copied .claude/skills/{name} (symlinks unavailable)")
     for name in strays:
         print(f"warning: stray .claude/skills/{name} left in place "

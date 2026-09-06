@@ -8,10 +8,12 @@
 #
 # What it sets: proposals land as one squashed commit, their branches are
 # deleted on merge, auto-merge is allowed (bookkeeping proposals use it), the
-# three labels exist, the workflow token is read-only by default, the bot keys
-# have an environment only main may use, and a ruleset named "main" requires a pull request with
-# the "doctor" and "review-gate" checks green before anything reaches the
-# approved copy. Rulesets are enforced on public repositories and on private
+# three labels exist, the workflow token is read-only by default (a job that
+# asks may open a proposal; the gate never counts a bot's approval), the bot
+# keys have an environment only main may use, and a ruleset named "main"
+# requires a pull request with the "doctor" and "review-gate" checks green
+# before anything reaches the approved copy; an admin may bypass the checks,
+# but only through a pull request, never with a direct push. Rulesets are enforced on public repositories and on private
 # ones under GitHub Pro or Team; on GitHub Free private repositories they are
 # created but not enforced, and the script says so.
 
@@ -41,9 +43,13 @@ for label in "bookkeeping:0E8A16:Only agent-maintained files; approves itself wh
   echo "   $name"
 done
 
-echo "3. workflow token: read-only by default, and Actions may not approve pull requests"
+echo "3. workflow token: read-only by default; a job that asks may open a proposal (the gate counts no bot approval)"
+# One GitHub toggle covers both creating and approving pull requests with the
+# workflow token. housekeeping.yml, transcripts-cron.yml and the agent runs
+# open their proposals with it, so it stays on; scripts/review_gate.py ignores
+# approvals from any *[bot] login, so the approving half buys nothing.
 $dry gh api -X PUT "repos/$repo/actions/permissions/workflow" \
-  -f default_workflow_permissions=read -F can_approve_pull_request_reviews=false >/dev/null
+  -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true >/dev/null
 
 echo "4. environment 'automation': the bot keys live here, and only main may use it"
 $dry gh api -X PUT "repos/$repo/environments/automation" --input - <<EOF >/dev/null
@@ -61,7 +67,7 @@ body='{
   "target": "branch",
   "enforcement": "active",
   "conditions": {"ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []}},
-  "bypass_actors": [{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always"}],
+  "bypass_actors": [{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "pull_request"}],
   "rules": [
     {"type": "deletion"},
     {"type": "non_fast_forward"},
@@ -99,7 +105,8 @@ if [ "$private" = "true" ]; then
 else
   echo "  - Public repository: rulesets are enforced on every plan."
 fi
-echo "  - The bot keys for the optional automations (ANTHROPIC_API_KEY, GRANOLA_API_KEY, SLACK_BOT_TOKEN) go in"
+echo "  - The bot keys for the optional automations (ANTHROPIC_API_KEY, GRANOLA_API_KEY, SLACK_BOT_TOKEN, and"
+echo "    DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD for the monthly brand-monitor run) go in"
 echo "    Settings -> Environments -> automation -> Environment secrets, never in repository secrets; docs/secrets.md."
 echo "  - Secret scanning and push protection: Settings -> Advanced Security (free on public repositories;"
 echo "    private ones need the GitHub Secret Protection add-on on the Team plan); docs/github-settings.md."

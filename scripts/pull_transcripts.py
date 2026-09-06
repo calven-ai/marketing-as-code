@@ -149,11 +149,24 @@ def slugify(text, maxlen=50):
 
 
 def date_of(note):
-    raw = note.get("created_at") or ""
+    """The note's date as YYYY-MM-DD; anything the API sends that is not a date becomes today.
+    The value lands in a filename, so it is never used unvalidated."""
+    raw = str(note.get("created_at") or "")
     try:
         return datetime.fromisoformat(raw.replace("Z", "+00:00")).strftime("%Y-%m-%d")
     except ValueError:
-        return raw[:10] or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        pass
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", raw[:10]):
+        return raw[:10]
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def inbox_path(filename):
+    """The file's place in the inbox; refuses anything that would resolve outside it."""
+    target = (INBOX / filename).resolve()
+    if target.parent != INBOX.resolve() or "/" in filename or "\\" in filename:
+        raise SystemExit(f"refusing to write outside memory/transcripts/inbox/: {filename!r}")
+    return target
 
 
 def speaker_label(segment):
@@ -254,7 +267,7 @@ def main():
             continue
         attendees = fetch_attendees(key, note_id)
         INBOX.mkdir(parents=True, exist_ok=True)
-        (INBOX / filename).write_text(
+        inbox_path(filename).write_text(
             render_file(title, date, attendees, note_id, body), encoding="utf-8")
         print(f"  + memory/transcripts/inbox/{filename}")
         written.append(filename)
