@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- The repository is private, on GitHub Team or Pro, everywhere the docs
+  speak: a new ground rule in `AGENTS.md`, the README, the fit check, the
+  setup interview and `docs/github-settings.md` assume it, and GitHub Free
+  is named once as unsupported instead of documented as a path. `lint.py`
+  warns when `repo.private` is false; `doctor.py --github` warns when
+  GitHub says the repository is public or the owner's plan is Free;
+  `github_setup.sh` says the same at the end of a run.
+
 ## [0.2.0] - 2026-09-06
 
 The first public release, as a GitHub template repository.

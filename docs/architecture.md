@@ -140,7 +140,8 @@ Per-domain folders, each with canonical tables at the root and dated,
 immutable pulls in `snapshots/`. The naming convention
 `YYYY-MM-DD-<source>-<what>.csv` is load-bearing: it is how an agent finds
 the latest snapshot without an index. Everything stays CSV so it stays
-diffable. No customer PII in a public copy, ever.
+diffable. Personal data comes in only by a logged decision, and the
+repository is private by rule.
 
 *Rejected:* reports inside `data/`, and one flat cross-domain snapshots
 folder.

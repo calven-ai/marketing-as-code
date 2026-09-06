@@ -13,9 +13,10 @@
 # keys have an environment only main may use, and a ruleset named "main"
 # requires a pull request with the "doctor" and "review-gate" checks green
 # before anything reaches the approved copy; an admin may bypass the checks,
-# but only through a pull request, never with a direct push. Rulesets are enforced on public repositories and on private
-# ones under GitHub Pro or Team; on GitHub Free private repositories they are
-# created but not enforced, and the script says so.
+# but only through a pull request, never with a direct push. The repository
+# is private by rule (AGENTS.md); GitHub enforces the ruleset on a private
+# repository under Pro or Team, and on Free it is created but not enforced.
+# The script says which case it found.
 
 set -eu
 
@@ -99,17 +100,18 @@ echo
 echo "Could not verify from here (check Settings -> Rules -> Rulesets in the browser):"
 private="$(gh repo view "$repo" --json isPrivate -q .isPrivate)"
 if [ "$private" = "true" ]; then
-  echo "  - This repository is private. The ruleset is enforced only on GitHub Pro (personal) or Team (organization)."
-  echo "    On GitHub Free it shows 'not enforced': the scripts and hooks still guard the local path, CI still"
-  echo "    reports, but nothing stops a direct push. docs/github-settings.md lays out the trade-off."
+  echo "  - This repository is private. The ruleset is enforced on GitHub Pro (personal) or Team (organization);"
+  echo "    on GitHub Free it shows 'not enforced' and nothing stops a direct push. Free is not supported;"
+  echo "    python3 scripts/doctor.py --github says which plan this is. docs/github-settings.md."
 else
-  echo "  - Public repository: rulesets are enforced on every plan."
+  echo "  - This repository is PUBLIC. It must be private (AGENTS.md, rule 8): Settings -> General ->"
+  echo "    Danger zone -> Change visibility. Add no transcripts or account lists until it is."
 fi
 echo "  - The bot keys for the optional automations (ANTHROPIC_API_KEY, GRANOLA_API_KEY, SLACK_BOT_TOKEN, and"
 echo "    DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD for the monthly brand-monitor run) go in"
 echo "    Settings -> Environments -> automation -> Environment secrets, never in repository secrets; docs/secrets.md."
-echo "  - Secret scanning and push protection: Settings -> Advanced Security (free on public repositories;"
-echo "    private ones need the GitHub Secret Protection add-on on the Team plan); docs/github-settings.md."
+echo "  - Secret scanning and push protection: Settings -> Advanced Security (the GitHub Secret Protection"
+echo "    add-on on the Team plan); docs/github-settings.md."
 echo "  - .github/CODEOWNERS names who is asked to review; replace the placeholder with real GitHub handles."
 echo "  - Each clone turns on the pre-push hook once: git config core.hooksPath scripts/hooks"
 echo "done; python3 scripts/doctor.py --github re-checks these settings any time."

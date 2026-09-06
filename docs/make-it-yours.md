@@ -11,15 +11,16 @@ yours", and `/setup` does items 2 and 3 for you. In order:
 2. **`.github/CODEOWNERS`.** Replace every `@owner-placeholder` with the
    GitHub handle of whoever reviews that area. One handle is enough.
    `/setup` round 10 asks.
-3. **`docs/schema.json`.** `repo.private` matches your repository (it
-   should be private: transcripts and strategy live here). `review.self_merge`
+3. **`docs/schema.json`.** `repo.private` stays `true`: the repository is
+   private by rule (transcripts and strategy live here), and the doctor
+   warns if GitHub disagrees. `review.self_merge`
    is `true` only if one person merges everything; the day a second person
    joins, set it to `false` and the gate waits for their approval.
 4. **Repository settings.** An admin runs `sh scripts/github_setup.sh` once,
    or follows the click path in [github-settings.md](github-settings.md).
    Then `python3 scripts/doctor.py --github` should print nothing under
-   "GitHub settings". A private repo needs GitHub Team or Pro for the rules
-   to be enforced rather than suggested.
+   "GitHub settings". The rules are enforced on GitHub Team or Pro; the
+   doctor says if the plan is Free.
 5. **`SECURITY.md` and `CODE_OF_CONDUCT.md`.** They point at the template's
    security inbox and contact address. Put your own in, or delete both.
 6. **`CHANGELOG.md` and `docs/roadmap.md`.** They are the template's own

@@ -67,9 +67,8 @@ cannot change the rules it is judged by) sorts it into one of two kinds:
   the gate: the tidy step runs main's lint against the proposal's files,
   and a proposal's own machinery takes no part in that.
 
-When in doubt the gate decides, and it errs toward review. On a public
-repository, and on a private one under GitHub Team or Pro, the checks are
-enforced; on a private repository under Free they advise
+When in doubt the gate decides, and it errs toward review. The checks are
+enforced on GitHub Team or Pro, the plan this template assumes
 ([github-settings.md](github-settings.md)).
 
 One maintainer? GitHub never lets an author approve their own proposal,

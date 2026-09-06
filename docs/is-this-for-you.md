@@ -21,7 +21,7 @@ teams should start there.
 | Keep API keys out of chat and in a secrets manager ([secrets.md](secrets.md)) | one owner | at setup, then rarely |
 | Fill in the strategy and brand templates, put a name and a review date on each, and keep the dates true (`strategy/`, `brand/`) | the owner of each document | quarterly |
 | Pay for a coding-agent seat per active user and pay-as-you-go data instead of subscription suites | whoever owns the budget | monthly |
-| Pay for GitHub Team or Pro, so the repository's rules are enforced rather than suggested ([github-settings.md](github-settings.md)) | whoever owns the budget | monthly, per seat |
+| Pay for GitHub Team (or Pro for a personal account), so the private repository's rules are enforced; your website repository is probably on it already ([github-settings.md](github-settings.md)) | whoever owns the budget | monthly, per seat |
 | Decide, per recurring workflow, whether a person runs it or GitHub Actions does ([operating-model.md](operating-model.md)) | the owner | once per workflow |
 | Change where the team looks for the truth, and stop maintaining the old place | everyone | once, and it is the hard part |
 

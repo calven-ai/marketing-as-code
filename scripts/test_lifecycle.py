@@ -412,6 +412,23 @@ class TestPureParts(unittest.TestCase):
         self.assertIsNone(propose.push_failure("! [rejected] main -> main (non-fast-forward)"))
         self.assertIn("refusing", propose.push_failure("pre-push: refusing to push straight to main.\nerror: failed"))
 
+    def test_review_policy_wants_private_on_a_paid_plan(self):
+        def policy(private, owner_type, plan, login="acme"):
+            answers = {
+                "orgs/acme": {"login": "acme", "plan": {"name": plan}},
+                "user": {"login": login, "plan": {"name": plan}},
+                "repos/acme/repo/collaborators": [{"login": "ana"}],
+            }
+            with mock.patch.object(doctor, "_api", side_effect=lambda path: answers.get(path)):
+                return doctor.review_policy("acme/repo", {"private": private, "owner": {"login": "acme", "type": owner_type}})
+
+        self.assertEqual([], policy(True, "Organization", "team"))
+        self.assertEqual([], policy(True, "User", "pro"))
+        self.assertTrue(any("public" in n and "must be private" in n for n in policy(False, "Organization", "team")))
+        self.assertTrue(any("GitHub Free" in n for n in policy(True, "Organization", "free")))
+        self.assertTrue(any("GitHub Free" in n for n in policy(True, "User", "free")))
+        self.assertEqual([], policy(True, "User", "free", login="someone-else"))  # another person's account: unknown plan
+
     def test_origin_repo_parsing(self):
         import _common
         for url in ("git@github.com:ana/repo.git", "https://github.com/ana/repo.git", "https://github.com/ana/repo",

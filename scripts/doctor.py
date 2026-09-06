@@ -53,14 +53,21 @@ def github_settings():
 
 
 def review_policy(name, repo):
-    """docs/schema.json's repo.private and review.self_merge against what GitHub says (docs/make-it-yours.md)."""
+    """The repository is private on a plan that enforces its rules (AGENTS.md rule 8, docs/github-settings.md),
+    and docs/schema.json's repo.private and review.self_merge agree with what GitHub says."""
     out = []
     schema = json.loads((ROOT / "docs" / "schema.json").read_text(encoding="utf-8"))
     declared = bool((schema.get("repo") or {}).get("private"))
-    if repo.get("private") is not None and bool(repo.get("private")) != declared:
-        actual = "private" if repo.get("private") else "public"
-        out.append(f"docs/schema.json says repo.private is {str(declared).lower()} but the repository is {actual}; "
-                   "set repo.private to match (/setup asks)")
+    if repo.get("private") is False:
+        out.append("the repository is public; it must be private (AGENTS.md rule 8): Settings -> General -> "
+                   "Danger zone -> Change visibility, and add no transcripts or account lists until then")
+    elif repo.get("private") and not declared:
+        out.append("docs/schema.json says repo.private is false but the repository is private; set it back to true")
+    plan = github_plan(repo)
+    if repo.get("private") and plan == "free":
+        out.append("the owner is on GitHub Free, which does not enforce the ruleset or the environment branch "
+                   "rule on a private repository; upgrade to Team (organization) or Pro (personal account), "
+                   "docs/github-settings.md")
     variable = _api(f"repos/{name}/actions/variables/REVIEW_SELF_MERGE") or {}
     self_merge = bool((schema.get("review") or {}).get("self_merge")) or \
         str(variable.get("value", "")).strip().lower() == "true"
@@ -70,6 +77,23 @@ def review_policy(name, repo):
                    "docs/schema.json (or remove the REVIEW_SELF_MERGE variable) so someone other than the author "
                    "approves (docs/workflow.md)")
     return out
+
+
+def github_plan(repo):
+    """The owner's plan name ('free', 'pro', 'team', ...) or None when the API will not say.
+    An organization reports it to its members; a personal account only to itself."""
+    owner = repo.get("owner") or {}
+    login = owner.get("login")
+    if not login:
+        return None
+    if owner.get("type") == "Organization":
+        account = _api(f"orgs/{login}")
+    else:
+        account = _api("user")
+        if not account or account.get("login") != login:
+            return None
+    plan = ((account or {}).get("plan") or {}).get("name")
+    return str(plan).lower() if plan else None
 
 
 def _api(path):

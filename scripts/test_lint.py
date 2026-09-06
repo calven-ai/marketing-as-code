@@ -711,13 +711,12 @@ class TestAdoption(LintCase):
                 write(self.root, rel, "# t\n\n> **" + SCHEMA["templates"][rel] + ".**\n")
         self.assertFalse(any(f.path == "examples" for f in self.findings("adoption")))
 
-    def test_public_repo_with_personal_data(self):
-        write(self.root, "data/accounts/target-accounts.csv", "company,domain,tier,owner,status,notes\nAcme,acme.com,1,,prospect,\n")
+    def test_public_repo_warns(self):
         self.assertFalse(self.findings("adoption"))  # ships private: true
         public = json.loads(json.dumps(SCHEMA))
         public["repo"]["private"] = False
         found = [f for f in lint.run_checks(lint.Ctx(root=self.root, schema=public)) if f.check == "adoption"]
-        self.assertTrue(any("repo.private" in f.message for f in found))
+        self.assertEqual([lint.WARNING], [f.level for f in found if "repo.private" in f.message])
 
 
 class TestScriptsIndex(LintCase):

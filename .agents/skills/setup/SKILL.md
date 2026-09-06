@@ -93,12 +93,14 @@ already filled in without asking.
       - How many people will merge proposals? One: set `review.self_merge`
         to `true` in `docs/schema.json` and say it goes back to `false`
         the day a second person joins. More than one: leave it `false`.
-      - Is the repository private? Set `repo.private` in `docs/schema.json`
-        to match. If it is public, say that account lists and transcripts
-        must stay out of it.
+      - Confirm the repository is private and in an organization on
+        GitHub Team (or a personal account on Pro), the plan that enforces
+        the rules. If it is public, making it private is the first task,
+        before any transcript or account list lands; `repo.private` in
+        `docs/schema.json` stays `true` either way.
       - An admin runs `sh scripts/github_setup.sh` once, or follows the
-        click path in `docs/github-settings.md`. On a private repo the
-        rules are enforced only on GitHub Team or Pro; say so once.
+        click path in `docs/github-settings.md`; `python3 scripts/doctor.py
+        --github` then says if the plan is Free.
       - Run `python3 scripts/doctor.py --fix` so the pre-push hook is on
         and their name is set for commits.
 

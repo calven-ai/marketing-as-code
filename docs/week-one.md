@@ -8,7 +8,8 @@ week of saying them.
 ## Before you start
 
 Someone with admin rights on GitHub, once: on the template's page, "Use
-this template", "Create a new repository", private. On each computer:
+this template", "Create a new repository", owned by your organization (on
+GitHub Team), private. On each computer:
 [GitHub Desktop](https://desktop.github.com),
 [Claude Code](https://claude.com/claude-code) (the desktop app is fine),
 the [GitHub CLI](https://cli.github.com), and Python 3.9 or newer (a Mac
@@ -25,8 +26,8 @@ has it after `xcode-select --install`; Windows gets it from python.org).
    type it. A code, a browser, paste the code. Say `/doctor` again: "your
    machine is ready to propose".*
 4. **`/setup`.** Rounds 1 to 5 today (positioning, messaging, ICP and one
-   persona, competitors, voice) and round 10 (who reviews, how many merge,
-   private or not). The rest can wait. *Filled files in `strategy/` and
+   persona, competitors, voice) and round 10 (who reviews, how many
+   merge). The rest can wait. *Filled files in `strategy/` and
    `brand/`, and the first entry in `memory/decision-log.md`.*
 5. **Repository settings** (the admin, once). `sh scripts/github_setup.sh`,
    or the click path in [github-settings.md](github-settings.md).
