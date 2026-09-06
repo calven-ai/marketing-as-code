@@ -35,6 +35,16 @@ accept the prompt; it installs both. On Windows, install Git for Windows
 and Python from python.org, ticking "add to PATH". On Linux, both come
 from your package manager: `apt install git python3`.
 
+**Windows, and the skills are missing in Claude Code.** `.claude/skills/`
+holds one symlink per skill, and Git for Windows checks a symlink out as a
+small text file unless symlinks are enabled. `/doctor` reports "skill
+links out of sync" and `--fix` copies the skills into place instead. The
+python.org installer gives you `python` and `py` but not `python3`, which
+every command here uses: run the commands in WSL, or alias `python3` to
+`python` in Git Bash. The shell scripts (`sh scripts/with_env.sh`,
+`sh scripts/github_setup.sh`) need Git Bash or WSL, not PowerShell. The
+maintainers test on macOS and Linux only.
+
 ## Proposing
 
 **"Nothing has changed since the approved copy."** There is nothing to

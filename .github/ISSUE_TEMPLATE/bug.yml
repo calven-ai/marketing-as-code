@@ -1,0 +1,43 @@
+name: Bug in the template
+description: A script, workflow, skill or guide in this repository does the wrong thing.
+labels: [needs-review]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a problem in your own copy, say `/doctor` first and read
+        [docs/troubleshooting.md](https://github.com/calven-ai/marketing-as-code/blob/main/docs/troubleshooting.md).
+        Paste no keys and no customer data; the doctor's output never contains either.
+  - type: input
+    id: what
+    attributes:
+      label: What you ran
+      description: The command, slash command or workflow, as typed.
+      placeholder: python3 scripts/doctor.py --fix
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: The doctor's output
+      description: "`python3 scripts/doctor.py` from the repo root, pasted whole."
+      render: text
+  - type: input
+    id: where
+    attributes:
+      label: Operating system and coding agent
+      placeholder: macOS 15, Claude Code 2.1 (or Cursor, Codex, GitHub Actions)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Template version
+      description: The tag your copy was made from, or the first line of `CHANGELOG.md` that names a version.
+      placeholder: v0.2.0

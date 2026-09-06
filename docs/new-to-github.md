@@ -34,6 +34,13 @@ do that.
 - **Merge.** Clicking Merge on a proposal. Merging is the approval.
 - **Check.** The automatic test that runs on every proposal and says what
   is wrong in plain words.
+- **Gate.** The second automatic step. It sorts a proposal into
+  bookkeeping or needs-review and merges only the first kind.
+- **Bookkeeping.** A proposal that touches only files the agents maintain:
+  a status entry, a decision-log line, a data snapshot, a recurring
+  report. It merges itself once the check is green.
+- **Wired.** Connected. A tool is wired when the repo knows how to reach
+  it; the table in `integrations/README.md` says which ones are.
 
 You can ignore everything else for now.
 
