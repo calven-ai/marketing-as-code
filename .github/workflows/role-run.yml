@@ -2,7 +2,10 @@ name: role-run
 
 # Opt-in, reusable. Runs one role skill (brand-monitor, pipeline-report, ...)
 # as a Claude Code agent inside GitHub Actions and opens a pull request with
-# the snapshot and the report it produced. It never merges. A thin caller
+# the snapshot and the report it produced. It never merges, and the gate
+# never merges it either: a `role/` branch is needs-review whatever files it
+# touches, because the agent read tool output nobody vetted (AGENTS.md rule
+# 11), so a person reads the diff before it becomes context. A thin caller
 # per role (role-brand-monitor.yml is the shipped example) sets the schedule
 # and names the skill and the MCP servers it may use.
 #
@@ -75,10 +78,11 @@ jobs:
         id: gate
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SKILL: ${{ inputs.skill }}
         run: |
           if [ -z "$ANTHROPIC_API_KEY" ]; then
             echo "ANTHROPIC_API_KEY is not set in the automation environment; nothing to do."
-            echo "A person runs /${{ inputs.skill }} instead (docs/operating-model.md)."
+            echo "A person runs /$SKILL instead (docs/operating-model.md)."
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
@@ -119,7 +123,10 @@ jobs:
       - name: Name the proposal branch
         id: branch
         if: steps.gate.outputs.run == 'true'
-        run: echo "name=role/${{ inputs.skill }}/$(date -u +%Y-%m-%d-%H%M)" >> "$GITHUB_OUTPUT"
+        env:
+          SKILL: ${{ inputs.skill }}
+        # role/<skill>/<stamp>: the gate treats every role/ branch as needs-review (scripts/review_gate.py)
+        run: echo "name=role/$SKILL/$(date -u +%Y-%m-%d-%H%M)" >> "$GITHUB_OUTPUT"
 
       - name: Run the role
         if: steps.gate.outputs.run == 'true'

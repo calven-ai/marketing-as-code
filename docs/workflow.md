@@ -55,15 +55,21 @@ cannot change the rules it is judged by) sorts it into one of two kinds:
   Nobody has to merge a snapshot.
 - **Needs review.** Everything else: content, strategy, brand, ontology,
   skills, scripts, workflows, docs. A person who is not the author reads
-  the diff and approves. Anything touching the machinery (`.github/`,
-  `scripts/`, `docs/schema.json`, the agent settings, the skills, the
-  integrations) is needs-review no matter what else is in the proposal.
-  A proposal that changes the rules themselves (`scripts/lint.py`,
-  `docs/schema.json`) gets no Tidy commit from the gate: main's fixes
-  would fight the proposal's own.
+  the diff and approves; a bot's approval never counts. Anything touching
+  the machinery (`.github/`, `scripts/`, `docs/schema.json`, the agent
+  settings, the skills, the integrations) is needs-review no matter what
+  else is in the proposal, and so is any proposal from a fork or from an
+  agent that ran with nobody watching (`transcripts-process.yml`,
+  `role-run.yml`), even when every file it touched is bookkeeping: the
+  agent read text nobody vetted, so a person reads the diff before it
+  becomes context every later agent trusts. A proposal that touches
+  `scripts/`, `.github/` or `docs/schema.json` gets no Tidy commit from
+  the gate: the tidy step runs main's lint against the proposal's files,
+  and a proposal's own machinery takes no part in that.
 
-When in doubt the gate decides, and it errs toward review. On GitHub Team
-or Pro the checks are enforced; on Free they advise
+When in doubt the gate decides, and it errs toward review. On a public
+repository, and on a private one under GitHub Team or Pro, the checks are
+enforced; on a private repository under Free they advise
 ([github-settings.md](github-settings.md)).
 
 One maintainer? GitHub never lets an author approve their own proposal,

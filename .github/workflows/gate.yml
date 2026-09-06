@@ -7,14 +7,18 @@ name: gate
 # proposal, and:
 #
 #   - classifies it: bookkeeping (agent-maintained files only, per
-#     docs/schema.json, never the machinery) or needs-review;
+#     docs/schema.json, never the machinery) or needs-review; a proposal from
+#     a fork or from an unattended agent run (`transcripts-processed/`,
+#     `role/`) is needs-review whatever it touches;
 #   - pushes the safe fixes to the proposal as a Tidy commit, from main's
-#     lint, and lets the next run decide;
+#     lint, and lets the next run decide; never for a proposal that touches
+#     scripts/, .github/ or docs/schema.json, and never for a fork;
 #   - publishes the `review-gate` check on the proposal's head commit, which
 #     the ruleset requires;
 #   - merges a bookkeeping proposal itself, only when the health check
 #     succeeded on that exact commit; a needs-review proposal passes only
-#     once someone other than the author has approved it.
+#     once a person other than the author has approved it (a bot's approval
+#     never counts).
 #
 # Run it by hand with the proposal number when a check run was missed.
 # No secrets, no AI, no third-party actions.
@@ -69,7 +73,13 @@ jobs:
             n="$(printf '%s' "$PRS" | python3 -c 'import json,sys; p=json.load(sys.stdin); print(p[0]["number"] if p else "")')"
           fi
           if [ -z "$n" ] && [ -n "$HEAD_BRANCH" ] && [ "$HEAD_BRANCH" != "main" ]; then
-            n="$(gh pr list --head "$HEAD_BRANCH" --state open --json number -q '.[0].number' || true)"
+            n="$(gh pr list --head "$HEAD_BRANCH" --state open --json number -q '.[0].number // empty' || true)"
+          fi
+          if [ -z "$n" ] && [ -n "$HEAD_BRANCH" ] && [ "$HEAD_BRANCH" != "main" ]; then
+            # A fork: the run carries no pull_requests and --head sees only this repository's
+            # branches. Search instead; the gate treats a fork as needs-review and never tidies it.
+            n="$(gh pr list --search "head:$HEAD_BRANCH" --state open --json number,headRefName \
+                  -q "([.[] | select(.headRefName == \"$HEAD_BRANCH\")][0].number) // empty" || true)"
           fi
           if [ -z "$n" ]; then
             echo "no open proposal for this run (a push to main, or a branch without a pull request); nothing to gate"
