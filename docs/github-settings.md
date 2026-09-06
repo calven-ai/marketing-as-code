@@ -2,7 +2,7 @@
 
 The workflow in [workflow.md](workflow.md) assumes a few repository
 settings that cannot live in a file. This page lists them, the script that
-applies them, and the one thing that depends on your GitHub plan.
+applies them, and the plan that enforces them.
 
 ## Apply them once
 
@@ -44,32 +44,29 @@ bookkeeping once the check is green. The full split is in
 `python3 scripts/review_gate.py --pr N --dry-run` only says what it would
 do; the check itself is published through GitHub's Checks API.
 
-## The plan question
+## Private, on a plan that enforces rules
 
-Rulesets and environment branch rules are enforced on public repositories
-on every plan, and on private repositories under GitHub Pro (personal
-accounts) or GitHub Team (organizations). On a private repository under
-GitHub Free they exist but show "not enforced". This repository holds
-transcripts and strategy, so it should be private. That makes Team or Pro
-the plan this template assumes. It is priced per seat and is the cheapest
-line item in the whole setup.
+The repository is private, always (AGENTS.md, rule 8). It holds
+transcripts, strategy, CRM exports and account lists; a public copy is an
+incident, not a mode. `python3 scripts/doctor.py --github` warns when
+GitHub says the repository is public, and `scripts/lint.py` warns when
+`repo.private` in `docs/schema.json` is not `true`. The one public copy is
+the template itself, which holds no transcripts and no customer data.
 
-| | Free, private | Pro or Team, private | Any plan, public |
-| --- | --- | --- | --- |
-| The check runs and comments on every proposal | yes | yes | yes |
-| Bookkeeping proposals merge themselves, after a green check | yes | yes | yes |
-| A red check blocks the merge button | no | yes | yes |
-| A direct push to the approved copy is refused | only locally, by the committed pre-push hook | yes | yes |
-| Code owners are requested and required | no | yes | yes |
-| The bot keys are readable only from `main` | no | yes | yes |
+GitHub enforces rulesets and environment branch rules on a private
+repository only under GitHub Team (organizations) or GitHub Pro (personal
+accounts). That is the plan this template assumes: priced per seat, the
+cheapest line item in the setup, and the plan your website repository is
+most likely on already. Put the copy in that organization and the seats are
+paid for. On GitHub Free the ruleset shows "not enforced", and the doctor
+says so. Free is not supported: on it
 
-On Free, the protection is the pre-push hook (`git config core.hooksPath
-scripts/hooks`, once per clone; the doctor reminds you, and `git push
---no-verify` skips it, so it guards against accidents, not intent), a loud
-check, the gate's classification, and a weekly housekeeping proposal. That works for
-a careful team of two running no automation with keys. Upgrade the day a
-third person joins, the first time somebody merges red by accident, or
-before you put a bot key in the `automation` environment.
+- a red check does not block the merge button,
+- a direct push to the approved copy is refused only by the local pre-push
+  hook, which `git push --no-verify` skips,
+- code owners are neither requested nor required,
+- the bot keys in the `automation` environment are readable from any
+  branch, so a bot key on Free is a leak waiting for a branch.
 
 ## Secrets for the optional automations
 
@@ -94,9 +91,9 @@ owns each key.
 
 GitHub can refuse a push that contains a key it recognizes and alert on any
 that slipped through. Turn both on under Settings → Advanced Security
-(older layouts: Settings → Code security). Free on public repositories; on
-a private one they are part of the GitHub Secret Protection add-on, sold
-per committer on the Team plan. The repo's own lint (`scripts/lint.py`)
+(older layouts: Settings → Code security). On a private repository they
+are part of the GitHub Secret Protection add-on, sold per committer on the
+Team plan. The repo's own lint (`scripts/lint.py`)
 scans every tracked file for common key shapes, and the pre-push hook runs
 it before anything leaves your machine. The add-on is a second net.
 

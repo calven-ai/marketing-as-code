@@ -109,9 +109,9 @@ maintainer? Set `review.self_merge` in `docs/schema.json`
 ([workflow.md](workflow.md)).
 
 **Merge button is grey.** The two checks, `doctor` and `review-gate`,
-must be green. On GitHub Free with a private repository the button stays
-usable but the rules are advice
-([github-settings.md](github-settings.md)).
+must be green. If the button stays usable while a check is red, the
+repository is on GitHub Free, which does not enforce the rules; upgrade
+to Team or Pro ([github-settings.md](github-settings.md)).
 
 ## Two tools, one folder
 

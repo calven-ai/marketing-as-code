@@ -13,7 +13,7 @@ still replaced a subscription with an agent it owns. Read
 | --- | --- | --- | --- | --- |
 | 1. Use what you already pay for, fully | The team's AI assistant, set up deliberately and connected to the tools you already use | A paid team plan, one curator, an afternoon per connector | Shared instructions, connected data, less re-pasting | You keep re-pasting the same context, or want the same task to run the same way every week |
 | 2. One activity, one agent | One recurring, data-heavy activity handed to a purpose-specific agent a human triggers | One person who can connect an MCP server and keep a key, a pay-as-you-go data account | One line item cheaper, outputs as files, the first agent you own | Two or three agents exist and need shared context, history, and review |
-| 3. The repo (this template) | Strategy, content, projects, data, decisions, and the agents themselves as versioned plain text | An owner and a second person, a leader who reads diffs, a private repo, a coding-agent seat | Everything in the [README](../README.md#what-you-get) | There is no next stage; there is keeping it alive |
+| 3. The repo (this template) | Strategy, content, projects, data, decisions, and the agents themselves as versioned plain text | An owner and a second person, a leader who reads diffs, a private repo on GitHub Team or Pro, a coding-agent seat | Everything in the [README](../README.md#what-you-get) | There is no next stage; there is keeping it alive |
 
 ## Stage 1: use what you already pay for, fully
 
@@ -104,8 +104,8 @@ a replacement for the task tool
 ([integrations/tasks.md](../integrations/tasks.md)).
 
 You need an owner and a second person, leadership that reads pull
-requests, a private GitHub repository, a coding-agent seat per person, and
-keys in a secrets manager. Effort by team size is in
+requests, a private repository on GitHub Team or Pro, a coding-agent seat
+per person, and keys in a secrets manager. Effort by team size is in
 [is-this-for-you.md](is-this-for-you.md#by-team-size). Enter through the
 README's [quick start](../README.md#quick-start), plus the three things the
 change-management section insists on: one pilot workflow with a pass/fail

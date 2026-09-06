@@ -702,8 +702,8 @@ def check_pii(ctx):
         for i, line in enumerate(ctx.text(rel).splitlines(), 1):
             for hit in email.findall(line):
                 if hit.split("@")[1].lower() not in p["allow_domains"]:
-                    out.append(Finding(level, rel, "personal email address; no PII in a public copy "
-                                       "(data/README.md)", "pii", line=i))
+                    out.append(Finding(level, rel, "personal email address; personal data needs a logged "
+                                       "decision and a private repository (data/README.md)", "pii", line=i))
                     break
     return out
 
@@ -1619,14 +1619,9 @@ def check_adoption(ctx):
         out.append(Finding(INFO, examples.rstrip("/"), "make it yours: the example company is still here; delete "
                            f"the folder now that your own templates are filled {where}", "adoption"))
     if not ctx.schema["repo"].get("private"):
-        accounts = "data/accounts/target-accounts.csv"
-        has_rows = accounts in ctx.files and any(l.strip() for l in ctx.text(accounts).splitlines()[1:])
-        has_transcripts = any(f.startswith(("memory/transcripts/inbox/", "memory/transcripts/processed/"))
-                              and Path(f).name not in (".gitkeep", "README.md") for f in ctx.files)
-        if has_rows or has_transcripts:
-            out.append(Finding(INFO, "docs/schema.json", "make it yours: repo.private is false but the repository "
-                               "holds account rows or transcripts; make it private and set repo.private to true, "
-                               f"or keep personal data out {where}", "adoption"))
+        out.append(Finding(WARNING, "docs/schema.json", "repo.private is false; the repository is private by rule "
+                           "(AGENTS.md, rule 8): make it private and set repo.private back to true "
+                           "(docs/github-settings.md)", "adoption"))
     return out
 
 

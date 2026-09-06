@@ -7,7 +7,7 @@
   ],
   "stale_after_days": 90,
   "repo": {
-    "_doc": "Whether the repository is private. Ships true, because transcripts and strategy belong in a private repository; set it to match yours (/setup asks). private: true turns the PII finding into an info line (data/README.md says private repos may hold names; log that decision); scripts/doctor.py --github warns when this disagrees with GitHub.",
+    "_doc": "Must be true. The repository holds transcripts and strategy and is private by rule (AGENTS.md, rule 8). scripts/lint.py warns when this is false; scripts/doctor.py --github warns when GitHub says the repository is public or its plan is Free. private: true keeps the PII finding an info line (data/README.md says a private repo may hold names once the team logs that decision).",
     "private": true
   },
   "review": {

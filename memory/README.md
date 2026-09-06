@@ -42,7 +42,8 @@ pipeline that feeds them.
 - Every decision-log entry follows the format at the top of the file. Append
   only. History is the point.
 - Transcripts are the most sensitive files in this repo: names, customer
-  details, salaries, candid opinions. Keep them in a private repo only, or
-  gitignore `memory/transcripts/` and version only what the skill extracts.
-  Log that choice in `decision-log.md`. Quote them in outputs only as much
+  details, salaries, candid opinions. The repository is private by rule
+  (AGENTS.md, rule 8); a team that still wants them out of Git ignores
+  `memory/transcripts/` and versions only what the skill extracts. Log
+  that choice in `decision-log.md`. Quote them in outputs only as much
   as the task needs.

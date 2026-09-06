@@ -46,10 +46,13 @@ You can ignore everything else for now.
 
 ## Get your own copy
 
-1. Create a free account at github.com if you don't have one.
+1. Create an account at github.com if you don't have one. The account is
+   free; the repository goes into your company's GitHub organization, which
+   is on the Team plan (whoever runs the website repo can add you).
 2. Open this repo and click **Use this template**, then **Create a new
-   repository**. Make it private. This is your team's copy, and it never
-   sends anything back here.
+   repository**. Choose the organization as the owner and make it private:
+   meeting notes and customer names will live here. This is your team's
+   copy, and it never sends anything back here.
 3. Install [GitHub Desktop](https://desktop.github.com). It puts the repo on
    your computer as a normal folder and handles the saving and syncing.
 4. In GitHub Desktop, choose **Clone a repository** and pick your new copy.

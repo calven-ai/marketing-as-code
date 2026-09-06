@@ -30,9 +30,9 @@ a coding agent that reads files, because that is what the skills are.
 **Where does my data go?** Nowhere you did not put it. Everything lives in
 your own copy of the repository, on your GitHub, and in the tools you
 connect with your own keys. No server of the maintainers sees it. The
-repo will hold names from meetings and CRM exports, so keep it private
-and treat it like your CRM ([github-settings.md](github-settings.md),
-`data/README.md`).
+repo will hold names from meetings and CRM exports, so it is private, on
+GitHub Team or Pro so the rules are enforced, and treated like your CRM
+([github-settings.md](github-settings.md), `data/README.md`).
 
 **How do I get later improvements from the template?** Add the template
 as a second remote and check out only the machinery paths from a released

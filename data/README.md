@@ -35,9 +35,10 @@ here.
   freshest.
 - **CSV preferred**, with a header row. Keep columns stable within a domain
   so snapshots stay diffable.
-- **No customer PII in a public copy, ever.** Company-level data is fine.
-  Personal emails and names of individuals are not, unless this repo is
-  private and the team has decided so (log the decision).
+- **Personal data is a decision, not a default.** The repository is private
+  by rule (AGENTS.md, rule 8). Company-level data is always fine. Personal
+  emails and names of individuals come in only once the team has decided so
+  and logged the decision; a copy that turns out to be public holds none.
 
 ## For agents
 

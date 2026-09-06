@@ -69,10 +69,12 @@ It is not:
 
 ## What you need
 
-- A GitHub account and your own private copy of this repo. GitHub Free works
-  for a careful team of two; a private repo whose rules are enforced rather
-  than suggested needs GitHub Team or Pro
-  ([docs/github-settings.md](docs/github-settings.md)).
+- Your own private copy of this repo, on GitHub Team (an organization) or
+  GitHub Pro (a personal account), so the rules the workflow relies on are
+  enforced. The repo holds transcripts and strategy, so private is not
+  optional. Your website's repo is almost certainly on that plan already.
+  GitHub Free does not enforce rulesets on a private repository and is not
+  supported ([docs/github-settings.md](docs/github-settings.md)).
 - A coding agent per person. [Claude Code](https://claude.com/claude-code)
   is what this repo is tuned for; Cursor and Codex read the same files
   ([the table below](#which-coding-agent)).
@@ -93,8 +95,8 @@ It is not:
 The repo is free (MIT). What you pay for around it, for a team of about
 five:
 
-- **GitHub.** Free on a public repo. A private repo with enforced rules is a
-  per-seat plan, the smallest line item.
+- **GitHub.** A Team or Pro seat per person, which most teams already pay
+  for. The smallest line item.
 - **Coding-agent seats.** One per active person. The largest line item.
 - **Data, pay as you go.** DataForSEO bills per request, Apify per run. Small
   at this size, and only on the days you run those skills.
@@ -162,8 +164,9 @@ technical parts for you.
 ## Quick start
 
 1. **Get your own copy.** On this page, click "Use this template", then
-   "Create a new repository", and make it private. Do not fork: a fork of a
-   public repository cannot be made private. Clone your copy with
+   "Create a new repository", put it in your company's GitHub organization
+   and make it private. Do not fork: a fork of a public repository cannot
+   be made private. Clone your copy with
    [GitHub Desktop](https://desktop.github.com).
 2. **Open it with a coding agent.** [Claude Code](https://claude.com/claude-code)
    is what this repo is tuned for ([CLAUDE.md](CLAUDE.md)), in the terminal
