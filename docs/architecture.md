@@ -60,7 +60,7 @@ marketing-as-code/
 ├── memory/                      # decision log, knowledge base, transcript pipeline
 ├── agents/                      # the human-readable workforce roster, one table per area
 ├── integrations/                # the registry (wired.json), catalog/<category>.json, the guide, the task adapter
-├── scripts/                     # deterministic non-AI code (OG images, pulls, sync, doctor)
+├── scripts/                     # deterministic non-AI code (pulls, sync, propose, doctor, the lint)
 ├── playgrounds/                 # disposable prototypes
 └── docs/                        # guides, this document, the roadmap
 ```
@@ -128,7 +128,7 @@ brief, status, working notes. Content never lives here; the brief lists
 repo paths into `content/`, and each piece points back with `project:`.
 When a project closes its folder is archived, and nothing of lasting value
 goes with it. Tasks live in the team's task tool via
-[`integrations/tasks.md`](#integrations-the-registry-and-the-task-adapter).
+[`integrations/tasks.md`](#integrations-the-registry-the-catalog-and-the-task-adapter).
 
 *Rejected:* separate `campaigns/` and `projects/` (the filing ambiguity
 never ends), content inside project folders, and symlinks from projects
@@ -233,10 +233,11 @@ The story includes a CMS-less Astro website, but it lives in its own
 repository. A deployable with `node_modules`, CI and deploy secrets would
 intimidate exactly the marketers this template targets. Website releases
 should not churn this repo's history, and strategy edits should not
-trigger deploys. The repos still connect: a GitHub Action here opens a PR
-against the website repo whenever a piece merges with
-`status: published`. A companion website template is planned, with `docs/website.md` (planned)
-describing the pattern.
+trigger deploys. The repos will still connect: a planned GitHub Action
+here opens a PR against the website repo whenever a piece merges with
+`status: published` ([roadmap.md](roadmap.md)). A companion website
+template is planned, with `docs/website.md` (planned) describing the
+pattern.
 
 ## Where things run, and where the keys live
 

@@ -1,6 +1,6 @@
 ---
 name: new-content
-description: Scaffold a new piece of content in content/. Use when asked to start, draft, or create a blog post, email, LinkedIn post, case study, webinar asset, or any content piece. Creates the folder, brief, and draft skeleton with wired frontmatter.
+description: Scaffold a piece of content in content/: folder, brief and draft skeleton with wired frontmatter. Use when asked to start, draft or create a blog post, email, LinkedIn post, case study, webinar asset or any piece.
 license: MIT
 metadata:
   kind: workflow

@@ -1,6 +1,6 @@
 ---
 name: pipeline-report
-description: Weekly funnel and pipeline report: stage conversion, velocity, marketing-sourced and influenced pipeline versus target; the monthly run adds a quarter forecast. Use when "pipeline report", "where will we land", or on the weekly cadence.
+description: Weekly funnel and pipeline report: stage conversion, velocity, marketing-sourced and influenced pipeline versus target; monthly adds a forecast. Use when "pipeline report", "where will we land", weekly.
 license: MIT
 metadata:
   kind: role
@@ -75,7 +75,8 @@ works only while `crm` is wired to a key-based server or a script
    with the three snapshot paths. Build the dashboard through
    `make-dashboard` beside it.
 8. **Suggest, do not decide.** End with the three to five deals or stages
-   that need a human this week; the team picks.
+   that need a human this week; the team picks, and the owner files any
+   follow-up per `integrations/tasks.md`. This skill files none itself.
 
 ## Worked example
 
@@ -111,4 +112,4 @@ works only while `crm` is wired to a key-based server or a script
 - Red flags (a deal that slipped a quarter, a top-10 deal gone dark, a
   target nobody can name) go to the leadership channel with
   `python3 scripts/slack_post.py --channel leadership`; printed instead
-  when Slack is not wired.
+  when `chat` is not wired.

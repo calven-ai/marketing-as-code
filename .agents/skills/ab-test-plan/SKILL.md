@@ -1,6 +1,6 @@
 ---
 name: ab-test-plan
-description: Design an A/B test: hypothesis, primary metric per the ontology, sample size, duration, stop rule; record the result later. Use when "design a test for X", "is this result significant", "log the test result".
+description: Design an A/B test: hypothesis, primary metric per the ontology, sample size, duration, stop rule; record the result later. Use when "design a test for X", "is this significant".
 license: MIT
 metadata:
   kind: workflow

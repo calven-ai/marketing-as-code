@@ -3,7 +3,7 @@
 The template ships with the maintainer's names in a few places, example
 rows in the tables, and a fictional company in `examples/`. Nothing here is
 hidden: `python3 scripts/doctor.py` lists what is left under "Make it
-yours", and `/setup` does the first three items for you. In order:
+yours", and `/setup` does items 2 and 3 for you. In order:
 
 1. **`examples/`.** Delete the folder. Beacon is a fictional company, there
    to show what filled templates look like; once yours are filled it only
@@ -56,7 +56,8 @@ yours", and `/setup` does the first three items for you. In order:
 17. **Docs you may delete.** [architecture.md](architecture.md),
     [is-this-for-you.md](is-this-for-you.md) and [stages.md](stages.md) are
     for evaluating the template. If you drop them, remove their lines from
-    [README.md](README.md) so the check stays green.
+    the root [README.md](../README.md) and from [docs/README.md](README.md)
+    so the check stays green.
 
 ## Later: taking improvements from the template
 
@@ -73,6 +74,10 @@ Then, on a branch, whenever you want the latest machinery:
 git fetch template
 git checkout template/main -- scripts .github/workflows docs/schema.json .agents/skills scripts/hooks
 ```
+
+Prefer a released version over the moving branch: `template/v0.2.0` in
+place of `template/main`, from the template's Releases page, so you can
+see exactly which version your copy carries.
 
 Say `/propose` and read the diff. Only those paths; never `strategy/`,
 `content/`, `memory/`, `data/`. Expect to reconcile `docs/schema.json` by

@@ -1,6 +1,6 @@
 ---
 name: campaign-discovery
-description: Run discovery for a campaign idea given in one sentence. Composes the competitive angle, keyword volumes and current ranks, AI answer-engine prompt coverage, and an inventory of existing content into one report in reports/adhoc/. Use when asked to "explore a campaign", "run discovery on", "what would it take to campaign on X", or before a new-project brief is written.
+description: Discovery for a campaign idea in one sentence: competitive angle, keywords and ranks, AI answer coverage, existing content, one report in reports/adhoc/. Use when "explore a campaign", "run discovery on".
 license: MIT
 metadata:
   kind: workflow

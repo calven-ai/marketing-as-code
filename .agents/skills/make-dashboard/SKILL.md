@@ -1,6 +1,6 @@
 ---
 name: make-dashboard
-description: Turn data into a self-contained HTML dashboard saved beside its report, or a spec for the team's BI tool. Use when asked for a dashboard, chart, or visual view of marketing data, when a report's answer is multidimensional enough that prose can't carry it, or to spec the HubSpot or Looker dashboard.
+description: Turn data into a self-contained HTML dashboard beside its report, or a spec for the team's BI tool. Use when asked for a dashboard, chart or visual view, or when a report's answer is too multidimensional for prose.
 license: MIT
 metadata:
   kind: workflow

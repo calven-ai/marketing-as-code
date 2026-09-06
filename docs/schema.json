@@ -350,12 +350,12 @@
       },
       {
         "file": "CHANGELOG.md",
-        "text": "Calven",
+        "text": "The first public release, as a GitHub template repository.",
         "what": "CHANGELOG.md is the template's own history; delete it together with docs/roadmap.md, or empty it"
       },
       {
         "file": "docs/roadmap.md",
-        "text": "Calven",
+        "text": "The stance: the maintainers ship",
         "what": "docs/roadmap.md is the template's own plan; delete it together with CHANGELOG.md, or empty it"
       }
     ],
@@ -464,7 +464,9 @@
       "cadence",
       "writes",
       "runs"
-    ]
+    ],
+    "_budget": "Every description loads into every session. Claude Code lists skills under a character budget and drops descriptions past it; on 2026-09-06 a 200k-context session overflowed at about 20,000 characters of names plus descriptions. The check warns above this total for descriptions alone.",
+    "description_budget": 19000
   },
   "csv": {
     "_doc": "Canonical tables: the header row must be exactly this. Snapshots only need a header and uniform columns.",

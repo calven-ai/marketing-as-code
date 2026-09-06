@@ -1,6 +1,6 @@
 ---
 name: sales-enablement-kit
-description: Write sales or partner collateral: one-pager, pitch narrative, objection handling, demo talk track, partner kit. Use when "one-pager for X", "objection doc", "partner kit", "what does sales say about Acme".
+description: Write sales or partner collateral: one-pager, pitch narrative, objection handling, demo talk track, partner kit. Use when "one-pager for X", "objection doc", "partner kit".
 license: MIT
 metadata:
   kind: workflow

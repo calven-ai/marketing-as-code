@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: ABM account research through the wired scraping and enrichment tools: people at or formerly at target accounts, company signals, social activity, saved as dated snapshots in data/accounts/; or a pre-call account brief from those snapshots plus CRM history. Use when asked to "research these accounts", "build an alumni list", "brief me on Acme before the call", or to enrich data/accounts/target-accounts.csv.
+description: Account research through the wired scraping and enrichment tools, saved as snapshots in data/accounts/, or a pre-call brief from them. Use when "research these accounts", "alumni list", "brief me on Acme".
 license: MIT
 metadata:
   kind: role
@@ -34,7 +34,9 @@ in `integrations/catalog/scraping-search.json`), and stop.
 
 - **Personal data only in a private repo.** Names, titles, and profile URLs
   of individuals are personal data. Confirm the repo is private before
-  writing any of it; if it is public, write company-level results only.
+  writing any of it: `repo.private` in `docs/schema.json` says what the
+  team declared, and `python3 scripts/doctor.py --github` says whether
+  GitHub agrees. If it is public, write company-level results only.
   This is the PII rule in `data/README.md`, and it is not negotiable.
 - **Never contact anyone.** No connection requests, messages, emails, or
   follows. Research is read-only.

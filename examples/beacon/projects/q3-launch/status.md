@@ -8,7 +8,7 @@ Newest entry on top.
 - [ ] Announcement email drafted (Tomas)
 - [ ] Comparison page brief (Ana)
 
-## 2026-08-20
+## 2026-09-01
 
 - **State:** at risk
 - The launch post is live and ranking; the announcement email slipped a

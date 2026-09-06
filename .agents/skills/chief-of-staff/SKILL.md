@@ -1,6 +1,6 @@
 ---
 name: chief-of-staff
-description: Process meeting transcripts from memory/transcripts/inbox/ into facts, decisions, project status updates, action items per owner, and risks and red flags. Use when asked to "process the transcript inbox", "process this meeting", or when a new transcript needs turning into decisions, tasks, doc updates, and a Slack summary.
+description: Process transcripts from memory/transcripts/inbox/ into facts, decisions, status updates, action items per owner and red flags. Use when "process the transcript inbox", "process this meeting".
 license: MIT
 metadata:
   kind: role

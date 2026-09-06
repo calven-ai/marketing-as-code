@@ -111,4 +111,4 @@ and leave the name and email columns out.
 - Red flags (a sync that stopped, a stage nobody defined holding revenue,
   personal data in a field that syncs outward) go to the leadership
   channel with `python3 scripts/slack_post.py --channel leadership`;
-  printed instead when Slack is not wired.
+  printed instead when `chat` is not wired.

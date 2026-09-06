@@ -5,8 +5,8 @@ the structure is in [architecture.md](architecture.md). This page is only
 what remains.
 
 The stance: the maintainers ship the structure, the skills for every
-marketing function, the guides, one worked example per way of connecting a
-tool (MCP server, CLI, script), the catalog of vendor routes per
+marketing function, the guides, worked examples of connecting a tool over
+MCP and by script (the CLI tier is described, not shipped), the catalog of vendor routes per
 integration category, and the guide for adding what the catalog lacks.
 The catalog is a list of routes with a verification date, not a set of
 connectors the maintainers run: a team wires the vendor it uses with
@@ -26,10 +26,8 @@ corrected entry contributed back is welcome
       own server, and `secrets: inherit` into the `automation` environment
 - [ ] `scripts/doctor.py`: warn when a wired server's variable is not set
       in the person's environment, without printing values
-- [ ] `scripts/og_image.py`: port from the Calven website repo; reads
+- [ ] `scripts/og_image.py`: render a social-preview image for a piece from
       `brand/tokens.json` and `brand/templates/`
-- [ ] Optional context pull script: mirror a connected context layer into
-      `strategy/` as dated files, for teams that need offline copies
 - [ ] `docs/website.md`: the sibling-repo pattern, and the content-to-website
       sync Action that opens a PR against the website repo on merge of
       `status: published`

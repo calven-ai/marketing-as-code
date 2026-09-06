@@ -1,6 +1,6 @@
 ---
 name: propose
-description: Turn what changed into a proposal (a pull request) and hand back the link. Use when asked to "propose", "send this for review", "ship it", "open a proposal", "save this to GitHub", or when a piece of work is done and should land.
+description: Turn what changed into a proposal (a pull request) and hand back the link. Use when asked to "propose", "send this for review", "ship it", "save this to GitHub", or when work is done and should land.
 license: MIT
 metadata:
   kind: workflow

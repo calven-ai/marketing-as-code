@@ -1,6 +1,6 @@
 ---
 name: context-freshness
-description: Monthly judgment pass on context: files past 90 days, contradictions between strategy, knowledge and the decision log, and which refresh to run. Use when "is our context current", "audit strategy", or on the monthly cadence.
+description: Monthly judgment pass on context: files past 90 days, contradictions between strategy, knowledge and the decision log, which refresh to run. Use when "is our context current", or monthly.
 license: MIT
 metadata:
   kind: role

@@ -35,7 +35,7 @@ is. Battlecards in `competitive/` carry `last_reviewed` and `owner`.
 ## Keeping this current
 
 These files go stale by default. `python3 scripts/doctor.py` lists anything
-not reviewed in 90 days, and CI prints the same list on every pull request.
+not reviewed in 90 days, and the check prints the same list on every proposal.
 The other path is a marketing context layer served over MCP, with these
 files as the fallback. The templates' headings match the documents such a
 layer serves (Calven, which maintains this repo, makes one), so switching

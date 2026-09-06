@@ -6,6 +6,51 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-06
+
+The first public release, as a GitHub template repository.
+
+- The gate's trust boundary. The lint runs this checkout's own
+  `scripts/sync_skills.py` (new `--root`) against the tree it checks,
+  never the checked tree's copy, so the gate's tidy step no longer executes
+  a proposal's script with a write token; the gate tidies nothing that
+  touches `scripts/`, `.github/` or `docs/schema.json`, counts no approval
+  from a `[bot]` login, and treats `transcripts-processed/` and `role/`
+  branches as needs-review whatever files they touch, so an agent that ran
+  unattended never lands in the decision log unread. `check.yml` runs the
+  proposal's code with a read-only token and posts the sticky comment from
+  a second job that never turns the required check red; `gate.yml` finds a
+  fork's proposal by search. GitHub's one toggle covers creating and
+  approving pull requests, so `scripts/github_setup.sh` leaves it on (four
+  workflows open their proposals with the workflow token) and admins
+  bypass the ruleset through a pull request only. `pull_transcripts.py`
+  validates the date it puts in a filename; `role-run.yml` routes its
+  input through `env`; the Slack manifest asks for `chat:write` only;
+  `LICENSES/Apache-2.0.txt` accompanies the Apache-2.0 reference material.
+  Tests are discovered from `scripts/test_*.py`; two new files cover
+  `sync_skills.py` and the transcript filenames.
+- Deny rules that match the promise: `.env` at any depth, a shell inside
+  the shell, `/usr/bin/env`, `export` and `declare -p`; auto mode switched
+  off beside bypass mode; `scripts/with_env.sh` exports only the variables
+  `.mcp.json` references; `docs/secrets.md` says what the rules stop and
+  what they do not.
+- Before publishing: the docs agree with the tree (five tools across six
+  categories, four scheduled workflows, the DataForSEO pair among the bot
+  keys, the tests as one command, the sizes the fit check covers, one bad
+  anchor, the website sync as planned rather than present, the
+  maintainer's decision out of the decision log); AGENTS.md rule 3 names
+  the chat summaries the wired script posts; six skills say "chat" where
+  they said Slack, `add-integration` and `setup` restate rule 11 for what
+  they read, `researcher` names where "private" is declared; skill
+  descriptions are trimmed under a budget the check now warns about,
+  because a coding agent drops the descriptions past its limit;
+  `examples/beacon` gets a social channel that really is the worst
+  converter, a snapshot behind the monthly signups tile, and a test that
+  the signups reconcile; the README says which platforms are tested,
+  where to get help, and shows the check's badge.
+- The check reports the doctor's exit code, not `tee`'s, so a red doctor
+  fails the job; the gate does not tidy a proposal that changes the rules
+  it applies (#13).
 - The foundation set: 99 skills across eighteen marketing areas (product
   marketing, content, organic search, AI visibility, social, paid, email,
   pipeline and ABM, events, PR, partner, community, customer marketing,
@@ -200,10 +245,10 @@ All notable changes to this project are documented here. The format follows
   not-yet-existing files (`.mcp.json`, setup docs), `.gitignore` no longer
   swallows Keynote `.key` files, doctor checks two more templates, PII note
   for transcripts.
-- Wave 1: structure v2 (`brand/`, `projects/` replacing `campaigns/`,
+- The first structure: v2 of the tree (`brand/`, `projects/` replacing `campaigns/`,
   `data/` domains + ontology, `reports/`, `integrations/`, `scripts/`),
   folder READMEs as machine contracts, AGENTS.md v2 with the data-question
-  routing table, all wave-1 templates, nine agents/skills in
+  routing table, the first templates, nine agents/skills in
   `.agents/skills/` (incl. `qmr` and `make-dashboard` pulled forward),
   QMR pack (report + data checklist + self-contained HTML dashboard
   template), skill-sync machinery with CI check, `docs/workflow.md` and

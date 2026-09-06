@@ -2,12 +2,12 @@
 """Deterministic checks for everything docs/schema.json says is valid:
 frontmatter, naming, file placement, CSV headers, links, secrets, the
 generated README tables. --fix applies the safe fixes; --strict, --format
-github, --json, --file and --classify serve CI, hooks and skills.
+github, --json, --file and --classify serve the check, hooks and skills.
 
 Run from the repo root:
     python3 scripts/lint.py                 # findings, exit 1 on any error
     python3 scripts/lint.py --fix           # apply the safe fixes, then re-check
-    python3 scripts/lint.py --strict        # warnings fail too (CI on main)
+    python3 scripts/lint.py --strict        # warnings fail too (the check on main)
     python3 scripts/lint.py --format github # ::error/::warning annotations
     python3 scripts/lint.py --json          # findings as JSON, for skills
     python3 scripts/lint.py --file PATH     # file-level checks for one file (hooks)
@@ -841,6 +841,7 @@ def check_skills(ctx):
     categories = catalog.get("categories", [])
     bridge_only = catalog.get("bridge_only", [])
     known_keys = set(spec.get("metadata_keys", []))
+    described = 0  # every description loads into every session, under a budget (docs/skill-authoring.md)
     for rel in ctx.glob(SKILL_GLOB):
         folder = rel.split("/")[2]
         fm = ctx.fm(rel) or {}
@@ -850,6 +851,7 @@ def check_skills(ctx):
                                "skill", line=line_of(text, "name:")))
         if not fm.get("description"):
             out.append(Finding(ERROR, rel, "`description:` is empty; agents route on it", "skill", line=1))
+        described += len(str(fm.get("description") or ""))
         meta = fm.get("metadata")
         line = line_of(text, "metadata:") or 1
         if not isinstance(meta, dict):
@@ -893,6 +895,11 @@ def check_skills(ctx):
         for key in meta:
             if known_keys and key not in known_keys:
                 bad(f"unknown metadata key `{key}` (typo?)", WARNING)
+    budget = int(spec.get("description_budget", 0) or 0)
+    if budget and described > budget:
+        out.append(Finding(WARNING, ".agents/skills", f"skill descriptions total {described:,} characters, over the "
+                           f"{budget:,} budget; a coding agent lists every skill in every session and drops "
+                           "descriptions past its limit, so trim the longest (docs/skill-authoring.md)", "skill"))
     return out
 
 

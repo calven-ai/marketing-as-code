@@ -1,6 +1,6 @@
 ---
 name: publish
-description: Move an approved draft to published: set frontmatter in a PR, stage it as a CMS draft or scheduled post when wired, and list distribution steps. Use when "publish this", "push to the CMS as draft", "schedule the post".
+description: Move an approved draft to published: frontmatter in a PR, a CMS draft or scheduled post when wired, the distribution steps. Use when "publish this", "push to the CMS as draft", "schedule the post".
 license: MIT
 metadata:
   kind: workflow

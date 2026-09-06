@@ -1,6 +1,6 @@
 ---
 name: seo-technical-audit
-description: Audit crawlability, indexation, speed, on-page basics, orphan pages, schema and AI-readiness (llms.txt) as a prioritised fix list. Use when "audit the site", "traffic dropped", "why aren't we indexed", "do we have llms.txt".
+description: Audit crawlability, indexation, speed, on-page basics, orphan pages, schema and llms.txt as a prioritised fix list. Use when "audit the site", "traffic dropped", "why aren't we indexed".
 license: MIT
 metadata:
   kind: workflow

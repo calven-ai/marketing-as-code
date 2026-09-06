@@ -30,8 +30,13 @@ metadata:
 - **`description`** is what agents route on and what the roster shows.
   Shape it `<one sentence of what>. Use when "<phrase>", "<phrase>".`: the
   roster prints everything before `. Use`, so keep that first sentence
-  short and concrete. Ninety skills load into every session; every word
-  costs.
+  short and concrete. Ninety-nine skills load into every session, and
+  every word costs: a coding agent lists them under a character budget
+  and, when the names and descriptions overflow it, drops descriptions
+  starting with the skills it used least (in a fresh session, the end of
+  the alphabet), so a skill is there and yet never routed to. Keep a
+  description under about 200 characters; the check warns when all of
+  them together pass the budget in `docs/schema.json`.
 - **`needs` and `optional` hold category ids, never vendors**: `crm`, not
   HubSpot. The 25 ids are in `docs/schema.json` under `catalog.categories`
   and explained in [integrations/catalog/README.md](../integrations/catalog/README.md).
