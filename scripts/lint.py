@@ -795,6 +795,10 @@ def check_settings(ctx):
     if spec.get("disable_bypass") and perms.get("disableBypassPermissionsMode") != "disable":
         out.append(Finding(ERROR, rel, "permissions.disableBypassPermissionsMode must be \"disable\" "
                            "(docs/secrets.md)", "settings", fix=lambda: _fix_settings(ctx, rel, spec)))
+    if spec.get("disable_auto") and perms.get("disableAutoMode") != "disable":
+        out.append(Finding(ERROR, rel, "permissions.disableAutoMode must be \"disable\": a classifier is not the "
+                           "person the docs promise asks first (docs/secrets.md)", "settings",
+                           fix=lambda: _fix_settings(ctx, rel, spec)))
     return out
 
 
@@ -808,6 +812,8 @@ def _fix_settings(ctx, rel, spec):
             deny.append(rule)
     if spec.get("disable_bypass"):
         perms["disableBypassPermissionsMode"] = "disable"
+    if spec.get("disable_auto"):
+        perms["disableAutoMode"] = "disable"
     ctx.path(rel).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     ctx.forget(rel)
 

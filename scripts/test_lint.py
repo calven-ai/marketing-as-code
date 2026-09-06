@@ -92,7 +92,8 @@ def make_repo(root):
     write(root, ".mcp.json", json.dumps({"mcpServers": {"dataforseo": {"type": "stdio", **server}}}))
     write(root, ".cursor/mcp.json", json.dumps({"mcpServers": {"dataforseo": server}}).replace("${", "${env:"))
     write(root, ".claude/settings.json", json.dumps({"permissions": {
-        "deny": list(SCHEMA["settings"]["required_deny"]), "disableBypassPermissionsMode": "disable"}}))
+        "deny": list(SCHEMA["settings"]["required_deny"]), "disableBypassPermissionsMode": "disable",
+        "disableAutoMode": "disable"}}))
     write(root, "integrations/README.md", "# integrations\n")
     write(root, "integrations/catalog/README.md", "# catalog\n")
     write(root, "integrations/catalog/seo-data.json", json.dumps(catalog_category()))
@@ -413,11 +414,21 @@ class TestConfigs(LintCase):
         self.assertTrue(found and all(f.fixable for f in found))
         self.assertTrue(any("Bash(env)" in f.message for f in found))
         self.assertTrue(any("disableBypassPermissionsMode" in f.message for f in found))
+        self.assertTrue(any("disableAutoMode" in f.message for f in found))
         self.fix()
         self.assertFalse(self.findings("settings"))
         data = json.loads((self.root / ".claude/settings.json").read_text())
         self.assertEqual(["Bash(ls)"], data["permissions"]["allow"])
         self.assertEqual("disable", data["permissions"]["disableBypassPermissionsMode"])
+        self.assertEqual("disable", data["permissions"]["disableAutoMode"])
+
+    def test_required_deny_covers_the_shapes_the_docs_promise(self):
+        """docs/secrets.md names what the rules stop; the list must keep covering it."""
+        deny = SCHEMA["settings"]["required_deny"]
+        for rule in ["Read(./.env)", "Read(**/.env)", "Read(**/.env.*)", "Bash(env)", "Bash(printenv*)",
+                     "Bash(sh -c *)", "Bash(bash -c *)", "Bash(python3 -c *)", "Bash(node -e *)",
+                     "Bash(gh pr merge *)", "Bash(gh secret *)", "Bash(git push --force*)"]:
+            self.assertIn(rule, deny)
 
 
 class TestSkillsAndDocs(LintCase):

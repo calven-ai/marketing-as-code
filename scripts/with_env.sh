@@ -7,6 +7,11 @@
 #   sh scripts/with_env.sh cursor .          # Cursor
 #   sh scripts/with_env.sh python3 scripts/seo_snapshot.py --dry-run
 #
+# Only the variables .mcp.json references are exported, not the whole file:
+# a server's process (a third-party npm package, say) sees the keys it needs
+# and nothing else, and so does the agent. The scripts under scripts/ read
+# .env themselves, so they need nothing from here.
+#
 # If .env holds 1Password references (KEY=op://Vault/Item/field) instead of
 # values, the command runs through `op run`, which resolves them at start
 # and masks them in output. Nothing is printed by this script, ever.
@@ -33,8 +38,16 @@ if grep -q 'op://' "$env_file"; then
   exec op run --env-file="$env_file" -- "$@"
 fi
 
-set -a
+# The names the servers reference, as ${VAR} in .mcp.json.
+names="$(grep -o '\${[A-Za-z_][A-Za-z0-9_]*}' "$root/.mcp.json" 2>/dev/null | tr -d '${}' | sort -u || true)"
+
+# Read .env into shell variables (not the environment), then export only the
+# names above that .env actually sets.
 # shellcheck disable=SC1090
 . "$env_file"
-set +a
+for name in $names; do
+  if eval "[ -n \"\${$name+set}\" ]"; then
+    export "$name"
+  fi
+done
 exec "$@"
