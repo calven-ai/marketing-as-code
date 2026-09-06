@@ -117,4 +117,4 @@ OAuth server cannot run headless.
 - Red flags (a churn signal, an incident thread, abuse the moderators
   missed) go to the leadership channel with
   `python3 scripts/slack_post.py --channel leadership`; printed instead
-  when Slack is not wired.
+  when `chat` is not wired.

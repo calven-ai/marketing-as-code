@@ -1,6 +1,6 @@
 ---
 name: win-loss
-description: Synthesise why deals were won and lost this period from closed deals and call transcripts, by competitor, segment and reason. Use when "why did we lose Acme", "run the quarterly win/loss", "what are we losing on".
+description: Synthesise why deals were won and lost this period from closed deals and call transcripts, by competitor, segment and reason. Use when "why did we lose Acme", "quarterly win/loss".
 license: MIT
 metadata:
   kind: workflow

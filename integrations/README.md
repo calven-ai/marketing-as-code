@@ -5,7 +5,8 @@
 The registry of tools this repo's agents can reach, and how each one
 connects. Skills never name a vendor: they name an integration *category*
 (`crm`, `web-analytics`, `ads`, and so on), and this page says which vendor
-fills each category in this repo. Five ship wired. For the rest of your
+fills each category in this repo. Five tools ship wired, filling six
+categories (one of them covers two). For the rest of your
 stack, [the catalog](catalog/README.md) holds the routes for the common
 vendors in every category, `python3 scripts/wire_integration.py <vendor>`
 wires one, and [adding-an-integration.md](adding-an-integration.md) carries

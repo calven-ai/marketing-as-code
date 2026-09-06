@@ -12,6 +12,7 @@ Every snapshot this QMR needed, checked off with its path.
 ## Analytics (`data/analytics/snapshots/`)
 
 - [x] **Traffic by source**: `2026-06-30-posthog-traffic-by-source.csv`
+- [x] **Signups by month**: `2026-06-30-posthog-signups-by-month.csv`
 
 ## SEO (`data/seo/snapshots/`)
 

@@ -64,8 +64,10 @@ gap in the report.
    used (the landing-page snapshot if one guided the list, and the fetch
    date per page).
 6. **Hand over.** Rewrites are proposals; a page change goes to the
-   person who owns the site, and a positioning finding may mean the
-   strategy file is what needs the diff, not the page.
+   person who owns the site as a task filed per `integrations/tasks.md`,
+   one per page, each linking the report, and a positioning finding may
+   mean the strategy file is what needs the diff, not the page. This
+   skill changes no page itself.
 
 ## Worked example
 

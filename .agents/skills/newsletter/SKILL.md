@@ -1,6 +1,6 @@
 ---
 name: newsletter
-description: Assemble the monthly newsletter, prospect or customer edition, from what shipped, was published and was decided. Use when "assemble the newsletter", "customer update email", "what goes in this month's issue".
+description: Assemble the monthly newsletter, prospect or customer edition, from what shipped, was published and was decided. Use when "assemble the newsletter", "customer update email".
 license: MIT
 metadata:
   kind: workflow

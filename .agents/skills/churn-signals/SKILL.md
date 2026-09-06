@@ -104,8 +104,8 @@ script, not an OAuth grant (`docs/operating-model.md`).
 - Every signal traces to a snapshot path and a threshold from step 4. A
   missing usage or health field is a gap, never an estimate.
 - Say how many calls you made and roughly what they cost.
-- Company names only in the report and in Slack; contact names appear
+- Company names only in the report and in the chat message; contact names appear
   only when `docs/schema.json` says `repo.private` is true and the
-  decision log records the choice. Ticket text is never quoted in Slack.
+  decision log records the choice. Ticket text is never quoted in chat.
 - No customer is contacted, no discount is proposed to a customer, and
   no CRM record is changed from here.

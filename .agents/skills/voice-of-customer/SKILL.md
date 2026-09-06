@@ -1,6 +1,6 @@
 ---
 name: voice-of-customer
-description: Synthesise interviews, surveys, NPS and reviews into themes, verbatims and proposed persona or messaging changes; or design the survey. Use when "synthesise these interviews", "what did NPS say", "draft the customer survey".
+description: Synthesise interviews, surveys, NPS and reviews into themes, verbatims and proposed persona or messaging changes; or design the survey. Use when "synthesise these interviews", "what did NPS say".
 license: MIT
 metadata:
   kind: workflow

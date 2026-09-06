@@ -24,7 +24,7 @@ it, and the digest goes to the team channel.
 Needs: nothing outside the repo. It reads `projects/*/status.md`, the
 newest file in each `reports/recurring/*/` folder, `memory/decision-log.md`,
 and `content/` frontmatter. With `chat` wired (the Wired table in
-`integrations/README.md`), the digest posts to Slack; without it, it is
+`integrations/README.md`), the digest posts to the chat channel; without it, it is
 printed. With `tasks` wired, overdue tasks per `integrations/tasks.md`
 join the risks; without it, the checklists in each `status.md` do.
 

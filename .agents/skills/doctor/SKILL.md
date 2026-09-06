@@ -1,6 +1,6 @@
 ---
 name: doctor
-description: Say what is wrong with this checkout in plain words and fix what is safe. Use when asked for the "doctor", "something is red", "the check failed", "is everything set up", or when sync or propose report a problem.
+description: Say what is wrong with this checkout in plain words and fix what is safe. Use when asked for the "doctor", "something is red", "the check failed", or when sync or propose report a problem.
 license: MIT
 metadata:
   kind: workflow

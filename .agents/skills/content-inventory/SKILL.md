@@ -1,6 +1,6 @@
 ---
 name: content-inventory
-description: List what content exists by channel, status, owner, age and topic, and what could be reused or must not be duplicated. Use when "what do we have on X", "content audit", or from campaign-discovery and content-strategy.
+description: List what content exists by channel, status, owner, age and topic, and what to reuse or not duplicate. Use when "what do we have on X", "content audit", or from campaign-discovery.
 license: MIT
 metadata:
   kind: workflow

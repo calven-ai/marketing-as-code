@@ -1,6 +1,6 @@
 ---
 name: campaign-plan
-description: Turn a discovery report into a campaign: narrative, channels including retargeting audiences, budget, calendar, KPIs and owners. Use when "plan the campaign", "campaign brief for X", after campaign-discovery.
+description: Turn a discovery report into a campaign: narrative, channels with retargeting audiences, budget, calendar, KPIs, owners. Use when "plan the campaign", "campaign brief for X".
 license: MIT; includes Apache-2.0 material, see THIRD_PARTY.md
 metadata:
   kind: workflow

@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/calven-ai/marketing-as-code/actions/workflows/check.yml"><img src="https://github.com/calven-ai/marketing-as-code/actions/workflows/check.yml/badge.svg" alt="check"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT license"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome"></a>
 </p>
@@ -41,14 +42,15 @@ floor. The agents are the point.
 
 This repository is that floor, pre-built. A roster of agents and skills
 for every marketing function ([agents/README.md](agents/README.md)). Five
-integrations wired and a catalog of the rest, one command each. No server.
-Start from it, make it yours, and run your marketing from here.
+tools wired across six integration categories, and a catalog of the rest,
+one command each. No server. Start from it, make it yours, and run your
+marketing from here.
 
 ## What this is, and what it is not
 
 This is a Git repository with a folder structure, templates, a set of agent
-and skill definitions, five wired integrations and a review workflow, for a
-B2B marketing team that works with a coding agent. You copy it, answer the
+and skill definitions, five wired tools and a review workflow, for a B2B
+marketing team that works with a coding agent. You copy it, answer the
 setup interview, and your marketing lives here as plain text that agents
 read and write and a person approves.
 
@@ -76,7 +78,10 @@ It is not:
   ([the table below](#which-coding-agent)).
 - On each computer: [GitHub Desktop](https://desktop.github.com), Python 3.9
   or newer, and the [GitHub CLI](https://cli.github.com) for one login
-  command, once. Node.js only if you turn on the DataForSEO server.
+  command, once. Node.js only if you turn on the DataForSEO server. The
+  scripts are written and tested on macOS and Linux; on Windows they run
+  in WSL or Git Bash, untested by the maintainers
+  ([docs/troubleshooting.md](docs/troubleshooting.md)).
 - One person who will read a diff and click Merge. This is the real
   requirement.
 - Keys only for the integrations you turn on. The setup interview, content,
@@ -140,7 +145,8 @@ Not necessarily. Marketing as code is a change project before it is a tool
 project. Team size, the appetite for semi-technical work (a repository, pull
 requests, API keys, a coding agent) and a leader who will read a diff decide
 whether it fits. [docs/is-this-for-you.md](docs/is-this-for-you.md) is the
-fit check, with profiles for teams of about 5, 20 and 100.
+fit check, with profiles for one or two people, teams of about 5, 20 and
+100, and agencies.
 [docs/stages.md](docs/stages.md) is the path for everyone not there yet: use
 the AI tools you already pay for, then hand one activity to one agent, then
 this repo.
@@ -200,7 +206,9 @@ The full first week, in order, one command per step:
 Whichever you use, keys are per person and never shared
 ([docs/secrets.md](docs/secrets.md)). The lifecycle words (`/sync`,
 `/propose`, `/doctor`) are slash commands in Claude Code; in Cursor or
-Codex, say the word.
+Codex, say the word. The table was checked against the three vendors'
+documentation on 2026-09-06; the skill format is the Agent Skills open
+standard, so a newer version reads the same files.
 
 ## A blueprint, not a product
 
@@ -213,8 +221,9 @@ from exported CSVs. Try that part first.
 
 What you make yours: the **integrations** (your CRM, task tool, meeting
 recorder, analytics), the **structure** where it doesn't match your team,
-and the **agents**, which are Markdown files you edit. Five integrations ship
-wired as worked examples. For the rest of your stack, the catalog in
+and the **agents**, which are Markdown files you edit. Five tools ship
+wired, across six categories, as worked examples. For the rest of your
+stack, the catalog in
 [integrations/catalog/](integrations/catalog/README.md) holds the routes for
 the common vendors in every category (CRM, marketing automation, analytics,
 ads, social, CMS, enrichment, and so on), and your coding agent wires one
@@ -276,13 +285,20 @@ still planned is in [docs/roadmap.md](docs/roadmap.md). Take it, change it,
 and send back what others could reuse
 ([CONTRIBUTING.md](CONTRIBUTING.md)).
 
+## Getting help
+
+Something red or confusing in your copy: say `/doctor` first, then read
+[docs/troubleshooting.md](docs/troubleshooting.md), which lists every
+message with its fix. Found a bug in the template itself, or a catalog
+entry that is out of date: open an issue on this repository. A question
+about whether or how to use it: start a discussion. A security concern:
+[SECURITY.md](SECURITY.md), never a public issue.
+
 ## Who is behind this
 
-Maintained by [Calven](https://calven.ai). This repo is the runnable
-companion to the article
-[Marketing as Code: Not a Move to GitHub. A Move to Agents.](https://calven.ai/resources)
-and distills how Calven runs its own marketing from repositories with
-agents. Calven also makes the marketing context layer described in
+Maintained by [Calven](https://calven.ai). It distills how Calven runs its
+own marketing from repositories with agents. Calven also makes the
+marketing context layer described in
 [integrations/context-layer.md](integrations/context-layer.md). The repo
 works without it.
 

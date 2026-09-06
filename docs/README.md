@@ -15,7 +15,7 @@ them.
 
 ## Deciding whether to do this at all
 
-- [is-this-for-you.md](is-this-for-you.md): the fit check. Who this is for, who it is not for yet, and what changes for teams of 5, 20 and 100.
+- [is-this-for-you.md](is-this-for-you.md): the fit check. Who this is for, who it is not for yet, and what changes for one or two people, teams of 5, 20 and 100, and agencies.
 - [stages.md](stages.md): the three-stage path to marketing as code, with a place to stop at each stage.
 
 ## Running it

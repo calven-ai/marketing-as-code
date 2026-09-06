@@ -1,6 +1,6 @@
 ---
 name: competitor-watch
-description: Track what changed on each competitor's pricing, positioning, product and ad-library pages since last month and flag battlecards to refresh. Use when "what changed at Acme", "competitor roundup", or on the monthly cadence.
+description: Track what changed on each competitor's pricing, positioning, product and ad-library pages since last month; flag battlecards to refresh. Use when "what changed at Acme", or monthly.
 license: MIT
 metadata:
   kind: role

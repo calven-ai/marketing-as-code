@@ -738,6 +738,29 @@ class TestExample(LintCase):
         self.assertEqual([], [f.path for f in self.findings("template") if f.path in overlaid])
         self.assertTrue(any(f.path.startswith("reports/qmr/") for f in self.findings("report-example")) is False)
 
+    def test_beacon_numbers_reconcile(self):
+        """The review's promise, "every number traces to a snapshot", holds for the signups it is built on."""
+        import csv
+        src = ROOT / "examples" / "beacon"
+        if not src.is_dir():
+            self.skipTest("no examples/beacon in this checkout")
+        analytics = src / "data" / "analytics" / "snapshots"
+        by_source = list(csv.DictReader(open(analytics / "2026-06-30-posthog-traffic-by-source.csv")))
+        by_month = list(csv.DictReader(open(analytics / "2026-06-30-posthog-signups-by-month.csv")))
+        lifecycle = {r["stage"]: int(r["count_q2"]) for r in
+                     csv.DictReader(open(src / "data" / "crm" / "snapshots" / "2026-06-30-hubspot-lifecycle.csv"))}
+        signups = sum(int(r["signups"]) for r in by_source)
+        sessions = sum(int(r["sessions"]) for r in by_source)
+        self.assertEqual(signups, sum(int(r["signups"]) for r in by_month))
+        self.assertEqual(signups, lifecycle["Signup"])
+        report = (src / "reports" / "qmr" / "2026-q2" / "report.md").read_text(encoding="utf-8")
+        dashboard = (src / "reports" / "qmr" / "2026-q2" / "dashboard.html").read_text(encoding="utf-8")
+        self.assertIn(f"| Signups | 850 | {signups} |", report)
+        self.assertIn(f"| Visitors | {sessions:,} |", report)
+        self.assertIn(f'value: {signups},', dashboard)
+        rates = {r["source"]: int(r["signups"]) / int(r["sessions"]) for r in by_source}
+        self.assertEqual("Social", min(rates, key=rates.get))  # the report says social converted worst
+
 
 class TestClassify(unittest.TestCase):
     def test_bookkeeping_globs(self):

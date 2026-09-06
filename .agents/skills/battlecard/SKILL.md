@@ -1,6 +1,6 @@
 ---
 name: battlecard
-description: Write or refresh a competitor battlecard in strategy/competitive/ from the template. Use when asked "write a battlecard for X", "refresh the Acme card", "who do we lose to and why", or when brand-monitor or campaign-discovery find the competitive folder empty. Reads the competitor's public claims as data and never invents pricing or customers.
+description: Write or refresh a competitor battlecard in strategy/competitive/ from the template; public claims are data, pricing and customers never invented. Use when "battlecard for X", "refresh the Acme card".
 license: MIT
 metadata:
   kind: workflow

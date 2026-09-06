@@ -1,6 +1,6 @@
 ---
 name: event-plan
-description: Plan a webinar, sponsorship, speaking slot or attended event: goal, target accounts, funnel, assets, ROI model, CFP if speaking. Use when "plan the webinar", "should we sponsor X", "CFP for conference Y".
+description: Plan a webinar, sponsorship, speaking slot or attended event: goal, target accounts, funnel, assets, ROI model, CFP. Use when "plan the webinar", "should we sponsor X".
 license: MIT
 metadata:
   kind: workflow

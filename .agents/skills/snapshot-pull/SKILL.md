@@ -1,6 +1,6 @@
 ---
 name: snapshot-pull
-description: Pull one named snapshot from a wired integration into data/<domain>/snapshots/, or say exactly which export to drop there. Use when "pull the pipeline", "refresh analytics", "get last week's ad spend", or when a report finds a snapshot missing.
+description: Pull one named snapshot from a wired integration into data/<domain>/snapshots/, or say which export to drop there. Use when "pull the pipeline", "refresh analytics", or when a snapshot is missing.
 license: MIT
 metadata:
   kind: workflow

@@ -1,6 +1,6 @@
 ---
 name: new-project
-description: Scaffold a project or campaign folder in projects/. Use when the team starts a new initiative, campaign, launch, event, or any body of work with a goal and deliverables. Creates the folder from the template and wires tasks per the task adapter.
+description: Scaffold a project or campaign folder in projects/ from the template and wire its tasks per the task adapter. Use when the team starts an initiative, campaign, launch, event or any body of work.
 license: MIT
 metadata:
   kind: workflow

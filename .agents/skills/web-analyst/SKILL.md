@@ -1,6 +1,6 @@
 ---
 name: web-analyst
-description: Weekly web report: traffic by source, conversions, top pages, deltas; the monthly run adds page performance and non-conforming UTMs. Use when "how is the site doing", "traffic report", or on the weekly cadence.
+description: Weekly web report: traffic by source, conversions, top pages, deltas; monthly adds page performance and non-conforming UTMs. Use when "how is the site doing", "traffic report", or weekly.
 license: MIT
 metadata:
   kind: role

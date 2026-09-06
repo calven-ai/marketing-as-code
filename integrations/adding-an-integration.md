@@ -2,8 +2,9 @@
 
 **Kind:** agents, the workforce as instructions in English.
 
-Five integrations ship wired, as worked examples of the three ways to
-connect a tool. For the rest of your stack, [the catalog](catalog/README.md)
+Five tools ship wired, as worked examples of two of the three ways to
+connect a tool: MCP servers and a script (the CLI tier is described below
+and not shipped). For the rest of your stack, [the catalog](catalog/README.md)
 holds the routes for the common vendors in every integration category, and
 `python3 scripts/wire_integration.py <vendor>` wires one in a minute. This
 page is the contract every route follows, and what your coding agent does
@@ -152,8 +153,9 @@ reads a variable; then the name goes into `.env.example` and the registry
 row. Call it from a skill (which names the exact command) or from a script
 (when the output needs reshaping). Prefer JSON output and save the result
 under `data/<domain>/snapshots/` with the naming in
-[data/README.md](../data/README.md). `gh` in
-`.github/workflows/transcripts-cron.yml` is the shipped example.
+[data/README.md](../data/README.md). No integration ships on this tier;
+the closest shipped use of a vendor CLI is `gh` in
+`.github/workflows/transcripts-cron.yml`, which opens the proposal.
 
 ## The script contract
 
@@ -162,7 +164,7 @@ reading; the agent follows it and the check enforces it.
 
 Every script in `scripts/` follows these rules. The three shipped scripts
 (`pull_transcripts.py`, `slack_post.py`, `seo_snapshot.py`) are the
-reference; a new connector copies the closest one.
+reference; a new integration copies the closest one.
 
 1. **Python 3.9 or newer, standard library only.** `urllib`, `json`, `csv`,
    `argparse`. No `requests`, no package to install. A marketer's laptop
@@ -275,8 +277,9 @@ No script, no key, no workflow. The first time a person's agent files a
 task, the browser opens for the OAuth grant, and Asana's interactive tools
 confirm before anything is created.
 
-## Contributing a connector back
+## Contributing an integration back
 
-A connector that follows this page is welcome upstream as an example others
-copy ([CONTRIBUTING.md](../CONTRIBUTING.md)). The maintainers do not build
-or keep connectors for tools they do not use; the ladder is the promise.
+An integration that follows this page is welcome upstream as an example
+others copy ([CONTRIBUTING.md](../CONTRIBUTING.md)). The maintainers do not
+build or keep integrations for tools they do not use; the ladder is the
+promise.

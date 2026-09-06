@@ -1,6 +1,6 @@
 ---
 name: content-calendar
-description: Build or refresh the editorial and social calendar from what is in flight, launches and events, one row per piece and channel. Use when "build the calendar", "what ships this month", "plan two weeks of posts".
+description: Build or refresh the editorial and social calendar from what is in flight, launches and events, one row per piece and channel. Use when "build the calendar", "what ships this month".
 license: MIT
 metadata:
   kind: workflow

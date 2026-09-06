@@ -5,7 +5,7 @@ context files past their review date, whether an .env exists, and whether
 this machine is ready to propose (git, your name, the pre-push hook, the
 GitHub CLI and its login). --fix applies the safe fixes first, turns the
 hook on and sets your name from your GitHub login; --strict fails on
-warnings too (CI on main); --brief prints three lines for the session-start
+warnings too (the check on main); --brief prints three lines for the session-start
 hook; --github checks the repository settings through gh. Exit 1 only on
 real breakage.
 

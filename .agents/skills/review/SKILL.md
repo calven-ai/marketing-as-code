@@ -1,6 +1,6 @@
 ---
 name: review
-description: Pre-publish review of a content draft against strategy, messaging, and brand voice. Use when asked to review, check, or QA a draft, or before any piece moves to in-review status. Reports findings; does not rewrite without being asked.
+description: Pre-publish review of a draft against strategy, messaging and brand voice; findings only, no rewrite unless asked. Use when asked to review, check or QA a draft, or before it moves to in-review.
 license: MIT
 metadata:
   kind: workflow
@@ -59,4 +59,5 @@ in the meantime.
 Findings ordered by severity, each with location, problem, and suggested
 fix. End with a verdict: *ready for human review* / *needs work first*.
 Never flip `status:` yourself past `in-review`, and don't rewrite the draft
-unless asked; review and revision are separate requests.
+unless asked; review and revision are separate requests. The findings go
+back to the author in the reply; this skill files no tasks.

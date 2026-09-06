@@ -61,7 +61,7 @@
 </header>
 <main id="app"></main>
 <footer>
-  Data: <code>data/crm/snapshots/2026-06-30-hubspot-lifecycle.csv</code> · <code>data/crm/snapshots/2026-06-30-hubspot-pipeline.csv</code> · <code>data/analytics/snapshots/2026-06-30-posthog-traffic-by-source.csv</code>.
+  Data: <code>data/crm/snapshots/2026-06-30-hubspot-lifecycle.csv</code> · <code>data/crm/snapshots/2026-06-30-hubspot-pipeline.csv</code> · <code>data/analytics/snapshots/2026-06-30-posthog-traffic-by-source.csv</code> · <code>data/analytics/snapshots/2026-06-30-posthog-signups-by-month.csv</code>.
   Definitions per <code>data/ontology/</code>. Gaps are shown as gaps.
 </footer>
 
@@ -71,7 +71,7 @@
 const DATA = {
   tiles: [
     { label: "MQLs",     value: 96,   delta: "+9% vs Q1",  note: "target 90" },
-    { label: "Signups",  value: 812,  delta: "+4% vs Q1",  note: "target 850" },
+    { label: "Signups",  value: 779,  delta: "+4% vs Q1",  note: "target 850" },
     { label: "Pipeline", value: "$410k", delta: "+12% vs Q1", note: "target $380k" },
   ],
   trafficBySource: {
@@ -80,14 +80,14 @@ const DATA = {
   },
   signupsTrend: {
     labels: ["Apr", "May", "Jun"],
-    series: [{ name: "signups", values: [251, 270, 291] }],
+    series: [{ name: "signups", values: [240, 258, 281] }],
   },
   funnel: {
     columns: ["Stage", "This Q", "Last Q", "Conv."],
     rows: [
       ["Visitors", "31,400", "29,600", ""],
-      ["Signups", "812", "781", "2.6%"],
-      ["Activated", "430", "398", "53%"],
+      ["Signups", "779", "750", "2.5%"],
+      ["Activated", "430", "398", "55%"],
       ["MQLs", "96", "88", "22%"],
     ],
     numeric: [1, 2, 3],

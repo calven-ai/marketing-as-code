@@ -1,6 +1,6 @@
 ---
 name: positioning-refresh
-description: Propose a reviewed update to strategy/positioning.md from decisions, win/loss and competitive evidence, with the list of files that inherit the change. Use when "refresh positioning", "positioning is stale", or when context-freshness flags it.
+description: Propose a reviewed update to strategy/positioning.md from decisions, win/loss and competitive evidence, listing what inherits the change. Use when "refresh positioning", or when context-freshness flags it.
 license: MIT
 metadata:
   kind: workflow
