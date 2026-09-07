@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- The checked-in `.claude/settings.json` carries only what this repository
+  owns: the allow-list for its lifecycle scripts, the `SessionStart` doctor
+  hook, and the write-tool deny rules `wire_integration.py` adds for a
+  server declared here. The shipped deny rules (`.env`, shells, one-liners,
+  `gh pr merge`, force-pushes) and the two `disable*` permission-mode
+  switches are gone, with the `settings` block in `docs/schema.json` and
+  the lint check that enforced them. A team's own restrictions belong in
+  their own settings; `docs/secrets.md` says why and gives a set to copy.
+
 - The repository is private, on GitHub Team or Pro, everywhere the docs
   speak: a new ground rule in `AGENTS.md`, the README, the fit check, the
   setup interview and `docs/github-settings.md` assume it, and GitHub Free

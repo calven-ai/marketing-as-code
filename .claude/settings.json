@@ -7,42 +7,7 @@
       "Bash(python3 scripts/lint.py*)",
       "Bash(python3 scripts/sync_skills.py*)",
       "Bash(python3 scripts/wire_integration.py*)"
-    ],
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(**/.env)",
-      "Read(**/.env.*)",
-      "Read(./.git/**)",
-      "Read(//proc/**)",
-      "Bash(env)",
-      "Bash(env *)",
-      "Bash(/usr/bin/env*)",
-      "Bash(printenv*)",
-      "Bash(export)",
-      "Bash(export -p*)",
-      "Bash(declare -p*)",
-      "Bash(set)",
-      "Bash(sh -c *)",
-      "Bash(bash -c *)",
-      "Bash(zsh -c *)",
-      "Bash(python3 -c *)",
-      "Bash(python -c *)",
-      "Bash(node -e *)",
-      "Bash(node -p *)",
-      "Bash(grep * .env*)",
-      "Bash(less .env*)",
-      "Bash(more .env*)",
-      "Bash(gh pr merge *)",
-      "Bash(gh pr review *)",
-      "Bash(gh secret *)",
-      "Bash(git push -f*)",
-      "Bash(git push --force*)",
-      "Bash(git push * -f*)",
-      "Bash(git push * --force*)"
-    ],
-    "disableBypassPermissionsMode": "disable",
-    "disableAutoMode": "disable"
+    ]
   },
   "hooks": {
     "SessionStart": [

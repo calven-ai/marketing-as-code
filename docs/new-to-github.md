@@ -96,7 +96,7 @@ Then the whole loop is three words:
 After that you never type a command. When the agent needs something technical, like
 connecting your CRM or storing an API key, it tells you exactly what to
 do and where. If it asks for a key value in chat, that is a red flag. Keys
-go in a file the agent never reads ([secrets.md](secrets.md)).
+go in a file the agent is told never to read ([secrets.md](secrets.md)).
 
 ## Where to go next
 

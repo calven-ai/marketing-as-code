@@ -204,7 +204,7 @@ The full first week, in order, one command per step:
 | Finds the skills | through `.claude/skills/`, symlinks kept by `scripts/sync_skills.py` | `.agents/skills/` directly | `.agents/skills/` directly |
 | Runs one | `/setup`, or ask in plain English | picks by description; ask in plain English | `$setup`, or ask in plain English |
 | MCP servers | `.mcp.json` | `.cursor/mcp.json` | TOML pasted from [the guide](integrations/adding-an-integration.md#configuring-an-mcp-server-per-coding-agent) |
-| Guardrails for keys | `.claude/settings.json` stops the agent reading `.env` | the skills' own rules only | the skills' own rules only |
+| Guardrails for keys | the skills' own rules, plus any deny rules you add to your own settings ([docs/secrets.md](docs/secrets.md)) | the skills' own rules only | the skills' own rules only |
 
 Whichever you use, keys are per person and never shared
 ([docs/secrets.md](docs/secrets.md)). The lifecycle words (`/sync`,

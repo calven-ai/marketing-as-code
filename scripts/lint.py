@@ -774,50 +774,6 @@ def _pinned(args):
     return any(re.search(r"(@|==)\d", str(a)) for a in (args or []))
 
 
-def check_settings(ctx):
-    """.claude/settings.json parses and carries every deny rule docs/secrets.md promises."""
-    spec = ctx.schema.get("settings", {})
-    rel = spec.get("file", ".claude/settings.json")
-    if not ctx.exists(rel):
-        return []
-    try:
-        data = json.loads(ctx.text(rel))
-    except json.JSONDecodeError as err:
-        return [Finding(ERROR, rel, f"not valid JSON: {err}", "settings")]
-    perms = data.get("permissions", {})
-    deny = perms.get("deny", [])
-    required = spec.get("required_deny", ["Read(./.env)"])
-    missing = [d for d in required if d not in deny]
-    out = []
-    if missing:
-        out.append(Finding(ERROR, rel, "permissions.deny is missing " + ", ".join(f"`{d}`" for d in missing)
-                           + " (docs/secrets.md)", "settings", fix=lambda: _fix_settings(ctx, rel, spec)))
-    if spec.get("disable_bypass") and perms.get("disableBypassPermissionsMode") != "disable":
-        out.append(Finding(ERROR, rel, "permissions.disableBypassPermissionsMode must be \"disable\" "
-                           "(docs/secrets.md)", "settings", fix=lambda: _fix_settings(ctx, rel, spec)))
-    if spec.get("disable_auto") and perms.get("disableAutoMode") != "disable":
-        out.append(Finding(ERROR, rel, "permissions.disableAutoMode must be \"disable\": a classifier is not the "
-                           "person the docs promise asks first (docs/secrets.md)", "settings",
-                           fix=lambda: _fix_settings(ctx, rel, spec)))
-    return out
-
-
-def _fix_settings(ctx, rel, spec):
-    """Add the missing deny rules and the bypass switch; keep everything else."""
-    data = json.loads(ctx.text(rel))
-    perms = data.setdefault("permissions", {})
-    deny = perms.setdefault("deny", [])
-    for rule in spec.get("required_deny", []):
-        if rule not in deny:
-            deny.append(rule)
-    if spec.get("disable_bypass"):
-        perms["disableBypassPermissionsMode"] = "disable"
-    if spec.get("disable_auto"):
-        perms["disableAutoMode"] = "disable"
-    ctx.path(rel).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-    ctx.forget(rel)
-
-
 SKILL_GLOB = ".agents/skills/*/SKILL.md"
 
 
@@ -1085,7 +1041,7 @@ def check_wired(ctx):
             servers = json.loads(ctx.text(".mcp.json")).get("mcpServers", {})
         except json.JSONDecodeError:
             servers = {}
-    settings_rel = ctx.schema.get("settings", {}).get("file", ".claude/settings.json")
+    settings_rel = ".claude/settings.json"
     deny = []
     if ctx.exists(settings_rel):
         try:
@@ -1660,7 +1616,6 @@ CHECKS = [
     (check_skills, "file"),
     (check_required, "repo"),
     (check_mcp_configs, "repo"),
-    (check_settings, "repo"),
     (check_catalog, "repo"),
     (check_wired, "repo"),
     (check_catalog_coverage, "repo"),

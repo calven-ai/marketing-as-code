@@ -170,13 +170,12 @@ class TestPropose(LifecycleCase):
         self.assertNotIn("pr create", self.gh_log())
 
     def test_fixable_problem_is_fixed_and_committed(self):
-        settings = json.loads((self.work / ".claude" / "settings.json").read_text())
-        settings["permissions"]["deny"].remove("Read(./.env)")
-        write(self.work, ".claude/settings.json", json.dumps(settings))
+        write(self.work, "content/2026-09-post/draft.md", draft())
+        (self.work / "reports" / "adhoc" / ".gitkeep").unlink()
         code, out = self.propose()
         self.assertEqual(0, code, out)
         self.assertIn("Fixed 1 small things on the way.", out["lines"])
-        self.assertIn("Read(./.env)", (self.work / ".claude" / "settings.json").read_text())
+        self.assertTrue((self.work / "reports" / "adhoc" / ".gitkeep").exists())
         self.assertEqual("", git(self.work, "status", "--porcelain"))
 
     def test_bookkeeping_outcome(self):

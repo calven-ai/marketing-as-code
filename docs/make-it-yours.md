@@ -48,8 +48,8 @@ yours", and `/setup` does items 2 and 3 for you. In order:
     table in `integrations/README.md` renders from them
     (`python3 scripts/lint.py --fix`).
 14. **`.env`.** Copy `.env.example` to `.env` yourself and fill only what you
-    use. The agent cannot read either file, by design
-    ([secrets.md](secrets.md)).
+    use. The agent is told never to read it; [secrets.md](secrets.md) has
+    the deny rules to copy into your own settings if you want that enforced.
 15. **`brand/tokens.json` and `brand/logos/`.** Real colors, fonts and logo
     files. `/setup` round 6 asks.
 16. **`.github/workflows/`.** Turn off what you will not run
