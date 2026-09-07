@@ -71,8 +71,8 @@ the repo templates keep the same headings.
 
 1. In Calven, open Settings, then Integrations, then the MCP card, and
    generate a key. It is shown once. Each person has one active key.
-2. Put it in `.env` as `CALVEN_MCP_KEY=cmcp_...`. Never in the repo; agents
-   cannot read `.env` by design.
+2. Put it in `.env` as `CALVEN_MCP_KEY=cmcp_...`. Never in the repo; `.env`
+   is gitignored and agents are told never to read it.
 3. The `calven` server is already listed in `.mcp.json`. Claude Code asks
    before starting a project server.
 4. Ask the agent to call `get_workspace_overview`. If it answers with your

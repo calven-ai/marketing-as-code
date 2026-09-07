@@ -202,7 +202,7 @@ One PR, reviewed like any other, with this list in its description:
       tables in [README.md](README.md) regenerated with
       `python3 scripts/lint.py --fix`, never edited by hand
 - [ ] `.env.example` lines for every variable the mechanism reads (the
-      wire script appends them; agents cannot read `.env*`)
+      wire script appends them; the real values stay in `.env`)
 - [ ] For tier 1: the `.mcp.json` and `.cursor/mcp.json` entries the wire
       script wrote, the Codex TOML it printed in the PR description, and
       the write-tool deny rules it added to `.claude/settings.json`

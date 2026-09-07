@@ -11,11 +11,13 @@ adds only what is Claude-Code-specific.
   `/propose`, `/doctor`, `/setup`, `/new-content`, `/qmr`, and more; the roster is
   [agents/README.md](agents/README.md).
   If a slash command is missing, run `python3 scripts/sync_skills.py`.
-- **Never read `.env`**: `.claude/settings.json` denies the Read tool and
-  the file commands on it, plus `env`, `printenv`, one-liners and the
-  merge and force-push commands a person owns; keys stay out of context
-  by design, and [docs/secrets.md](docs/secrets.md) says exactly what the
-  rules stop and what they do not.
+- **Never read `.env`**: a rule, not a wall. The checked-in
+  `.claude/settings.json` carries only this repo's own machinery (the
+  allow-list for the lifecycle scripts, the doctor hook, and the write-tool
+  deny rules `wire_integration.py` adds for a server declared here), so
+  nothing stops you mechanically. Keys stay out of context because you keep
+  them out; [docs/secrets.md](docs/secrets.md) has the deny rules to copy
+  into your own settings if you want them enforced.
 - **Every session opens with the doctor's lines** (a `SessionStart` hook
   runs `scripts/doctor.py --brief`). Act on them before anything else:
   problems mean `/doctor`, unfilled templates mean `/setup`, "make it

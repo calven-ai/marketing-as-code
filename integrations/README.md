@@ -30,8 +30,8 @@ this table.
 | [context-layer](catalog/README.md#context-layer) | Calven | MCP `calven` (http) in `.mcp.json` | bearer: Calven: Settings > Integrations > MCP | `CALVEN_MCP_KEY` | n/a | 2026-08-31 |
 <!-- /generated:wired -->
 
-The Env vars column mirrors `.env.example`. Agents cannot read any `.env*`
-file, so keep the two in sync (the check does). Who owns each key, where it
+The Env vars column mirrors `.env.example`. Agents are told never to read a
+`.env*` file, so keep the two in sync (the check does). Who owns each key, where it
 lives and how to rotate it is in [docs/secrets.md](../docs/secrets.md).
 
 ## Every category
