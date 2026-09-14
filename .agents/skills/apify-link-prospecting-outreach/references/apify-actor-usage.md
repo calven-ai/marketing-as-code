@@ -70,7 +70,7 @@ The Actor's own run-level `timeoutSecs` defaults to 60000 (~16 hours) — that i
 
 The trap is the **API client wait timeout** — how long the calling code polls for completion before giving up. Apify's JS client and most lightweight runners default to a few minutes. The link-prospecting Actor typically runs 5-15 minutes per query, much longer for big keyword lists, and 18 of 24 recent public runs ended in `TIMED-OUT` status with default polling.
 
-In this skill, `.agents/skills/apify-link-prospecting-outreach/scripts/run_actor.js` exposes `--timeout` (in seconds) for the client-side wait, not the Actor's runtime. Always pass at least `--timeout 900`. Raise to 1800 or 3600 for runs with more than three queries.
+In this skill, `run_actor.js` (upstream helper, not shipped here) exposes `--timeout` (in seconds) for the client-side wait, not the Actor's runtime. Always pass at least `--timeout 900`. Raise to 1800 or 3600 for runs with more than three queries.
 
 ## Datasets produced by one run
 

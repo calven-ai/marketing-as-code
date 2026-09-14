@@ -1,6 +1,6 @@
 ---
 name: pipeline-report
-description: Weekly funnel and pipeline report: stage conversion, velocity, marketing-sourced and influenced pipeline versus target; monthly adds a forecast. Use when "pipeline report", "where will we land", weekly.
+description: Weekly funnel and pipeline report: stage conversion, velocity, marketing-sourced and influenced pipeline versus target; monthly adds a forecast. Use when "pipeline report", "where will we land".
 license: MIT
 metadata:
   kind: role

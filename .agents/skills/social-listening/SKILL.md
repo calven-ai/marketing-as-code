@@ -1,6 +1,6 @@
 ---
 name: social-listening
-description: Track brand, competitor and category mentions on LinkedIn, X, Reddit and forums and surface buyer questions and red flags. Use when "who's talking about us", "listening report", or on the weekly cadence.
+description: Track brand, competitor and category mentions on LinkedIn, X, Reddit and forums and surface buyer questions and red flags. Use when "who's talking about us", "listening report", or weekly.
 license: MIT
 metadata:
   kind: role

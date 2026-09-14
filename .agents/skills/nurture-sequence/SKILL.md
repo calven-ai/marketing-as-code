@@ -1,6 +1,6 @@
 ---
 name: nurture-sequence
-description: Design a nurture, onboarding or post-event sequence: emails, timing, triggers, exits, each linking existing content. Use when "nurture for persona X", "post-webinar sequence", "onboarding emails".
+description: Design a nurture, onboarding or post-event sequence: emails, timing, triggers, exits, each linking existing content. Use when "nurture for persona X", "onboarding emails".
 license: MIT; includes Apache-2.0 material, see THIRD_PARTY.md
 metadata:
   kind: workflow

@@ -1,6 +1,6 @@
 ---
 name: seo-analyst
-description: Keyword and ranking analysis against data/seo/keywords.csv through the wired seo-data integration, saved as dated snapshots. Use when asked about volumes, difficulty, ranks, SERP competitors or keyword ideas.
+description: Keyword and ranking analysis against data/seo/keywords.csv through the wired seo-data integration, saved as dated snapshots. Use when asked about volumes, difficulty, ranks or keyword ideas.
 license: MIT
 metadata:
   kind: role

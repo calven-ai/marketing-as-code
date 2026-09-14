@@ -93,7 +93,7 @@ The runner writes only the columns it can populate from the Actor datasets (colu
 5. Run Step 8 (placement + email + outreach type) → fill columns 22, 24, 25, 26, 27.
 6. Re-save the .xlsx.
 
-See `.agents/skills/apify-link-prospecting-outreach/scripts/run_actor.js` for the round-trip pattern.
+See `run_actor.js` (upstream helper, not shipped here) for the round-trip pattern.
 
 ## Markdown rendering
 

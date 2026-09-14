@@ -1,6 +1,6 @@
 ---
 name: launch-plan
-description: Plan a product or feature launch: tier, narrative, channel plan, asset list and owners, as a project folder plus content stubs. Use when "plan the launch of X", "we ship X on date", "launch checklist".
+description: Plan a product or feature launch: tier, narrative, channel plan, assets and owners, as a project folder plus content stubs. Use when "plan the launch of X", "launch checklist".
 license: MIT
 metadata:
   kind: workflow

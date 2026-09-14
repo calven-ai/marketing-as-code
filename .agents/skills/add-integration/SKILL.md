@@ -1,6 +1,6 @@
 ---
 name: add-integration
-description: Connect a tool the team uses by the MCP, CLI, script ladder in integrations/adding-an-integration.md, as one reviewable PR. Use when "we use X, connect it", "automate pulling Y", or when a skill needs an unwired tool.
+description: Connect a tool the team uses by the MCP, CLI, script ladder in integrations/adding-an-integration.md, as one PR. Use when "we use X, connect it", or when a skill needs an unwired tool.
 license: MIT
 metadata:
   kind: workflow

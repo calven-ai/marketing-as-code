@@ -1,6 +1,6 @@
 ---
 name: community-digest
-description: Weekly digest of community threads: top questions, feature requests, churn signals, threads needing an answer. Use when "what's happening in the community", "community digest", or on the weekly cadence.
+description: Weekly digest of community threads: top questions, feature requests, churn signals, threads needing an answer. Use when "what's happening in the community", or weekly.
 license: MIT
 metadata:
   kind: role

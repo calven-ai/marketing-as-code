@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: Account research through the wired scraping and enrichment tools, saved as snapshots in data/accounts/, or a pre-call brief from them. Use when "research these accounts", "alumni list", "brief me on Acme".
+description: Account research through the wired scraping and enrichment tools, saved as snapshots in data/accounts/, or a pre-call brief from them. Use when "research these accounts", "brief me on Acme".
 license: MIT
 metadata:
   kind: role

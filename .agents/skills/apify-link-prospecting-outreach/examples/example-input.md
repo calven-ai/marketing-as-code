@@ -34,7 +34,8 @@ The LLM-source multi-select maps directly to the Actor's `enableChatGpt` / `enab
 ## Step 3: Actor call
 
 ```bash
-node --env-file=.env ${CLAUDE_PLUGIN_ROOT}/scripts/run_actor.js \
+# upstream helper (not shipped here); the same input goes to the vendor's call-actor tool
+run_actor \
   --actor "apify/link-prospecting-tool" \
   --input '{
     "queries": "headless cms for ecommerce\nbest headless cms 2026",

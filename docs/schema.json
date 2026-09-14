@@ -466,7 +466,7 @@
       "runs"
     ],
     "_budget": "Every description loads into every session. Claude Code lists skills under a character budget and drops descriptions past it; on 2026-09-06 a 200k-context session overflowed at about 20,000 characters of names plus descriptions. The check warns above this total for descriptions alone.",
-    "description_budget": 20000
+    "description_budget": 19000
   },
   "csv": {
     "_doc": "Canonical tables: the header row must be exactly this. Snapshots only need a header and uniform columns.",

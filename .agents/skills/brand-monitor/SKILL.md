@@ -1,6 +1,6 @@
 ---
 name: brand-monitor
-description: Track how AI answer engines mention us and competitors through the wired ai-visibility integration, against data/seo/prompts.csv. Use when "are we cited by ChatGPT", "run the AEO check", for the mentions report.
+description: Track how AI answer engines mention us and competitors through the wired ai-visibility integration, against data/seo/prompts.csv. Use when "are we cited by ChatGPT", "run the AEO check".
 license: MIT
 metadata:
   kind: role

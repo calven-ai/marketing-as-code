@@ -1,6 +1,6 @@
 ---
 name: persona-builder
-description: Write or refresh a persona in strategy/personas.md from interviews, CRM facts and customer language, never from stereotypes. Use when "write the persona for X", "who is the champion", "refresh personas".
+description: Write or refresh a persona in strategy/personas.md from interviews, CRM facts and customer language, never stereotypes. Use when "write the persona for X", "refresh personas".
 license: MIT
 metadata:
   kind: workflow

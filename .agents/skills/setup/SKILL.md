@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Onboard a team: interview them, fill the strategy, brand and ontology templates, connect integrations, write the task adapter. Use when "set up the repo", "run the setup interview", or when the templates are unfilled.
+description: Onboard a team: interview them, fill the strategy, brand and ontology templates, connect integrations, write the task adapter. Use when "set up the repo", or when the templates are unfilled.
 license: MIT
 metadata:
   kind: workflow
