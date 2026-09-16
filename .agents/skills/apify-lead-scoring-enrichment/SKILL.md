@@ -27,11 +27,11 @@ Needs: a wired `scraping-search` integration; the Wired table in
 `references/apify.md` has the actor routing (tech-stack detection, site
 crawl, contact-info scrape with and without the people add-on, blog
 discovery and author extraction, an email-finder fallback), the two
-enrichment paths and the merge, with input schemas in
-`references/actor-index.md` and the gotchas in `references/gotchas.md`.
-The upstream helper scripts are not shipped; the steps run through the
-vendor's tools. Without the integration, name the exports a person can
-run and where to drop them
+enrichment paths and the merge, with the input shape per actor. The
+upstream helper scripts are not shipped; the steps run through the
+vendor's tools, and the per-actor schemas and gotchas they document
+stay upstream (the link is in `references/apify.md`). Without the
+integration, name the exports a person can run and where to drop them
 (`data/accounts/snapshots/YYYY-MM-DD-web-leads-scored.csv`), and stop.
 Optional: `enrichment` for firmographics and titles instead of the
 contact scrape, `crm` to exclude customers and open deals.

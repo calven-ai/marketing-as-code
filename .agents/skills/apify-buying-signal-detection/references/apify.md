@@ -1,5 +1,6 @@
 <!-- source: https://raw.githubusercontent.com/apify/awesome-skills/bcb7fb8935d2f36f0ec4143fe3a40efc0c191f0b/skills/apify-buying-signal-detection/SKILL.md | license: Apache-2.0 | fetched: 2026-09-14 -->
 <!-- Upstream SKILL.md body, kept as the vendor reference. Its auth and setup steps, helper scripts and ${CLAUDE_PLUGIN_ROOT} paths are not used here: SKILL.md in this folder is the procedure, and the Wired table in integrations/README.md is the auth. -->
+<!-- Its `actors.md`, `csv-schema.md`, `gotchas.md`, `icp-config-schema.md` reference files are not vendored here either; they are upstream at https://github.com/apify/awesome-skills/tree/bcb7fb8935d2f36f0ec4143fe3a40efc0c191f0b/skills/apify-buying-signal-detection/references. -->
 # Buying-Signal Detection
 
 Turn an ICP description into a recurring pipeline that surfaces companies showing buying intent across three signal types — job postings, fundraising events, and LinkedIn content — and appends them to a single deduplicated `leads.csv` you can pipe straight into your CRM.
@@ -44,16 +45,16 @@ Ask the user for all of the following before writing any file. The setup script 
 
 1. **Campaign name** — a short slug (lowercase, dashes). Used as the prefix on every Apify Task name (e.g. `emea-saas-hiring-aes-bebity-linkedin-jobs-scraper`). If the user already runs multiple campaigns, prevent collisions upfront.
 2. **Signals to track** — subset of `["jobs", "funding", "linkedin_content"]`. Rarely will a campaign want only one; the strength of the workflow is the intersection of signals per company. Recommend all three unless there's a specific cost concern.
-3. **Geo (ISO country codes)** — uppercase two-letter codes. Drives regional Actor routing (Stepstone for DE/AT/BE, Seek for AU/NZ, France Travail for FR, Maddyness for FR-funding). Global campaigns should list every country the user actually sells into — passing `["US", "GB", "DE", "FR", "AU"]` will fan out to five regional job Actors, which is 5× the weekly cost. See [`references/gotchas.md`](gotchas.md#cost-guardrails).
+3. **Geo (ISO country codes)** — uppercase two-letter codes. Drives regional Actor routing (Stepstone for DE/AT/BE, Seek for AU/NZ, France Travail for FR, Maddyness for FR-funding). Global campaigns should list every country the user actually sells into — passing `["US", "GB", "DE", "FR", "AU"]` will fan out to five regional job Actors, which is 5× the weekly cost. See the cost-guardrails section of the upstream `gotchas.md`.
 4. **Industry keywords** — the category descriptor. Passed to funding trackers as `industry`, to LinkedIn as `keywords` when no explicit content search terms are provided, and to job scrapers as a fallback when no persona titles are given.
 5. **Persona (if jobs signal enabled)** — job titles the ICP hires for. Concrete titles beat categories: `"Account Executive"`, `"SDR"`, `"BDR"` are hits; `"sales"` is noise. Optional seniority (`entry`, `mid`, `senior`, `manager`, `director`, `vp`, `cxo`) and company-size bands (`"11-50"`, etc.) get applied post-hoc in the aggregator.
 6. **Funding config (if funding signal enabled)** — stages (`seed`, `series_a`, `series_b`, etc.) and `max_days_since_announcement` (default 90). Fresh cash → open budget → tighter window is better.
-7. **LinkedIn content config (if linkedin_content signal enabled)** — search phrases. This is the biggest quality lever; broad terms (`"sales"`) waste budget. Specific pain-point phrases beat category names — see [`references/actors.md`](actors.md#linkedin-search-phrase-design). Plus `min_reactions` (default 5) and `posted_within_days` (default 14) for post-filtering.
+7. **LinkedIn content config (if linkedin_content signal enabled)** — search phrases. This is the biggest quality lever; broad terms (`"sales"`) waste budget. Specific pain-point phrases beat category names — see the LinkedIn search-phrase-design section of the upstream `actors.md`. Plus `min_reactions` (default 5) and `posted_within_days` (default 14) for post-filtering.
 8. **Where to store leads** — path to a CSV file. Default `./leads.csv` inside the campaign directory. This file is the pipeline's memory across runs; keep it under version control (or at least back it up) so the dedup guard survives disk resets.
 9. **Blacklist CSV path** — optional. CSV with columns `domain,company,reason`. Rows matching either the exact domain or the normalized company name get dropped before append. If the user doesn't have one, ask if they want to start with obvious exclusions (existing customers, their own domain, top competitors).
 10. **Schedule** — `apify_side_cron` (when Apify runs the Actors) and `claude_side_cron` (when Claude aggregates). Default: `0 6 * * 1` (Apify Monday 06:00 UTC) and `0 8 * * 1` (Claude Monday 08:00 UTC). Two hours of buffer between them absorbs slow Actor runs.
 
-The full schema is documented in [`references/icp-config-schema.md`](icp-config-schema.md). A worked example lives at [`examples/icp.example.json`](../examples/icp.example.json).
+The full schema is documented in the upstream `icp-config-schema.md`. A worked example lives at [`examples/icp.example.json`](../examples/icp.example.json).
 
 ### Step 2: Write `icp.json` and `blacklist.csv`
 
@@ -66,7 +67,7 @@ Write the campaign directory contents:
   leads.csv          ← created empty; the aggregator will populate it
 ```
 
-Start `leads.csv` with just the header row (schema in [`references/csv-schema.md`](csv-schema.md)) so the aggregator doesn't have to handle a missing-file case on first run:
+Start `leads.csv` with just the header row (schema in the upstream `csv-schema.md`) so the aggregator doesn't have to handle a missing-file case on first run:
 
 ```
 detected_at,company,domain,signal_type,signal_detail,signal_source_actor,signal_date,evidence_url,geo,notes
@@ -83,7 +84,7 @@ python ${CLAUDE_PLUGIN_ROOT}/scripts/setup_apify_tasks.py \
 ```
 
 What this does:
-- Reads `icp.json` and picks Actors per the routing tables in [`references/actors.md`](actors.md) — global Actors always, plus regional Actors matching the geo list.
+- Reads `icp.json` and picks Actors per the routing tables in the upstream `actors.md` — global Actors always, plus regional Actors matching the geo list.
 - For each pick, upserts an Apify Actor Task named `<campaign>-<actor-slug>` with the input payload derived from the ICP. Re-running the script updates existing tasks in place; it does not create duplicates.
 - Writes a sidecar `<campaign-dir>/.<campaign-name>.tasks.json` recording the task IDs. `aggregate.py` reads this to know which tasks to pull dataset items from.
 - If `schedule.apify_side_cron` is set in the ICP (default is), creates or updates a single Apify Schedule that fires all the tasks on that cron.
@@ -184,7 +185,7 @@ Use `--dry-run` to see what would be appended without touching the CSV, and `--f
 
 ## Actor routing
 
-The full catalog with per-signal PICK rules lives in [`references/actors.md`](actors.md). Condensed summary:
+The full catalog with per-signal PICK rules lives in the upstream `actors.md`. Condensed summary:
 
 | Signal | Global default | Regional additions |
 |---|---|---|
@@ -259,7 +260,7 @@ Standalone CLI client. See [github.com/apify/mcpc](https://github.com/apify/mcpc
 | `skipped: already run this week` on a legitimate re-run | Pass `--force`. The guard preserves the week's entries and dedupes on top; it does not overwrite. |
 | Task runs on Apify but `aggregate.py` reports `"fetched_by_signal": {"jobs": 0}` | The Actor ran but returned zero items. Check the Actor's run log for schema errors (wrong keyword format, unsupported country code). Post-fix, run the task manually via `apify tasks run` and re-aggregate. |
 | Tasks provisioned but no data ever lands | The Apify Schedule may be disabled. In the Console, open Schedules → `<campaign>-schedule` and confirm it's enabled. Also check the schedule's cron matches your timezone assumption — schedules are in UTC unless you set `timezone`. |
-| Costs higher than expected | See [`references/gotchas.md#cost-guardrails`](gotchas.md#cost-guardrails). Most common cause: broad LinkedIn search terms multiplying `harvestapi/linkedin-post-search` cost. Second-most-common: adding all regional job Actors when the ICP only really sells into two countries. |
+| Costs higher than expected | See the cost-guardrails section of the upstream `gotchas.md`. Most common cause: broad LinkedIn search terms multiplying `harvestapi/linkedin-post-search` cost. Second-most-common: adding all regional job Actors when the ICP only really sells into two countries. |
 | Reposts inflate LinkedIn signal counts | The aggregator strips `trackingId` and `utm_*` query params to canonicalize URLs before dedup, but LinkedIn's URL scheme changes periodically. If you see the same post appearing twice, check whether the URLs differ only in a param not in the strip list and add it to `strip_tracking()` in `aggregate.py`. |
 | Duplicate leads after a company rebrand | Dedup is `domain`-first. If a company changes domains, the aggregator treats it as a new lead. Manual reconciliation only — no automatic fix. |
 | Multiple machines writing the same `leads.csv` | Not supported. Single-writer assumption. Put the CSV behind a locking layer (Google Sheets export, `flock`, etc.) or partition per machine. |

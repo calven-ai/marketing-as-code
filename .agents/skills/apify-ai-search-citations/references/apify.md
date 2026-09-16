@@ -1,5 +1,6 @@
 <!-- source: https://raw.githubusercontent.com/apify/awesome-skills/bcb7fb8935d2f36f0ec4143fe3a40efc0c191f0b/skills/apify-ai-search-visibility-tracker/SKILL.md | license: Apache-2.0 | fetched: 2026-09-14 -->
 <!-- Upstream SKILL.md body, kept as the vendor reference. Its auth and setup steps, helper scripts and ${CLAUDE_PLUGIN_ROOT} paths are not used here: SKILL.md in this folder is the procedure, and the Wired table in integrations/README.md is the auth. -->
+<!-- Its `output-schema.md` reference file is not vendored here either; it is upstream at https://github.com/apify/awesome-skills/tree/bcb7fb8935d2f36f0ec4143fe3a40efc0c191f0b/skills/apify-ai-search-visibility-tracker/reference. -->
 # AI Search Visibility Tracker
 
 Four workflows covering the full AI visibility lifecycle: **discover** which prompts matter → **find** citation opportunities → **audit** your site → **track** over time.
@@ -234,7 +235,7 @@ Both paths:
 
 1. Call `apify/google-search-scraper` with the configured prompts + AI-source toggles.
 2. Parse each (prompt x source) cell for citations and brand/competitor mentions.
-3. Append rows to the named Apify Dataset (schema in `references/output-schema.md`).
+3. Append rows to the named Apify Dataset (schema in the upstream `output-schema.md`).
 4. Write the raw item to the named KV store (long-term archive).
 5. Compute the history vs. all prior runs.
 6. Write `reports/snapshot-<ISO-date>.md` next to `config.json`.

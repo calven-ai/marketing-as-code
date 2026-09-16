@@ -1,5 +1,5 @@
 ---
-name: apify-ai-search-visibility-tracker
+name: apify-ai-search-citations
 description: Prompts that surface competitors in AI answers, citation gaps and a mentions snapshot via scraping. Use when "which prompts cite Acme".
 license: Apache-2.0
 metadata:
@@ -12,7 +12,7 @@ metadata:
   runs: person
 ---
 
-# AI search visibility tracker
+# AI search citations
 
 The scraping route to AI-answer visibility: which prompts surface a
 competitor in Google AI Overviews, AI Mode, ChatGPT search, Perplexity,
@@ -30,6 +30,15 @@ upstream workflows in full. When `ai-visibility` is wired, prefer
 and opportunities only. Without either, name the prompts a person can
 paste into each engine and where to drop the result
 (`data/seo/snapshots/YYYY-MM-DD-web-llm-mentions.csv`), and stop.
+
+This is the discovery and snapshot half of the upstream skill, which is
+why it is not called a tracker: the scheduled half, an OS cron installer
+and a runner that writes a dated report with nobody present, is not
+vendored here, because GitHub Actions is this repo's only unattended
+runtime. Recurrence is a person running this monthly, or `brand-monitor`
+once `ai-visibility` is wired. For the scheduled version, go to the
+skill upstream:
+https://github.com/apify/awesome-skills/tree/main/skills/apify-ai-search-visibility-tracker
 
 ## Procedure
 
@@ -64,9 +73,7 @@ paste into each engine and where to drop the result
    which engine, who leads, and the delta against the previous snapshot.
 6. **Hand over.** Propose the follow-ups a person decides on: rows for
    `prompts.csv`, pages for `aeo-page-optimize`, a competitor for
-   `competitor-watch`. Recurrence is a person running this monthly (or
-   `brand-monitor` once `ai-visibility` is wired); nothing here installs a
-   scheduler.
+   `competitor-watch`, and the date to run this again.
 
 ## Worked example
 

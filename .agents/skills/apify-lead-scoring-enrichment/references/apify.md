@@ -1,5 +1,6 @@
 <!-- source: https://raw.githubusercontent.com/apify/awesome-skills/bcb7fb8935d2f36f0ec4143fe3a40efc0c191f0b/skills/apify-lead-scoring-enrichment/SKILL.md | license: Apache-2.0 | fetched: 2026-09-14 -->
 <!-- Upstream SKILL.md body, kept as the vendor reference. Its auth and setup steps, helper scripts and ${CLAUDE_PLUGIN_ROOT} paths are not used here: SKILL.md in this folder is the procedure, and the Wired table in integrations/README.md is the auth. -->
+<!-- Its `actor-index.md`, `gotchas.md` reference files are not vendored here either; they are upstream at https://github.com/apify/awesome-skills/tree/bcb7fb8935d2f36f0ec4143fe3a40efc0c191f0b/skills/apify-lead-scoring-enrichment/references. -->
 # Lead Scoring & Enrichment
 
 Turn a CSV of company URLs into a scored, contact-enriched pitch list. The
@@ -268,7 +269,7 @@ readability), `emails` (semicolon-separated), and `authors` (Path B).
 | Blog author extraction | [`apify/ai-web-scraper`](https://apify.com/apify/ai-web-scraper) | apify | Use example `get-author-name-from-blog-post`. |
 | Email finder fallback | [`scalelist/email-finder`](https://apify.com/scalelist/email-finder) | community | Input: `{ "leads": [{ "first_name", "last_name", "company_domain" }] }`. Called only for leads with a name but no email. |
 
-Full input schemas and quirks: [references/actor-index.md](actor-index.md).
+Full input schemas and quirks: the upstream `actor-index.md`.
 
 ## Calling Actors — the CLI recipe
 
@@ -314,4 +315,4 @@ logic yourself and produce the final CSV.
 - **Contact Info Scraper returned 0 leads for a domain** — the domain is filtered out by the Actor's built-in exclusion list (large chains, social platforms, retail giants, food-delivery services), or the site has no discoverable employees in the requested department. Try broader departments (e.g. add `c_suite` alongside `marketing`) or fall back to the copywriter path for that segment.
 - **Lead has a name but no email** — the Business-Leads add-on couldn't resolve one. Path A auto-falls-back to `scalelist/email-finder` on `(firstName, lastName, domain)`. If the fallback also returns nothing, the person's email is genuinely not in Scalelist's index — try LinkedIn Sales Navigator manually or drop the row.
 - **Copywriter path returns 0 authors for a domain** — the domain has no blog, or blog posts don't expose an author byline. Skip the row; guest-post outreach isn't the right play for that domain.
-- **Ran out of Apify credits mid-run** — no partial recovery in `run_scoring.js` v1. Re-run against a smaller CSV slice. See [references/gotchas.md](gotchas.md) for cost estimates per Actor.
+- **Ran out of Apify credits mid-run** — no partial recovery in `run_scoring.js` v1. Re-run against a smaller CSV slice. See the upstream `gotchas.md` for cost estimates per Actor.
