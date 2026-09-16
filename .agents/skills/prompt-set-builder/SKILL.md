@@ -1,6 +1,6 @@
 ---
 name: prompt-set-builder
-description: Propose buyer prompts for data/seo/prompts.csv per persona and buying stage, never rewriting existing ones. Use when "add prompts for X", "prompt coverage for persona Y", "what would buyers ask ChatGPT".
+description: Propose buyer prompts for data/seo/prompts.csv per persona and buying stage, never rewriting existing ones. Use when "add prompts for X", "what would buyers ask ChatGPT".
 license: MIT
 metadata:
   kind: workflow

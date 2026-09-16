@@ -1,6 +1,6 @@
 ---
 name: qmr
-description: Assemble the Quarterly Marketing Review: the data checklist, snapshots or human exports, deltas versus last quarter, the report and dashboard. Use when asked to prepare, start or update the QMR or quarterly review.
+description: Assemble the Quarterly Marketing Review: the data checklist, snapshots or human exports, deltas versus last quarter, the report and dashboard. Use when asked to prepare or update the QMR.
 license: MIT
 metadata:
   kind: workflow

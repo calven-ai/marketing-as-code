@@ -119,10 +119,14 @@ jobs:
   comment:
     # Posts what `doctor` wrote. Checks out nothing and runs none of the
     # proposal's files, which is why it may hold a token that writes comments.
-    # From a fork the token is read-only whatever this says, so the step may
-    # fail; that never turns the required check red.
+    # From a fork GitHub hands every job a read-only token whatever this
+    # says, so the job is skipped there rather than failing on a 403; the
+    # summary is still in the `doctor` job's log and annotations.
     needs: doctor
-    if: always() && needs.doctor.outputs.pr != ''
+    if: >-
+      always() && needs.doctor.outputs.pr != ''
+      && (!github.event.pull_request
+          || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:

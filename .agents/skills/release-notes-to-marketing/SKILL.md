@@ -1,6 +1,6 @@
 ---
 name: release-notes-to-marketing
-description: Turn a product changelog into customer-facing copy: what changed, why it matters per persona, as email, post and blog drafts. Use when "announce this release", "changelog to email", "what's new post".
+description: Turn a product changelog into customer-facing copy: what changed, why it matters per persona, as email, post and blog drafts. Use when "announce this release", "what's new post".
 license: MIT
 metadata:
   kind: workflow

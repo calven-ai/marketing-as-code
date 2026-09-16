@@ -1,6 +1,6 @@
 ---
 name: account-signals
-description: Weekly account heat: intent, web and CRM engagement per target account with buying-group coverage and who to hand to sales. Use when "which accounts are warm", "ABM report", or on the weekly cadence.
+description: Weekly account heat: intent, web and CRM engagement per target account, buying-group coverage, who to hand to sales. Use when "which accounts are warm", "ABM report", or weekly.
 license: MIT
 metadata:
   kind: role

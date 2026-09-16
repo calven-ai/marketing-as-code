@@ -1,6 +1,6 @@
 ---
 name: project-status-roundup
-description: Weekly pass over every project: propose a status entry from tasks and reports, flag projects with no update in 14 days. Use when "status roundup", "which projects are stale", or on the weekly cadence.
+description: Weekly pass over every project: propose a status entry from tasks and reports, flag projects with no update in 14 days. Use when "status roundup", "which projects are stale", or weekly.
 license: MIT
 metadata:
   kind: role
