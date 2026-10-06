@@ -42,7 +42,9 @@ unwritten rule are the reason attribution breaks.
    email, partner, event, PR). Ask for the destination URLs when the
    brief has none; never invent a page.
 4. **Build each link**: lowercase throughout, hyphens for spaces,
-   `utm_source` and `utm_medium` from the allowed values, `utm_campaign`
+   `utm_source` and `utm_medium` from the allowed values (each landing in
+   the intended channel of the Channels table in `naming.md`: `newsletter`
+   and `email` are different channels), `utm_campaign`
    the campaign slug in the file's pattern, `utm_content` for the variant
    or placement, `utm_term` for paid search keywords only; no personal
    data, no internal navigation links, no UTMs on links that stay inside

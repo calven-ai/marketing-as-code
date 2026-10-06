@@ -150,12 +150,12 @@
           "notes": "posthog-cli api runs any endpoint and HogQL query with JSON output; run `posthog-cli api --agent-help` first; the route for scripted, scheduled pulls"
         },
         "script": {
-          "path": null,
+          "path": "scripts/web_snapshot.py",
           "env": [
             "POSTHOG_API_KEY",
             "POSTHOG_PROJECT_ID"
           ],
-          "notes": "usually unnecessary: a workflow step runs posthog-cli and saves the JSON as a snapshot; a stdlib script posting to /api/projects/{id}/query is the fallback"
+          "notes": "the weekly web snapshots (sessions by channel and source, landing pages, engine fetches, CTA and conversions, funnel, tracking quality) through /api/projects/{id}/query; --print-sql and --from-results serve the MCP route"
         }
       }
     },

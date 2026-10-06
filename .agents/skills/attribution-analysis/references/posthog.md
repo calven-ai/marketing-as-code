@@ -11,7 +11,7 @@ queries over properties the SDK already set.
 | --- | --- |
 | first touch (person) | `person.properties.$initial_utm_source`, `$initial_utm_medium`, `$initial_utm_campaign`, `$initial_utm_content`, `$initial_referring_domain`, `$initial_current_url`; set once, on the first event |
 | last touch (person) | `person.properties.utm_source`, `utm_medium`, `utm_campaign`, `$referring_domain`; overwritten on each new session that carries them |
-| per session | `sessions` table: `$entry_utm_source`, `$entry_utm_medium`, `$entry_utm_campaign`, `$entry_referring_domain`, `$entry_current_url`, `$channel_type` (PostHog's channel grouping) |
+| per session | `sessions` table: `$entry_utm_source`, `$entry_utm_medium`, `$entry_utm_campaign`, `$entry_referring_domain`, `$entry_current_url`; group into channels with the expression in `.agents/skills/web-analyst/references/posthog.md` (the model in `data/ontology/naming.md`), not PostHog's `$channel_type` |
 | every touch | one row per `$pageview` with `properties.utm_*` and `$referring_domain`, the input for a linear or position-based view |
 | self-reported | a custom event or person property the signup form sets (ask) |
 
@@ -32,8 +32,11 @@ assume `signed_up` means what it says.
 
 ## Joining to the CRM
 
-The join key is `distinct_id` or the person's email when the product
-identifies users and the CRM stores the same id; PostHog has a HubSpot
+When the website and the product or CRM are separate systems, the join
+is the attribution forwarded on the conversion link
+(`data/ontology/funnel.md`), never identity. Otherwise the join key is
+`distinct_id` or the person's email when the product identifies users
+and the CRM stores the same id; PostHog has a HubSpot
 and a Salesforce destination that write it. Without a key, the web view
 and the deal view are two tables side by side. Person ids are pseudonymous
 but can be linked; treat a touch snapshot with person ids like contact

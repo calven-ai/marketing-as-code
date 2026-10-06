@@ -92,7 +92,7 @@ Falls back to: generic.
 | Vendor | Mechanism | Auth | Writes | Headless | Verified | Checked |
 | --- | --- | --- | --- | --- | --- | --- |
 | Google Analytics 4 | stdio `ga4`: pipx run analytics-mcp==0.7.0; CLI `gcloud` | env: `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_PROJECT_ID` | no | yes | vendor | 2026-09-04 |
-| PostHog | http `posthog`: https://mcp.posthog.com/mcp?readonly=true (+1 variant); CLI `posthog-cli` | oauth | yes, tools unrecorded; read-only switch | no | vendor | 2026-09-04 |
+| PostHog | http `posthog`: https://mcp.posthog.com/mcp?readonly=true (+1 variant); CLI `posthog-cli`; script `scripts/web_snapshot.py` | oauth: `POSTHOG_API_KEY`, `POSTHOG_PROJECT_ID` | yes, tools unrecorded; read-only switch | script | vendor | 2026-09-04 |
 | Mixpanel | http `mixpanel`: https://mcp.mixpanel.com/mcp (+1 variant) | oauth | no | no | vendor | 2026-09-04 |
 | Amplitude | http `amplitude`: https://mcp.amplitude.com/mcp (+1 variant) | oauth | yes, tools unrecorded | no | vendor | 2026-09-04 |
 | Plausible | http `plausible`: https://plausible-mcp.sentry.dev/mcp | bearer: `PLAUSIBLE_API_KEY` | no | yes | listing | 2026-09-04 |
