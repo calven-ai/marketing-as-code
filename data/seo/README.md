@@ -12,7 +12,7 @@
   `id` is `K001`, `K002`..., stable and never reused. Never edit a keyword's
   text in place: delete the row, log it in `memory/knowledge/seo-memory.md`
   (Set log) and add a new id. `track` and `tier` are defined in the Tracks
-  and Tiers tables above; a row takes the tier of the question it answers,
+  and Tiers tables below; a row takes the tier of the question it answers,
   and the `brand` track is scored apart from the headline. `intent` is one of
   informational, commercial, transactional or navigational. `target_url` is
   the page path meant to rank (empty: no page yet). `aeo_prompts` lists the

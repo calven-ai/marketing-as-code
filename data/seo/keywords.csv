@@ -1,5 +1,5 @@
 id,keyword,track,tier,intent,target_url,aeo_prompts,difficulty,volume,current_rank,last_checked,notes
 K001,"[category] software",category,1,commercial,/product,P001,38,90,4,2026-09-01,"example row: the category term as buyers type it, kept even at low volume"
-K002,"[competitor] alternative",alternatives,1,commercial,/compare/[competitor],,29,140,,2026-09-01,"example row: the switch question; no page ranks yet"
-K003,"how to [solve the problem you solve]",craft,2,informational,/resources/[guide],P002,21,480,12,2026-09-01,"example row: the problem question; the guide we want cited"
+K002,"[competitor] alternative",alternatives,1,commercial,/compare/[competitor],P002,29,140,,2026-09-01,"example row: the switch question; no page ranks yet"
+K003,"how to [solve the problem you solve]",category,2,informational,/resources/[guide],P003,21,480,12,2026-09-01,"example row: the problem question; the guide we want cited"
 K004,"[your brand]",brand,1,navigational,/,,,,1,2026-09-01,"example row: branded; measures brand ownership, never enters the headline"
