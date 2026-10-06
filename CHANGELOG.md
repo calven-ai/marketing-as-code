@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- SEO tracking by tier. `scripts/seo_rank_track.py` pulls the top 30 and
+  the AI Overview for every keyword, `scripts/seo_diff.py` scores ranks by
+  tier with striking distance and a crosswalk to the AEO prompts,
+  `scripts/gsc_snapshot.py` pulls Search Console, and `scripts/page_join.py`
+  joins every search source by page path. `keywords.csv` gains ids, tracks,
+  tiers and `aeo_prompts`; the search market comes from
+  `data/ontology/metrics.md`, never a silent default; `seo-analyst` gains a
+  why-not-us ladder and a frozen keyword set reviewed quarterly.
+
 - AEO tracking runs as a script. `scripts/aeo_track.py` asks every active
   prompt in `data/seo/prompts.csv` on ChatGPT, Google AI Mode and Claude
   through DataForSEO and saves who is named and cited; `scripts/aeo_diff.py`
