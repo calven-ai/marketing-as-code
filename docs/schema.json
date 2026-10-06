@@ -472,9 +472,13 @@
     "_doc": "Canonical tables: the header row must be exactly this. Snapshots only need a header and uniform columns.",
     "canonical": {
       "data/seo/keywords.csv": [
+        "id",
         "keyword",
+        "track",
+        "tier",
         "intent",
         "target_url",
+        "aeo_prompts",
         "difficulty",
         "volume",
         "current_rank",

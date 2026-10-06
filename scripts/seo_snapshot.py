@@ -3,8 +3,9 @@
 data/seo/keywords.csv from DataForSEO and save
 data/seo/snapshots/YYYY-MM-DD-dataforseo-volume.csv. --update also refreshes
 volume, difficulty and last_checked in the canonical table; --dry-run lists
-what would be pulled. Needs DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD
-(environment or .env). Standard library only.
+what would be pulled. Location and language come from data/ontology/metrics.md
+or --location and --language, never a default. Needs DATAFORSEO_LOGIN and
+DATAFORSEO_PASSWORD (environment or .env). Standard library only.
 
     python3 scripts/seo_snapshot.py                 # snapshot only
     python3 scripts/seo_snapshot.py --update        # also refresh keywords.csv
@@ -14,8 +15,8 @@ Credentials come from DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD in the
 environment or the repo's .env file. They are never printed. The snapshot
 lands in data/seo/snapshots/YYYY-MM-DD-dataforseo-volume.csv with the columns
 the seo-analyst skill expects: keyword,volume,difficulty,rank,url,checked.
-Ranks are not pulled here (that needs a domain and a SERP check); the column
-is kept so every snapshot in the folder stays diffable.
+Ranks are not pulled here (scripts/seo_rank_track.py does the SERP check); the
+column is kept so every snapshot in the folder stays diffable.
 """
 import argparse
 import base64
@@ -27,6 +28,7 @@ import urllib.error
 import urllib.request
 
 from _common import ROOT as REPO, setting, snapshot_path
+from _seo import market
 
 API = "https://api.dataforseo.com/v3"
 KEYWORDS = REPO / "data" / "seo" / "keywords.csv"
@@ -59,10 +61,9 @@ def call(endpoint, payload):
     return body
 
 
-def search_volume(keywords, location=2840, language="en"):
+def search_volume(keywords, place):
     """Monthly search volume per keyword, one call for the whole list."""
-    task = {"keywords": keywords, "location_code": location,
-            "language_code": language}
+    task = {"keywords": keywords, **place}
     body = call("keywords_data/google_ads/"
                 "search_volume/live", [task])
     result = body["tasks"][0].get("result") or []
@@ -70,10 +71,9 @@ def search_volume(keywords, location=2840, language="en"):
             for row in result}
 
 
-def keyword_difficulty(keywords, location=2840, language="en"):
+def keyword_difficulty(keywords, place):
     """Keyword difficulty (0 to 100) per keyword, one call."""
-    task = {"keywords": keywords, "location_code": location,
-            "language_code": language}
+    task = {"keywords": keywords, **place}
     body = call("dataforseo_labs/google/bulk_keyword_difficulty/live", [task])
     result = body["tasks"][0].get("result") or []
     items = result[0].get("items") if result else []
@@ -121,23 +121,25 @@ def main():
                         help="also refresh volume, difficulty, last_checked in keywords.csv")
     parser.add_argument("--dry-run", action="store_true",
                         help="list the keywords and stop, no API call")
-    parser.add_argument("--location", type=int, default=2840,
-                        help="DataForSEO location code (default 2840, United States)")
-    parser.add_argument("--language", default="en")
+    parser.add_argument("--location",
+                        help="DataForSEO location name or code (else data/ontology/metrics.md)")
+    parser.add_argument("--language", help="language code (else data/ontology/metrics.md)")
     args = parser.parse_args()
 
     existing = read_keywords()
     keywords = [row["keyword"] for row in existing]
     today = dt.date.today().isoformat()
+    place = market(args.location, args.language)
+    where = place.get("location_name") or place.get("location_code")
     if args.dry_run:
-        print(f"{len(keywords)} keywords would be pulled for location "
-              f"{args.location}/{args.language}:")
+        print(f"{len(keywords)} keywords would be pulled for "
+              f"{where}/{place['language_code']}:")
         for kw in keywords:
             print(f"  {kw}")
         return
 
-    volumes = search_volume(keywords, args.location, args.language)
-    difficulty = keyword_difficulty(keywords, args.location, args.language)
+    volumes = search_volume(keywords, place)
+    difficulty = keyword_difficulty(keywords, place)
     rows = []
     for row in existing:
         kw = row["keyword"]

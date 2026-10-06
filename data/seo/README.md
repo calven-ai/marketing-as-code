@@ -6,16 +6,25 @@
   tracks. Columns:
 
   ```csv
-  keyword,intent,target_url,difficulty,volume,current_rank,last_checked,notes
+  id,keyword,track,tier,intent,target_url,aeo_prompts,difficulty,volume,current_rank,last_checked,notes
   ```
 
-  `intent` is one of informational, commercial, transactional or
-  navigational. A row here means "we care about ranking for this", so add
-  rows on purpose.
-  Update `difficulty`, `volume`, `current_rank` and `last_checked` from
-  fresh pulls. The three rows it ships with are examples; replace them with
-  yours. `scripts/seo_snapshot.py` refreshes volume and difficulty for every
-  row and saves the pull as a snapshot.
+  `id` is `K001`, `K002`..., stable and never reused. Never edit a keyword's
+  text in place: delete the row, log it in `memory/knowledge/seo-memory.md`
+  (Set log) and add a new id. `track` and `tier` are defined in the Tracks
+  and Tiers tables above; a row takes the tier of the question it answers,
+  and the `brand` track is scored apart from the headline. `intent` is one of
+  informational, commercial, transactional or navigational. `target_url` is
+  the page path meant to rank (empty: no page yet). `aeo_prompts` lists the
+  `prompts.csv` ids this keyword is the search form of, `|`-separated; such
+  a keyword takes their tier and track, and naming a retired or unknown id
+  fails `scripts/seo_diff.py`. A row here means "we care about ranking for
+  this", so add rows on purpose: the set is frozen between quarterly reviews
+  (`seo-analyst`). The rows it ships with are examples; replace them with
+  yours. `scripts/seo_snapshot.py` refreshes volume and difficulty;
+  `scripts/seo_rank_track.py` checks the SERP for every row. The market
+  both measure is `Search location` and `Search language` in
+  `../ontology/metrics.md`.
 
 - **`prompts.csv`**: the AI answer-engine (AEO) prompt set, the questions a
   buyer types into ChatGPT, Google AI Mode or Claude. A fixed panel, so a
@@ -96,8 +105,13 @@ the wording's.
 
 `snapshots/YYYY-MM-DD-<source>-<what>.csv`, immutable. Typical:
 
-- `2026-08-31-dataforseo-rankings.csv`: rank check for every keyword in the
-  canonical table
+- `2026-08-31-dataforseo-serp.csv`: one row per keyword from
+  `scripts/seo_rank_track.py`: our rank and URL, AI Overview shown and
+  citing us, People Also Ask, the top 10 domains and brands
+- `2026-08-31-dataforseo-serp-results.csv`: the same run's top 30, AI
+  Overview references, People Also Ask and related searches, one row each
+- `2026-08-31-gsc-pages.csv` and `-gsc-queries.csv`: Search Console by page
+  (with the index verdict) and by query and page (`scripts/gsc_snapshot.py`)
 - `2026-08-31-dataforseo-keyword-ideas.csv`: research output, pending triage
   into `keywords.csv`
 - `2026-08-31-dataforseo-aeo-results.csv`: one row per prompt and engine,
@@ -109,8 +123,10 @@ the wording's.
 
 ## For agents
 
-- Weekly delta: diff the two most recent ranking snapshots (`seo-analyst`
-  skill) and write the analysis to `reports/recurring/seo/`, not here.
+- Delta: `scripts/seo_diff.py` scores the newest SERP snapshot against the
+  earlier ones; `scripts/page_join.py` joins every search source by page
+  path. The analysis goes to `reports/recurring/seo/` (`seo-analyst`), not
+  here.
 - Pulls go through DataForSEO (see `integrations/README.md`). Keyword and
   rank pulls: `seo-analyst`. AI answer-engine visibility: `brand-monitor`
   (`scripts/aeo_track.py` collects, `scripts/aeo_diff.py` scores).

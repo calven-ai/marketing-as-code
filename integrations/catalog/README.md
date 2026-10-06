@@ -113,7 +113,7 @@ Falls back to: generic.
 | Ahrefs | http `ahrefs`: https://api.ahrefs.com/mcp/mcp | oauth | no | no | vendor | 2026-09-04 |
 | Semrush | http `semrush`: https://mcp.semrush.com/v2/mcp (+1 variant) | oauth | no | no | vendor | 2026-09-04 |
 | Moz | none | manual export | no | no | vendor | 2026-09-04 |
-| Google Search Console | stdio `gsc`: uvx mcp-search-console==0.3.3 | env: `GSC_CREDENTIALS_PATH` | yes, tools unrecorded | yes | listing | 2026-09-04 |
+| Google Search Console | stdio `gsc`: uvx mcp-search-console==0.3.3; script `scripts/gsc_snapshot.py` | env: `GSC_CLIENT_ID`, `GSC_CLIENT_SECRET`, `GSC_CREDENTIALS_PATH`, `GSC_REFRESH_TOKEN`, `GSC_SITE_URL` | yes, tools unrecorded | yes | listing | 2026-09-04 |
 | Similarweb | http `similarweb`: https://mcp.similarweb.com | header: `SIMILARWEB_API_KEY` | no | yes | vendor | 2026-09-04 |
 | Screaming Frog SEO Spider | CLI `screamingfrogseospider` | manual export | no | no | vendor | 2026-09-04 |
 | Bing Webmaster Tools | none | manual export | yes, tools unrecorded | no | listing | 2026-09-04 |

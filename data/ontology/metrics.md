@@ -17,4 +17,6 @@ precise enough to compute from raw data.
 | Opportunity | | |
 | Win | | |
 | Pipeline ($) | [which stages count, at what probability] | |
+| Search location | [the one market search pulls measure, e.g. United States] | `scripts/seo_rank_track.py`, `scripts/seo_snapshot.py` |
+| Search language | [its language code, e.g. en] | the same pulls |
 | [add your own] | | |
