@@ -1,6 +1,6 @@
 ---
 name: social-post
-description: Write a LinkedIn or X post in the company or an exec voice with hook, body and CTA. Use when "LinkedIn post about X", "thread on X", "post for the launch".
+description: Write a LinkedIn or X post in the company or an exec voice. Use when "LinkedIn post about X", "thread on X", "post for the launch".
 license: MIT
 metadata:
   kind: workflow
@@ -53,7 +53,8 @@ nothing to the writing; staging a draft in a scheduling tool is
 6. **Scaffold and save** through `new-content`: `content/YYYY-MM-<slug>/`
    with `brief.md` (source piece, persona, pillar, goal) and `draft.md`
    holding the post, the alternative hooks, the first-comment link, and
-   the image or document ask for `design-qa` if one is needed. Set
+   the image: rendered by `brand-image` (4:5 portrait by default), or
+   an ask for `design-qa` when no template fits. Set
    `project:` to the campaign when there is one.
 7. **Hand over.** What the post argues, which hook you recommend, and
    what only a person decides: whether it goes out in the company voice
