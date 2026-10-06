@@ -25,7 +25,7 @@ I want to choose five questions to write for this quarter.
 
 READ FROM THE REPO
 - Every row in data/seo/prompts.csv, with persona and stage.
-- The newest AI-mentions snapshot (the `*-llm-mentions.csv` file) in data/seo/snapshots/ and the latest report in reports/recurring/mentions/.
+- The newest AEO results snapshot (the `*-aeo-results.csv` file) in data/seo/snapshots/ and the latest report in reports/recurring/mentions/.
 - What we've published in content/ that answers each one.
 
 BUILD
@@ -115,7 +115,7 @@ I can't see inside the engines. I can approximate how retrieval and synthesis tr
 
 FROM THE REPO
 - The question's row in data/seo/prompts.csv.
-- Who is cited for it in the newest AI-mentions snapshot (the `*-llm-mentions.csv` file) in data/seo/snapshots/.
+- Who is cited for it in the newest AEO results snapshot (the `*-aeo-results.csv` file) in data/seo/snapshots/.
 - Our draft in content/.
 
 METHOD
