@@ -1,4 +1,6 @@
-prompt,persona,stage,category,notes
-"What is the best [category] tool for a [buyer role]?",[buyer role],decision,category,"example row: the category question; put your category and buyer in"
-"How do [buyer roles] solve [the problem you solve]?",[buyer role],awareness,use case,"example row: the problem question; who gets cited as the reference"
-"Which [category] tools work with [a system your buyers already use]?",[buyer role],consideration,integration,"example row: the integration question"
+id,prompt,track,stage,intent,tier,persona,target_page,source,status,added_on,retired_on,rationale
+P001,What is the best [category] for a [team size] team?,category,consideration,direct,1,[buyer role],/[category-page],research,active,2026-10-06,,"example row: the category shortlist; winning is being named, ideally first"
+P002,What are the best alternatives to [competitor]?,alternatives,decision,direct,1,[buyer role],,research,active,2026-10-06,,"example row: the switching question; empty target_page means no page answers it yet (a content gap)"
+P003,How do other [buyer roles] handle [the problem you solve]?,category,awareness,indirect,2,[buyer role],/guides/[slug],research,active,2026-10-06,,"example row: the problem question; winning is our guide cited, then us offered as the way"
+P004,How do I write a [craft artifact]?,craft,awareness,indirect,3,[buyer role],/resources/[slug],research,active,2026-10-06,,"example row: the craft question; winning is our page cited, a mention is a bonus"
+P005,What is [our product]?,brand,decision,branded,1,[buyer role],/,research,active,2026-10-06,,"example row: branded; measures whether engines describe us correctly, never enters visibility"

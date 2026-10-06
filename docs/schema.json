@@ -482,11 +482,25 @@
         "notes"
       ],
       "data/seo/prompts.csv": [
+        "id",
         "prompt",
-        "persona",
+        "track",
         "stage",
-        "category",
-        "notes"
+        "intent",
+        "tier",
+        "persona",
+        "target_page",
+        "source",
+        "status",
+        "added_on",
+        "retired_on",
+        "rationale"
+      ],
+      "data/seo/brands.csv": [
+        "brand",
+        "kind",
+        "aliases",
+        "domains"
       ],
       "data/accounts/target-accounts.csv": [
         "company",

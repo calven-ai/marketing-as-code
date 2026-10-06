@@ -126,7 +126,7 @@ Falls back to: generic.
 
 | Vendor | Mechanism | Auth | Writes | Headless | Verified | Checked |
 | --- | --- | --- | --- | --- | --- | --- |
-| DataForSEO AI Optimization | stdio `dataforseo`: npx -y dataforseo-mcp-server@3.1.1 | env: `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD` | no | yes | vendor | 2026-09-04 |
+| DataForSEO AI Optimization | stdio `dataforseo`: npx -y dataforseo-mcp-server@3.1.1; script `scripts/aeo_track.py` | env: `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD` | no | yes | vendor | 2026-09-04 |
 | Profound | stdio `profound`: npx -y @profoundai/mcp@0.47.0 | env: `PROFOUND_API_KEY` | no | yes | vendor | 2026-09-04 |
 | Peec AI | http `peec`: https://api.peec.ai/mcp | oauth | no | no | vendor | 2026-09-04 |
 | Otterly.ai | http `otterly`: https://data.otterly.ai/mcp | oauth | yes, tools unrecorded | no | listing | 2026-09-04 |

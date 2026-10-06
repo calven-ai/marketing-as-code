@@ -30,14 +30,15 @@ These name vendors. Most of the set belongs here.
 - "Is [competitor] worth it for a [team size] team?"
 - "How much does a [category] tool cost for [scope]?"
 
-Never put our brand in the prompt; a prompt that names us only tests
-whether the engine knows the name.
+Only a `branded` row names us; it measures whether engines describe us
+correctly, not whether they choose us.
 
-## Category tags used in `prompts.csv`
+## Tier by shape
 
-`category` (the category question), `use case`, `integration`,
-`comparison`, `pricing`, `alternatives`, `how-to`. Add a new tag only with
-a reason in `notes`.
+Decision and shortlist shapes are tier 1 (Buy); a problem question where
+we want our method cited is tier 2; a craft question is tier 3. The tier
+follows the question, not the track: an alternatives prompt with no
+buying intent is tier 2.
 
 ## Phrasing rules
 
@@ -53,7 +54,7 @@ a reason in `notes`.
 
 ## Coverage grid
 
-Rows: personas. Columns: awareness, consideration, decision. Cells: the
-count of prompts and their category tags. A persona with zero
-consideration prompts is the first gap; a cell with more than five is
-probably over-covered.
+Rows: tracks. Columns: tiers, split by stage. Cells: the count of active
+prompts and the personas they serve. A track under five prompts or a
+persona with no tier-1 prompt is the first gap; a cell with more than ten
+is probably over-covered.
