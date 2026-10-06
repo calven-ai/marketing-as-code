@@ -14,6 +14,13 @@ All notable changes to this project are documented here. The format follows
   new, and `brand-monitor` follows a written protocol (mention audit, the
   why-not-us ladder, a frozen prompt set reviewed quarterly).
   `aeo-track-cron.yml` collects on Mondays once DataForSEO keys are set.
+- Web analytics has one channel model in `data/ontology/`: the channel
+  order, source resolution, session-entry scope and session classes
+  (answer-engine link fetches counted apart from humans).
+  `scripts/web_snapshot.py` runs the weekly PostHog queries into
+  `data/analytics/snapshots/`, or prints them for the MCP, and
+  `web-analyst` works by a written method: expectation before so-what, a
+  cause ladder, and fixing what let a finding hide.
 
 - The checked-in `.claude/settings.json` carries only what this repository
   owns: the allow-list for its lifecycle scripts, the `SessionStart` doctor
