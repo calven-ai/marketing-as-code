@@ -666,7 +666,9 @@
       "THIRD_PARTY.md",
       "docs/*.md",
       "*/README.md",
-      "integrations/catalog/README.md"
+      "integrations/catalog/README.md",
+      "agents/prompts/*.md",
+      "agents/prompts/*/*.md"
     ],
     "error_prefixes": [
       "scripts/",

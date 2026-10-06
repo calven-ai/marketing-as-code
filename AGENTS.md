@@ -118,6 +118,7 @@ because they define what the agents may reach.
 | Adding an integration, a script, or a skill | `integrations/adding-an-integration.md`, then `agents/README.md` |
 | Where things run, what may run unattended, a person vs GitHub Actions | `docs/operating-model.md` |
 | What an agent/skill does | `agents/README.md` (roster) → `.agents/skills/` (definitions) |
+| A ready prompt or question for a marketing team's task | `agents/prompts/` |
 
 ## Answering questions from data
 

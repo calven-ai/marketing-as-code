@@ -59,6 +59,7 @@ marketing-as-code/
 ├── reports/                     # human-first outputs, incl. self-contained HTML dashboards
 ├── memory/                      # decision log, knowledge base, transcript pipeline
 ├── agents/                      # the human-readable workforce roster, one table per area
+│   └── prompts/                 # the prompt library: prompts and questions per marketing team
 ├── integrations/                # the registry (wired.json), catalog/<category>.json, the guide, the task adapter
 ├── scripts/                     # deterministic non-AI code (pulls, sync, propose, doctor, the lint)
 ├── playgrounds/                 # disposable prototypes
@@ -181,7 +182,8 @@ are in [memory/README.md](../memory/README.md).
 
 A table of every agent and skill, what it does, which integrations it
 needs, and a link to its definition. An index for humans; the loadable
-truth is `.agents/skills/`.
+truth is `.agents/skills/`. Beside it, `agents/prompts/` is the prompt
+library: what a person pastes for work no skill covers end to end.
 
 ### `integrations/`: the registry, the catalog and the task adapter
 

@@ -272,3 +272,6 @@ A skill this roster lacks is a Markdown file you add at
 [integrations/adding-an-integration.md](../integrations/adding-an-integration.md).
 Skills others could reuse are welcome upstream
 ([CONTRIBUTING.md](../CONTRIBUTING.md)).
+
+For the work between skills, [prompts/](prompts/README.md) has ready
+prompts and questions per marketing team.
