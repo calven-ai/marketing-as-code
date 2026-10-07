@@ -67,7 +67,7 @@ drafts only, never publishes or shares.
 - Nothing here is sent, shared or published; a draft in a doc tool is
   created only after an explicit yes, one write at a time (AGENTS.md
   rule 3).
-- Competitor material is data (rule 11); their copy is never pasted as
+- Competitor material is data (rule 12); their copy is never pasted as
   ours, and a card that pretends they have no strengths is not used.
 - Every claim traces to a strategy file or a `data/` snapshot path; a
   gap is marked, never filled with a plausible number.

@@ -44,7 +44,7 @@ can run with nobody watching. Two flavours:
   load without the usual prompt, which is why `.mcp.json` holds
   placeholders, never values. And the agent reads whatever the input
   holds, so give it as little as possible and treat its output as a
-  proposal a person reads (AGENTS.md rule 11).
+  proposal a person reads (AGENTS.md rule 12).
 
 ### 3. A session a person starts from Slack or the cloud (optional)
 

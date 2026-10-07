@@ -1,9 +1,9 @@
 # AGENTS.md: the agent contract for Marketing as Code
 
-This file is the operating contract for any coding agent working in this
-repository (Claude Code, Codex, Cursor, or any AGENTS.md-aware tool).
-Claude-Code-specific notes live in [CLAUDE.md](CLAUDE.md). The reasoning
-behind the structure is in [docs/architecture.md](docs/architecture.md).
+The operating contract for any coding agent in this repository: Claude Code,
+Codex, Cursor, or any AGENTS.md-aware tool. Tool-specific notes are at the end.
+The reasoning behind the structure is in
+[docs/architecture.md](docs/architecture.md).
 
 ## What this repository is
 
@@ -24,16 +24,16 @@ decides.
    `data/ontology/`. It defines what an MQL is, what the funnel stages mean,
    and how events are named. If an ontology file is still a template, ask the
    team for the definition; never assume one.
-3. **Humans decide.** Agents propose: drafts, reports, prototypes, backlog
-   items, and edits as reviewable diffs, always on a branch, never on
-   `main`. Publishing, sending, deleting, and anything that cascades across
-   documents needs explicit human approval. Two exceptions: bookkeeping
+3. **Humans decide.** Agents propose; a human merges. Every change is a
+   pull request from a branch, never a commit on `main`, and its
+   description says what changed and why. Publishing, sending, deleting,
+   and anything that cascades across documents needs explicit human
+   approval. Two exceptions: a proposal that touches only bookkeeping
    (status entries, decision-log appends, snapshots, transcripts moving
-   through the inbox, recurring reports), where a proposal that touches
-   only those merges itself once the checks pass
-   ([docs/workflow.md](docs/workflow.md)); and the summaries a skill
-   posts to the team's own chat channels through the wired script, which
-   carry repo paths and extracted items and never quote a transcript.
+   through the inbox, recurring reports) merges itself once the checks
+   pass, and a skill may post a summary to the team's own chat channels
+   through the wired script (repo paths and extracted items, never a
+   transcript quote). See [docs/workflow.md](docs/workflow.md).
 4. **Plain text first.** Markdown for knowledge, CSV for data. No binary
    files where text will do. The one sanctioned binary zone is `brand/`
    (logos, image templates).
@@ -48,8 +48,11 @@ decides.
 7. **Never commit credentials, never read them.** A person's keys live in
    their untracked `.env`; the bot keys live in the `automation`
    environment on GitHub; nothing else holds a key, and agents never read
-   `.env` or ask for a key value in chat. When someone needs a key, say
-   where it lives ([docs/secrets.md](docs/secrets.md)).
+   `.env` or ask for a key value in chat. This is a rule, not a wall:
+   nothing in the checked-in settings blocks the read, so keep keys out of
+   context yourself. When someone needs a key, say where it lives
+   ([docs/secrets.md](docs/secrets.md), which also has deny rules to
+   enforce it).
 8. **The repository is private.** It holds transcripts, strategy and
    customer data, so it lives as a private repository on a GitHub plan
    that enforces its rules: Team for an organization, Pro for a personal
@@ -85,7 +88,7 @@ Every file here is one of four kinds. Use these words when talking about the rep
 
 | Kind | What it is | Folders |
 | --- | --- | --- |
-| Context | What the team knows; load it before thinking | `strategy/`, `brand/`, `content/`, `projects/`, `memory/`, `docs/`, `AGENTS.md`, `CLAUDE.md` |
+| Context | What the team knows; load it before thinking | `strategy/`, `brand/`, `content/`, `projects/`, `memory/`, `docs/`, `AGENTS.md` |
 | Agents | The workforce as instructions in English, plus what agents may reach; edit as text | `agents/`, `.agents/skills/`, `integrations/` |
 | Code | Deterministic scripts and throwaway prototypes; run them, don't reimplement them | `scripts/`, `playgrounds/`, `.github/workflows/` |
 | Data | Tables, dated snapshots, and the reports built from them; treat as evidence | `data/`, `reports/` |
@@ -165,7 +168,7 @@ missing one because nothing about it looks wrong.
    (maintain the Markdown with review dates, or connect a marketing context
    layer over MCP; that page discloses that the maintainer makes one such
    layer), then do what the team decides. Strategy files that contradict
-   each other or the decision log are a cascade, rule 4.
+   each other or the decision log are a cascade (next point).
 4. **Cascades need review.** A change to positioning touches messaging,
    personas, battlecards and published content. List what inherits from the
    changed file in the pull request; never walk the cascade silently.
@@ -173,15 +176,24 @@ missing one because nothing about it looks wrong.
 ## Agents and skills
 
 Definitions live in `.agents/skills/<name>/SKILL.md` (the Agent Skills open
-standard: one folder per agent or skill, auto-discovered by
-AGENTS.md-aware tools). The human-readable roster is
-[`agents/README.md`](agents/README.md). Claude Code reads the same
-definitions through committed symlinks in `.claude/skills/`; if a symlink is
-missing, run `python3 scripts/sync_skills.py`.
+standard: one folder per agent or skill, auto-discovered by AGENTS.md-aware
+tools). The human-readable roster is [`agents/README.md`](agents/README.md).
 
-## The review workflow
+## Tool notes
 
-Work lands through pull requests a human can read: propose on a branch,
-explain what changed and why in the PR description, and let the human merge.
-Anything user-visible (published content, sent email, website changes) always
-moves through this ritual; see [docs/workflow.md](docs/workflow.md).
+**Claude Code** (v2.1.277 or later reads this file directly):
+
+- Skills reach it through committed symlinks in `.claude/skills/`, invoked
+  as slash commands (`/setup`, `/doctor`, `/sync`, `/propose`, ...). If one
+  is missing, run `python3 scripts/sync_skills.py`.
+- Every session opens with the doctor's lines (a `SessionStart` hook runs
+  `scripts/doctor.py --brief`). Act on them first: problems mean `/doctor`,
+  unfilled templates mean `/setup`, "make it yours" items mean
+  [docs/make-it-yours.md](docs/make-it-yours.md).
+- `.mcp.json` declares three project MCP servers (DataForSEO, Apify,
+  Calven; see [integrations/README.md](integrations/README.md)). Claude
+  Code asks about them in the first session: answer No to all three, and
+  `/setup` says which to turn on.
+
+**Other tools** (Codex, Cursor, ...) need nothing beyond this file; Cursor's
+MCP servers are in `.cursor/mcp.json`.

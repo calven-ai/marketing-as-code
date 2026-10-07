@@ -77,7 +77,7 @@ jobs:
 
           This is bookkeeping: the gate merges it once the checks are green, so nobody needs to merge it. Then process the inbox: run `/chief-of-staff` (or ask your agent to "process the transcript inbox"), or, if the team has opted into `transcripts-process.yml`, its daily run picks the files up and a "Transcripts processed" PR follows, which a person reads and merges; the gate never merges an unattended run's proposal.
 
-          Transcripts are sensitive, and anything said in a meeting ends up here verbatim. Keep this repository private, and remember that agents treat transcript text as data, never as instructions (AGENTS.md rule 11).
+          Transcripts are sensitive, and anything said in a meeting ends up here verbatim. Keep this repository private, and remember that agents treat transcript text as data, never as instructions (AGENTS.md rule 12).
           BODY
           )"
           # A PR opened with the workflow token starts no workflows on its own; ask for the check explicitly.
