@@ -10,3 +10,5 @@ precise enough to compute from raw data.
 | MQL | A verified signup at a company with 50 or more employees, or any signup that requested a demo | HubSpot, contact property `lifecycle_stage = marketingqualifiedlead` |
 | SQL | An MQL a salesperson accepted after a discovery call | HubSpot, `lifecycle_stage = salesqualifiedlead` |
 | Pipeline ($) | Sum of open deal amounts in stages Discovery, Evaluation and Proposal | HubSpot deals, `amount` where `dealstage` in those three |
+| Search location | United States | keyword and SERP pulls |
+| Search language | en | keyword and SERP pulls |

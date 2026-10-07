@@ -53,7 +53,8 @@ count or an authority score.
 5. **Analyse** per `references/profile-health.md` (authority histogram,
    anchor classes against their healthy ranges, growth, toxic candidates)
    and `references/link-gap.md` (intersection threshold, link type,
-   outreach angle per prospect).
+   outreach angle per prospect); score every domain and prospect into
+   tiers A, B, C or spam by `references/link-ledger.md`.
 6. **Write the report** from `reports/_templates/report.md` to
    `reports/adhoc/YYYY-MM-DD-backlinks/report.md`: the answer (profile
    health in a paragraph, the size of the gap), a top-line table, the

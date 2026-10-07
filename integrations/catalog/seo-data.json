@@ -181,7 +181,7 @@
           }
         ],
         "cli": null,
-        "script": {"path": null, "env": ["GSC_CREDENTIALS_PATH", "GSC_SITE_URL"], "notes": "copy scripts/seo_snapshot.py; the same service account posts to searchconsole.googleapis.com/webmasters/v3/sites/{site}/searchAnalytics/query for the weekly query and page snapshot; the Search Console API is simple enough that the script is the better unattended route"}
+        "script": {"path": "scripts/gsc_snapshot.py", "env": ["GSC_CLIENT_ID", "GSC_CLIENT_SECRET", "GSC_REFRESH_TOKEN", "GSC_SITE_URL"], "notes": "the unattended route: pages (with the index verdict under --inspect) and queries by page into data/seo/snapshots/YYYY-MM-DD-gsc-pages.csv and -gsc-queries.csv; an OAuth refresh token rather than the service account, because signing a service-account token needs a crypto library; the script's docstring says how a person mints the token once"}
       }
     },
     {

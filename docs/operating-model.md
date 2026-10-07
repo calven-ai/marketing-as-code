@@ -102,6 +102,7 @@ Whatever the mode, these need a person every time (AGENTS.md rule 3,
 | Pull transcripts into the inbox | `python3 scripts/pull_transcripts.py` | `transcripts-cron.yml`, daily, opens a PR (shipped) |
 | Process the inbox | `/chief-of-staff` after the meeting (the default) | `transcripts-process.yml`, on merge of an inbox PR, opens a PR that a person reads: the gate never merges an unattended run's proposal (opt-in, needs `ANTHROPIC_API_KEY`) |
 | Refresh keyword volumes and difficulty | `python3 scripts/seo_snapshot.py --update` | A cron step running the same script, yours to add |
+| Google ranks and AI Overviews for every keyword; Search Console | `python3 scripts/seo_rank_track.py`, `python3 scripts/gsc_snapshot.py --inspect` | A cron step running the same scripts, yours to add |
 | Rankings, SERP questions, keyword ideas | `/seo-analyst` (the wired `seo-data` server) | Not headless; the script covers the scheduled part |
 | Run a role unattended | never directly | `role-run.yml`, reusable, called by a `role-<skill>.yml` with a schedule: filters `.mcp.json` to the servers the caller names, hands the run only their keys, opens a PR that a person reads, snapshots included (opt-in, needs `ANTHROPIC_API_KEY` plus those keys in `automation`) |
 | Collect and score the answer-engine prompt set | `python3 scripts/aeo_track.py`, then `python3 scripts/aeo_diff.py` | `aeo-track-cron.yml`, Mondays, opens a bookkeeping PR (shipped, dormant until the DataForSEO keys exist) |
