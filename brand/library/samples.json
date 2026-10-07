@@ -1,0 +1,15 @@
+{
+  "_doc": "Sample copy for the brand library pages (scripts/brand_render.py book). Replace it with lines from strategy/messaging.md; headlines follow brand/image-rules.md.",
+  "name": "",
+  "banner": "Your headline, *in the gradient*",
+  "display": "The display line, set large",
+  "headline": "A headline at section size",
+  "title": "A title for cards and lists",
+  "lede": "A lede sentence introduces a page in the body face.",
+  "eyebrow": "Eyebrow",
+  "posts": [
+    {"name": "Portrait", "ratio": "4:5", "w": 1080, "h": 1350, "headline": "An opinion, *said plainly*"},
+    {"name": "Square", "ratio": "1:1", "w": 1080, "h": 1080, "headline": "A claim the number proves", "stat": "3x"},
+    {"name": "Landscape", "ratio": "1.91:1", "w": 1200, "h": 627, "headline": "A link post, *one idea*"}
+  ]
+}

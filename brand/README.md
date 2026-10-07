@@ -16,6 +16,7 @@ see (a draft, an email, a prototype, an image) loads this folder first.
 | `logos/` | Logo files (SVG preferred) |
 | `templates/` | Image templates and the size registry that `scripts/brand_render.py` renders |
 | `screenshots/` | Product screenshots the templates may use |
+| `library/` | The brand library: open `library/index.html` in a browser for logos, color and type, banners, social posts and screenshots, with live template previews. `python3 scripts/brand_render.py book` regenerates its data (`library.js`) after a change; `library/samples.json` holds the sample copy |
 
 ## Rules
 

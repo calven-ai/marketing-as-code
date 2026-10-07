@@ -1,0 +1,5 @@
+competitor,page,url,checked,hash,changed,summary,previous
+Northstar,homepage,https://northstar.example/,2026-09-01,4be1c09a,no,"Headline: one place to watch, alert and tell. Status page shown as part of the suite",2026-08-01
+Northstar,pricing,https://northstar.example/pricing,2026-09-01,91d3e7f2,no,"Team 39 per seat, Business 69 per seat; status page included from Team",2026-08-01
+Northstar,product,https://northstar.example/status-pages,2026-09-01,07ac5b13,no,"Public and private status pages, email subscribers, one audience",2026-08-01
+Northstar,changelog,https://northstar.example/changelog,2026-09-01,c2f80d64,yes,"August: alert routing rules; nothing on status pages",2026-08-01

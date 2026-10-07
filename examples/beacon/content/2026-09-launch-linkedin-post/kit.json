@@ -1,0 +1,9 @@
+{
+  "jobs": [
+    {"file": "stat.png", "preset": "portrait-4x5", "stat": "48s",
+     "headline": "Median time to a *first update*"},
+    {"file": "segments.png", "preset": "linkedin-post",
+     "headline": "Tell only the customers *who are affected*", "shot": "audience-segments.png"},
+    {"file": "og.png", "preset": "og", "headline": "Your customers hear it *from you first*"}
+  ]
+}

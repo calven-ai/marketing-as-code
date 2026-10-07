@@ -1,14 +1,14 @@
 ---
 document: icp
 source: repo
-last_reviewed: 2026-08-15
+last_reviewed: 2026-09-30
 owner: Ana Ruiz
 ---
 
 # Ideal Customer Profile
 
-The summary, the firmographic attributes and the disqualifiers are filled;
-the rest waits for the first campaign that needs it. The people inside
+The summary, the firmographic and technographic attributes and the
+disqualifiers are filled; the rest waits for the campaign that needs it. The people inside
 these accounts live in the personas file.
 
 ## ICP Summary
@@ -32,8 +32,12 @@ these accounts live in the personas file.
 
 ## Technographic Attributes
 
-Not yet. The first campaign will need the monitoring and support tools we
-integrate with.
+| Attribute | Fit signal | Why it matters |
+| --- | --- | --- |
+| Monitoring | PagerDuty, Opsgenie, Datadog or Northstar in place | Incidents are already detected; the gap is telling customers |
+| Status page | A bundled page (Northstar) or a standalone one (Pagewise) | They have the page and feel what it does not do |
+| Support tool | Zendesk, Intercom or Freshdesk | Account sync for segments, and tagged incident tickets to measure |
+| CRM | HubSpot or Salesforce with plan and region per account | Segments work on day one |
 
 ## Behavioral Attributes
 

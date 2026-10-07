@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product screenshots</title>
+<link rel="stylesheet" href="library.css">
+<style>
+.shots { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr)); margin-top: 28px; }
+.shot { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 10px; overflow: hidden; }
+.shot a.img { display: block; aspect-ratio: 16 / 10; background: #050505; }
+.shot img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.shot .info { padding: 14px; display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--text-on-dark-2); }
+</style>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="eyebrow">Product screenshots</div>
+  <h1>The real product, <span class="hl">ready to reuse</span>.</h1>
+  <p class="lede">For listings, profile pages, galleries and posts. Match each one to what the copy next to it says; a post zooms to one feature with <code>focus=x,y</code>.</p>
+  <p class="muted small">Files live in <code>brand/screenshots/</code>. Fit one to an exact slot: <code>brand_render.py render shot --size 1600x1000 --param shot=&lt;file&gt;</code>.</p>
+  <div class="shots" id="shots"></div>
+</main>
+<script src="library.js"></script>
+<script src="library-runtime.js"></script>
+<script>
+const S = window.LIB.screenshots || [];
+document.getElementById('shots').innerHTML = S.length ? S.map((s) => `<div class="shot">
+  <a class="img" href="${s.src}" target="_blank"><img loading="lazy" src="${s.src}" alt="${esc(s.file)}"></a>
+  <div class="info"><code>${esc(s.file)}</code><span>${s.w} × ${s.h}</span></div></div>`).join('')
+  : '<div class="empty">No screenshots yet: add PNG, JPEG or WebP files to <code>brand/screenshots/</code>.</div>';
+</script>
+</body>
+</html>

@@ -28,3 +28,4 @@ __pycache__/
 
 # Rendered images (scripts/brand_render.py); the spec reproduces them
 brand/renders/
+examples/*/brand/renders/

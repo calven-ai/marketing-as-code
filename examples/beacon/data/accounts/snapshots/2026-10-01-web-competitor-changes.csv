@@ -1,0 +1,9 @@
+competitor,page,url,checked,hash,changed,summary,previous
+Northstar,homepage,https://northstar.example/,2026-10-01,4be1c09a,no,"Headline unchanged: one place to watch, alert and tell",2026-09-01
+Northstar,pricing,https://northstar.example/pricing,2026-10-01,91d3e7f2,no,"Team 39 per seat, Business 69 per seat; status page included from Team",2026-09-01
+Northstar,product,https://northstar.example/status-pages,2026-10-01,5f2e9a71,yes,"New section: subscriber groups, updates sent to a chosen group of subscribers (Business tier only)",2026-09-01
+Northstar,changelog,https://northstar.example/changelog,2026-10-01,e81b4c30,yes,"2026-09-17: subscriber groups for status pages, beta",2026-09-01
+Pagewise,homepage,https://pagewise.example/,2026-10-01,a93d0e55,,"A beautiful status page in five minutes; self-serve, no sales call",
+Pagewise,pricing,https://pagewise.example/pricing,2026-10-01,3c71f8b2,,"Starter 29 per month, Business 99 per month; public pricing, monthly billing",
+Pagewise,product,https://pagewise.example/features,2026-10-01,d40e6a19,,"Status page, uptime checks, email and Slack subscribers; no audience segments, no incident report",
+Pagewise,changelog,https://pagewise.example/changelog,2026-10-01,7b05c2de,,"2026-09-10: incident templates, five starter texts",

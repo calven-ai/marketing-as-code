@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color and type</title>
+<link rel="stylesheet" href="library.css">
+<style>
+.swatches { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-top: 24px; }
+.sw { border: 1px solid var(--border-dark); border-radius: 10px; overflow: hidden; background: var(--surface-dark); }
+.sw .chip { height: 110px; }
+.sw .info { padding: 12px; font-size: 13px; line-height: 1.5; }
+.sw .info b { font-weight: 500; display: block; color: var(--text-on-dark); }
+.sw .info code { color: var(--text-on-dark-2); }
+.gradient { height: 160px; border-radius: 10px; margin-top: 24px; display: flex; align-items: flex-end; padding: 16px 20px; font: 500 15px var(--font-display); }
+.pairs { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-top: 24px; }
+.pair { border-radius: 10px; padding: 22px; border: 1px solid var(--border-dark); }
+.pair .big { font: 500 28px/1.1 var(--font-display); letter-spacing: -.02em; }
+.pair .body { font: 400 15px/1.6 var(--font-body); }
+.pair .meta { font-size: 12px; margin-top: 10px; opacity: .85; }
+.specimen { margin-top: 24px; display: grid; gap: 4px; }
+.row { display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: baseline; padding: 18px 0; }
+.row .label { font-size: 12px; color: var(--text-on-dark-2); line-height: 1.5; }
+.d1 { font: 500 72px/1.02 var(--font-display); letter-spacing: -.03em; }
+.d2 { font: 500 44px/1.08 var(--font-display); letter-spacing: -.025em; }
+.d3 { font: 500 26px/1.2 var(--font-display); letter-spacing: -.015em; }
+.b1 { font: 400 18px/1.55 var(--font-body); color: var(--text-on-dark-2); max-width: 640px; }
+.b2 { font: 400 15px/1.6 var(--font-body); max-width: 640px; }
+.cap { font: 600 12px/1 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--text-on-dark-2); }
+.weights { display: flex; flex-wrap: wrap; gap: 28px; font: 32px var(--font-display); }
+@media (max-width: 720px) { .row { grid-template-columns: 1fr; gap: 8px; } .d1 { font-size: 48px; } }
+</style>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="eyebrow">Color &amp; type</div>
+  <h1>The palette, one gradient, <span class="hl">the type pair</span>.</h1>
+  <p class="lede">Source of truth: <code>brand/visual-identity.md</code>, mirrored in <code>brand/tokens.json</code>; <code>brand_render.py check</code> reports drift between them.</p>
+
+  <h2>Palette</h2>
+  <p class="muted">Images sit on Background with Text. The gradient phrase and the glow run Primary into Accent.</p>
+  <div class="swatches" id="palette"></div>
+  <div class="gradient" id="gradient"></div>
+
+  <h2>Text on surfaces</h2>
+  <p class="muted">Contrast ratios computed live against WCAG 2.</p>
+  <div class="pairs" id="pairs"></div>
+
+  <div id="identity"></div>
+
+  <h2>Typography</h2>
+  <p class="muted" id="typenote"></p>
+  <div class="specimen" id="specimen"></div>
+</main>
+<script src="library.js"></script>
+<script src="library-runtime.js"></script>
+<script>
+const L = window.LIB, c = L.colors || {}, f = L.fonts || {};
+const ROLES = [['primary', 'Primary'], ['secondary', 'Secondary'], ['background', 'Background'], ['text', 'Text'], ['accent', 'Accent']];
+const have = ROLES.filter(([k]) => c[k]);
+document.getElementById('palette').innerHTML = have.length ? have.map(([k, name]) =>
+  `<div class="sw"><div class="chip" style="background:${c[k]}"></div><div class="info"><b>${name}</b><code>${c[k].toUpperCase()}</code><br><code>colors.${k}</code></div></div>`).join('')
+  : '<div class="empty">No colors yet: fill <code>colors</code> in <code>tokens.json</code> (or run <code>/setup</code>).</div>';
+const g = document.getElementById('gradient');
+if (c.primary && c.accent) {
+  g.style.background = `linear-gradient(90deg, ${c.primary}, ${c.accent})`;
+  g.style.color = c.background || '#0A0A0A';
+  g.textContent = `Gradient · ${c.primary.toUpperCase()} → ${c.accent.toUpperCase()}`;
+} else g.remove();
+
+const lum = (hex) => {
+  const v = hex.replace('#', '').match(/../g).map((x) => parseInt(x, 16) / 255).map((x) => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+};
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+const pairs = [['background', 'text', 'Text on Background'], ['text', 'background', 'Background on Text'],
+  ['background', 'primary', 'Primary on Background'], ['background', 'accent', 'Accent on Background'],
+  ['text', 'secondary', 'Secondary on Text', 'body']]
+  .filter(([bg, fg]) => c[bg] && c[fg]);
+document.getElementById('pairs').innerHTML = pairs.map(([bg, fg, label, size = 'big']) => {
+  const r = ratio(c[bg], c[fg]);
+  const grade = r >= 7 ? ['AAA', 'ok'] : r >= 4.5 ? ['AA', 'ok'] : r >= 3 ? ['AA large only', 'warn'] : ['Fail', 'warn'];
+  return `<div class="pair" style="background:${c[bg]};color:${c[fg]}"><div class="${size}">${label}</div>
+    <div class="meta">${c[fg].toUpperCase()} on ${c[bg].toUpperCase()} · ${r.toFixed(1)}:1 <span class="tag ${grade[1]}">${grade[0]}</span></div></div>`;
+}).join('');
+
+const id = L.identity || {};
+document.getElementById('identity').innerHTML = [['Color rules', id.colors], ['Imagery', id.imagery]]
+  .filter(([, html]) => html).map(([h, html]) => `<h2>${h}</h2>${html}`).join('');
+
+const s = L.samples || {};
+document.getElementById('typenote').innerHTML = id.typography || `${esc(f.heading || 'The fallback stack')} for headlines, ${esc(f.body || 'the fallback stack')} for everything else.`;
+const row = (label, cls, text) => `<div class="row"><div class="label">${label}</div><div class="${cls}">${esc(text)}</div></div>`;
+document.getElementById('specimen').innerHTML =
+  row(`Display<br>${esc(f.heading || 'fallback')} 500 · -3%`, 'd1', s.display) +
+  row(`Headline<br>${esc(f.heading || 'fallback')} 500 · -2.5%`, 'd2', s.headline) +
+  row(`Title<br>${esc(f.heading || 'fallback')} 500`, 'd3', s.title) +
+  row(`Lede<br>${esc(f.body || 'fallback')} 400 · 18/28`, 'b1', s.lede) +
+  row(`Body<br>${esc(f.body || 'fallback')} 400 · 15/24`, 'b2', 'Body copy stays left aligned, generous in line height and short in measure. Centered text is for headlines only.') +
+  row(`Eyebrow<br>${esc(f.body || 'fallback')} 600 · caps +14%`, 'cap', s.eyebrow) +
+  `<div class="row"><div class="label">${esc(f.heading || 'Heading')} weights</div><div class="weights">${[[300, 'Light'], [400, 'Regular'], [500, 'Medium'], [600, 'Semibold'], [700, 'Bold']]
+    .map(([w, n]) => `<span style="font-weight:${w}">${n}</span>`).join('')}</div></div>`;
+</script>
+</body>
+</html>

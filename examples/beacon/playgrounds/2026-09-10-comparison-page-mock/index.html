@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beacon vs Northstar (mock)</title>
+<style>
+  :root {
+    --amber: #F2A93B; --navy: #1E3A5F; --night: #0F1B2D; --paper: #F4F1EA; --glow: #FFD27A;
+    --head: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--night); color: var(--paper); font: 17px/1.6 var(--body); }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 16px; }
+  .mock { background: var(--glow); color: var(--night); font-size: 13px; text-align: center; padding: 6px 16px; }
+  nav { display: flex; align-items: center; gap: 10px; padding: 20px 0; font: 600 20px var(--head); }
+  .mark { width: 14px; height: 14px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px var(--night), 0 0 0 6px var(--amber); }
+  header { padding: 48px 0 32px;
+    background: radial-gradient(ellipse at 110% 140%, rgba(242,169,59,.35), transparent 55%); }
+  h1, h2 { font-family: var(--head); line-height: 1.15; }
+  h1 { font-size: clamp(34px, 6vw, 56px); margin: 0 0 16px; }
+  h2 { font-size: 26px; margin: 48px 0 12px; }
+  .lede { max-width: 640px; opacity: .9; }
+  .grad { background: linear-gradient(90deg, var(--amber), var(--glow)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .table { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid rgba(244,241,234,.12); vertical-align: top; }
+  thead th { font-family: var(--head); font-size: 16px; }
+  thead th:last-child, td:last-child { background: rgba(30,58,95,.55); }
+  tbody th { font-weight: 500; opacity: .75; width: 28%; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card { background: var(--navy); border-radius: 12px; padding: 20px 22px; }
+  .card h3 { font-family: var(--head); margin: 0 0 8px; }
+  .card ul { margin: 0; padding-left: 18px; }
+  .cta { display: inline-block; margin: 40px 0 64px; background: var(--amber); color: var(--night); font-weight: 600; padding: 14px 22px; border-radius: 8px; text-decoration: none; }
+  .note { font-size: 13px; opacity: .6; padding-bottom: 40px; }
+</style>
+</head>
+<body>
+<div class="mock">Prototype for the 2026-09-11 launch sync. Not production.</div>
+<div class="wrap">
+  <nav><span class="mark" aria-hidden="true"></span>Beacon</nav>
+  <header>
+    <h1>Beacon vs Northstar: <span class="grad">different jobs</span></h1>
+    <p class="lede">Northstar tells engineering what is down. Beacon tells customers what it means for them. Many of our customers run both. Here is how to tell which one you need.</p>
+  </header>
+
+  <h2>Side by side</h2>
+  <div class="table">
+  <table>
+    <thead><tr><th></th><th>Northstar</th><th>Beacon</th></tr></thead>
+    <tbody>
+      <tr><th>Built for</th><td>Engineers running monitoring and on-call</td><td>Support teams talking to customers</td></tr>
+      <tr><th>Status page</th><td>Yes, bundled with monitoring</td><td>Yes, or keep your Northstar page</td></tr>
+      <tr><th>Monitoring and alerting</th><td>Yes, its core product</td><td>No</td></tr>
+      <tr><th>Who writes the update</th><td>Whoever is on call</td><td>Support, from templates in your voice</td></tr>
+      <tr><th>Where updates go</th><td>Status page and subscribers</td><td>Status page, in-product banner and email at once</td></tr>
+      <tr><th>Message per audience</th><td>No</td><td>Segments by region, plan and feature</td></tr>
+      <tr><th>Customer-facing report</th><td>Engineering postmortem</td><td>Plain-language report from the timeline</td></tr>
+      <tr><th>Pricing</th><td>Included in monitoring plans</td><td>Per seat</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Which one fits</h2>
+  <div class="cols">
+    <div class="card">
+      <h3>Northstar alone is right when</h3>
+      <ul>
+        <li>Engineering buys and runs the tools</li>
+        <li>Your customers are developers who want the uptime graph</li>
+        <li>One message for everyone is the right message</li>
+        <li>The page you already pay for does the job</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Add Beacon when</h3>
+      <ul>
+        <li>The first update is late: median 48 seconds on Beacon</li>
+        <li>Tickets come from customers who were fine: 31 percent fewer at a design-tool customer</li>
+        <li>The renewal call opens with the outage: 64 percent open the report</li>
+      </ul>
+    </div>
+  </div>
+
+  <a class="cta" href="https://example.com/demo">See audience segments in a demo</a>
+  <p class="note">Northstar features as listed on their public site, September 2026.</p>
+</div>
+</body>
+</html>

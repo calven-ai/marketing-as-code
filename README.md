@@ -108,17 +108,14 @@ error.
 
 ## See it filled
 
-[examples/beacon/](examples/beacon/) is a fictional company with the
-templates filled: a positioning, messaging, an ideal customer profile, one
-persona, one battlecard, a voice guide, the metric definitions, five
-keywords with a snapshot, a project with its status, a published post,
-three logged decisions, and a quarterly review with its dashboard. Start
-with [the positioning](examples/beacon/strategy/positioning.md),
-[the post](examples/beacon/content/2026-08-what-customers-want-during-an-outage/draft.md)
-and [the review](examples/beacon/reports/qmr/2026-q2/report.md); download
-the dashboard beside the review and open it in a browser. Every path
-mirrors the real one. Delete the folder when you adopt the repo; the doctor
-reminds you.
+[examples/beacon/](examples/beacon/) is a fictional company one quarter
+into using this repo: strategy, a brand library with logos, screenshots and
+an image kit, a campaign with child projects, seven content pieces,
+processed meeting transcripts, a decision log, dated snapshots, two
+quarterly reviews with dashboards, and the recurring reports.
+[examples/README.md](examples/README.md) walks through it in the order
+things happened. Every path mirrors the real one. Delete the folder when
+you adopt the repo; the doctor reminds you.
 
 ## What you get
 
