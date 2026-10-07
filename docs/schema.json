@@ -16,7 +16,6 @@
   },
   "required_files": [
     "AGENTS.md",
-    "CLAUDE.md",
     "README.md",
     ".env.example",
     ".mcp.json",
@@ -663,7 +662,6 @@
       ".agents/skills/*/SKILL.md",
       ".agents/skills/*/references/*.md",
       "AGENTS.md",
-      "CLAUDE.md",
       "THIRD_PARTY.md",
       "docs/*.md",
       "*/README.md",

@@ -90,7 +90,7 @@ def approvals_from(data):
 # Proposals an agent opened with nobody watching (transcripts-process.yml,
 # role-run.yml). Their files may all be bookkeeping, but the agent read
 # untrusted text to write them, so a person reads the diff before it becomes
-# context every later agent trusts (AGENTS.md rules 1, 8 and 11).
+# context every later agent trusts (AGENTS.md rules 1, 9 and 12).
 UNATTENDED_BRANCHES = ("transcripts-processed/", "role/")
 
 

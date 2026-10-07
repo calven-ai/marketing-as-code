@@ -166,7 +166,7 @@ technical parts for you.
    be made private. Clone your copy with
    [GitHub Desktop](https://desktop.github.com).
 2. **Open it with a coding agent.** [Claude Code](https://claude.com/claude-code)
-   is what this repo is tuned for ([CLAUDE.md](CLAUDE.md)), in the terminal
+   is what this repo is tuned for ([AGENTS.md](AGENTS.md)), in the terminal
    or the desktop app; Cursor and Codex read the same files
    ([which agent?](#which-coding-agent)). When it asks about three project
    MCP servers, say No to all three for now.
@@ -243,11 +243,11 @@ in [docs/make-it-yours.md](docs/make-it-yours.md).
 ## Four kinds of files
 
 <p align="center">
-  <img src="docs/assets/four-kinds-8bit.svg" alt="The four kinds of files as pixel-art panels: Context holds strategy, brand, content, projects, memory and docs plus AGENTS.md and CLAUDE.md; Agents holds agents, .agents/skills and integrations; Data holds data and reports; Code holds scripts, playgrounds and .github/workflows" width="640">
+  <img src="docs/assets/four-kinds-8bit.svg" alt="The four kinds of files as pixel-art panels: Context holds strategy, brand, content, projects, memory and docs plus AGENTS.md; Agents holds agents, .agents/skills and integrations; Data holds data and reports; Code holds scripts, playgrounds and .github/workflows" width="640">
 </p>
 
 - **Context**, what the team knows: `strategy/`, `brand/`, `content/`,
-  `projects/`, `memory/`, `docs/`, plus `AGENTS.md` and `CLAUDE.md`. Every
+  `projects/`, `memory/`, `docs/`, plus `AGENTS.md`. Every
   strategy file is dated, and the health check flags stale ones.
 - **Agents**, the workforce as instructions in English: `agents/`,
   `.agents/skills/`, `integrations/`.

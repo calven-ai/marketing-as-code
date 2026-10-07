@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- One instruction file: `CLAUDE.md` is gone, because Claude Code 2.1.277 and
+  later read `AGENTS.md` directly. Its notes (skills symlinks, the doctor
+  hook, the first-session MCP prompt) moved into `AGENTS.md`, which is also
+  tighter: the review workflow folds into rule 3. Skills that cited
+  "AGENTS.md rule 11" for untrusted input now cite rule 12, its number since
+  the private-repository rule was added.
+
 - Beacon, the worked example, covers the whole tree: the brand library
   (visual identity, tokens, logos, screenshots, an image kit), the product
   brief, a second persona and battlecard, the Q3 launch as a campaign with
