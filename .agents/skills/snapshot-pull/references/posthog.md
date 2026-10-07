@@ -13,24 +13,18 @@ The server exposes insight and HogQL query tools; check the tool list in
 the session. HogQL is the contract, and the same queries run through the
 CLI (`posthog-cli api` against the query endpoint).
 
+The weekly web set (`traffic-by-source`, `landing-pages`,
+`page-by-source`, `engine-fetches`, `conversions`, `site-funnel`,
+`tracking-quality`) comes from `scripts/web_snapshot.py`: run it with the
+key, or `--print-sql` for the MCP and `--from-results` to save. Its
+queries, columns and the session-entry rule (never the per-event
+`$referring_domain`) are in
+`.agents/skills/web-analyst/references/posthog.md`.
+
 | `<what>` | HogQL |
 | --- | --- |
-| traffic-by-source | `SELECT toDate(timestamp) AS date, properties.$referring_domain AS source, properties.utm_medium AS medium, properties.utm_campaign AS campaign, count(DISTINCT $session_id) AS sessions, count(DISTINCT person_id) AS users FROM events WHERE event = '$pageview' AND timestamp >= '<start>' AND timestamp < '<end>' GROUP BY 1,2,3,4` |
-| conversions | `SELECT toDate(timestamp) AS date, event, properties.utm_source, properties.utm_medium, properties.utm_campaign, count() FROM events WHERE event IN (<ontology conversion events>) AND timestamp >= '<start>' GROUP BY 1,2,3,4,5` |
-| landing-pages | `$pageview` events where `properties.$entry_pathname` (or the session's first pathname) is the page, grouped by date, page, source, medium |
 | funnel | a funnel insight over the ontology's steps, or `funnel` via the insights tool; one row per step |
-
-Session-level source needs the `sessions` table on newer projects
-(`SELECT $entry_referring_domain, $entry_utm_source ... FROM sessions`);
-use it when the project has it, the events table otherwise, and say which.
-
-## Mapping to the snapshot columns
-
-`source` = `utm_source` when set, else the referring domain; `medium` and
-`campaign` = the UTM properties (empty, not `(not set)`); `users` = distinct
-persons; `new_users` = persons whose first event is in the row's day
-(`person.created_at`); `conversions` = the count of the ontology's primary
-conversion event in the same source group.
+| other | from the `sessions` table for anything per session (`$entry_utm_source`, `$entry_referring_domain`, `$entry_pathname`), from `events` per event; always a date window and a `LIMIT` |
 
 ## Limits and cost
 

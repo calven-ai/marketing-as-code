@@ -228,7 +228,7 @@ path without it. Keys never live in this repo
 <!-- generated:skills-web -->
 | Skill | Kind | What it does | Needs |
 | --- | --- | --- | --- |
-| [web-analyst](../.agents/skills/web-analyst/SKILL.md) | role (weekly) | Weekly web report: traffic by source, conversions, top pages, deltas; monthly adds page performance and non-conforming UTMs | [web-analytics](../integrations/catalog/README.md#web-analytics) |
+| [web-analyst](../.agents/skills/web-analyst/SKILL.md) | role (weekly) | Weekly web report: sessions by channel and source, engine fetches, landing pages, CTA and conversions, the cause and the one thing to do | [web-analytics](../integrations/catalog/README.md#web-analytics) (optional: [chat](../integrations/catalog/README.md#chat)) |
 | [publish](../.agents/skills/publish/SKILL.md) | workflow | Move an approved draft to published: frontmatter in a PR, a CMS draft or scheduled post when wired, the distribution steps | nothing (optional: [cms](../integrations/catalog/README.md#cms), [social](../integrations/catalog/README.md#social)) |
 | [site-architecture](../.agents/skills/site-architecture/SKILL.md) | workflow | Plan page hierarchy, navigation, URL structure and redirects for a section or the whole site | nothing (optional: [seo-data](../integrations/catalog/README.md#seo-data), [cms](../integrations/catalog/README.md#cms)) |
 | [web-copy-audit](../.agents/skills/web-copy-audit/SKILL.md) | workflow | Review the homepage, pricing and key pages against positioning, messaging and voice | nothing |
