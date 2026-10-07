@@ -41,7 +41,7 @@
           }
         ],
         "cli": null,
-        "script": null
+        "script": {"path": "scripts/aeo_track.py", "env": ["DATAFORSEO_LOGIN", "DATAFORSEO_PASSWORD"], "notes": "the weekly collection: every active prompt in data/seo/prompts.csv on ChatGPT, Google AI Mode and Claude into data/seo/snapshots/YYYY-MM-DD-dataforseo-aeo-results.csv; scripts/aeo_diff.py scores it; Mondays via .github/workflows/aeo-track-cron.yml"}
       }
     },
     {

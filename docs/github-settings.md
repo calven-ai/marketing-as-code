@@ -78,8 +78,9 @@ owns each key.
   (`transcripts-cron.yml`).
 - `ANTHROPIC_API_KEY` turns on the agent in Actions that processes the
   inbox (`transcripts-process.yml`) and the role runs (`role-run.yml`).
-- `DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD`, with the key above, turn
-  on the monthly brand-monitor run (`role-brand-monitor.yml`).
+- `DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD` turn on the weekly
+  answer-engine collection (`aeo-track-cron.yml`), and with the key above
+  the weekly brand-monitor run (`role-brand-monitor.yml`).
 - `SLACK_BOT_TOKEN` turns on the Slack message when the approved copy fails
   its check, and the "a proposal is waiting" pointer after the agent runs.
 - `SLACK_TEAM_CHANNEL_ID`, `SLACK_LEADERSHIP_CHANNEL_ID` and

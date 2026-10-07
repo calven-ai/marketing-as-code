@@ -1,0 +1,4 @@
+brand,kind,aliases,domains
+[Our product],self,[Our product],example.com
+[Competitor A],competitor,[Competitor A],competitor-a.example
+[Competitor B],competitor,[Competitor B],competitor-b.example

@@ -28,7 +28,8 @@ can run with nobody watching. Two flavours:
   deterministic script and opens a pull request with the result. It never
   merges. Keys come from the `automation` environment, which only `main`
   may use ([secrets.md](secrets.md)). Shipped: `transcripts-cron.yml`
-  (Granola into the inbox, daily), `check.yml` (the health check on every
+  (Granola into the inbox, daily), `aeo-track-cron.yml` (the answer-engine
+  prompt set, weekly), `check.yml` (the health check on every
   proposal), `gate.yml` (the review gate, run from `main`) and
   `housekeeping.yml` (the weekly tidy-up).
 - **An agent in Actions** (opt-in). A workflow runs a Claude Code agent on
@@ -103,7 +104,8 @@ Whatever the mode, these need a person every time (AGENTS.md rule 3,
 | Refresh keyword volumes and difficulty | `python3 scripts/seo_snapshot.py --update` | A cron step running the same script, yours to add |
 | Rankings, SERP questions, keyword ideas | `/seo-analyst` (the wired `seo-data` server) | Not headless; the script covers the scheduled part |
 | Run a role unattended | never directly | `role-run.yml`, reusable, called by a `role-<skill>.yml` with a schedule: filters `.mcp.json` to the servers the caller names, hands the run only their keys, opens a PR that a person reads, snapshots included (opt-in, needs `ANTHROPIC_API_KEY` plus those keys in `automation`) |
-| AI answer-engine mentions | `/brand-monitor` | `role-brand-monitor.yml`, monthly, through `role-run.yml` (shipped, dormant until the keys exist) |
+| Collect and score the answer-engine prompt set | `python3 scripts/aeo_track.py`, then `python3 scripts/aeo_diff.py` | `aeo-track-cron.yml`, Mondays, opens a bookkeeping PR (shipped, dormant until the DataForSEO keys exist) |
+| AI answer-engine visibility report | `/brand-monitor` | `role-brand-monitor.yml`, Mondays after the collection, through `role-run.yml` (shipped, dormant until the keys exist) |
 | Pipeline, web, ads, email, social, reviews, PR, community, account and churn reports; content decay, competitor watch, status roundup, context freshness, the weekly report | `/<skill>` from the roster in `agents/README.md` | A `role-<skill>.yml` caller copied from `role-brand-monitor.yml`, yours to add once the role's categories are wired to a key-based server or a script; the check refuses a caller whose skill needs an OAuth server or writes to external systems |
 | Quarterly review | `/qmr` | By hand: it needs the team's judgment and the exports it asks for |
 | Account research | `/researcher` (the wired `scraping-search` server, OAuth) | Not headless |
@@ -120,14 +122,15 @@ asks for it.
 
 ## Turning a workflow off
 
-Four scheduled workflows run in every copy of this repo whether or not you
+Five scheduled workflows run in every copy of this repo whether or not you
 asked: `housekeeping.yml` opens a tidy-up proposal on Mondays when the
 approved copy needs one; `transcripts-cron.yml` runs daily and does
 nothing until a Granola key exists; `transcripts-process.yml` runs daily
-and does nothing until an Anthropic key exists; `role-brand-monitor.yml`
-runs monthly and does nothing until that key and the DataForSEO login
-exist. The dormant three cost a few seconds of runner time. The first
-Monday's "Housekeeping" proposal is expected; it is short, read it once.
+and does nothing until an Anthropic key exists; `aeo-track-cron.yml` runs
+on Mondays and does nothing until the DataForSEO login exists;
+`role-brand-monitor.yml` runs on Mondays and does nothing until the
+Anthropic key and the DataForSEO login exist. The dormant four cost a few
+seconds of runner time. The first Monday's "Housekeeping" proposal is expected; it is short, read it once.
 
 To stop one: on GitHub, Actions tab, pick the workflow, the "..." menu,
 "Disable workflow". The file stays and you can turn it back on. To remove

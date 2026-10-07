@@ -13,47 +13,48 @@ metadata:
 
 # AI share of voice
 
-`brand-monitor` records who is cited per prompt per model each month.
-This skill turns that history into a share: our citations over all vendor
-citations, per model, per prompt category and over time, against the
-competitors in `strategy/competitive/`. The report is
+`brand-monitor` records who is named and cited per prompt and engine each
+week. This skill turns that history into a share: our mentions over all
+tracked-brand mentions, per engine, per track and tier and over time,
+against the brands in `data/seo/brands.csv`. The report is
 `reports/recurring/mentions/YYYY-MM-DD-sov.md` with a dashboard beside it
 when the team asks.
 
-Needs: a wired `ai-visibility` integration, because the share needs a
-fresh mentions snapshot and the aggregate mention metrics. Which vendor
+Needs: a wired `ai-visibility` integration, because the share needs fresh
+results snapshots and the aggregate mention metrics. Which vendor
 fills it here is the Wired table in `integrations/README.md`;
 `references/dataforseo.md` has the tool names and the column mapping.
 Without it: say which export to drop into
-`data/seo/snapshots/YYYY-MM-DD-<vendor>-llm-mentions.csv` (the manual
-route in `integrations/catalog/ai-visibility.json`: the prompt set run by
-hand, one row per prompt, engine and cited brand) and compute the share
-from whatever snapshots exist, dated. Never estimate a citation count.
+`data/seo/snapshots/YYYY-MM-DD-manual-aeo-results.csv` (the manual route
+in `integrations/catalog/ai-visibility.json`: the prompt set run by hand,
+one row per prompt and engine, columns per `data/seo/README.md`) and
+compute the share from whatever snapshots exist, dated. Never estimate a citation count.
 
 ## Procedure
 
-1. **Load context.** `strategy/positioning.md` (our brand names and
-   domains), `strategy/competitive/` (the competitor list; a name seen in
+1. **Load context.** `data/seo/brands.csv` (who is tracked; a name seen in
    answers but not there goes into "unknown players"), `data/ontology/`
-   before any number, `data/seo/prompts.csv` for the persona, stage and
-   category of each prompt.
-2. **Check what exists.** Every `*-llm-mentions.csv` in `data/seo/snapshots/`
-   is the history. The newest older than a month: ask `brand-monitor` to
-   run the set first (it saves the snapshot and reports its calls).
+   before any number, `data/seo/prompts.csv` for the track, tier, stage
+   and intent of each prompt (branded rows stay out of the share).
+2. **Check what exists.** Every `*-aeo-results.csv` in `data/seo/snapshots/`
+   is the history (older `*-llm-mentions.csv` files too, read as they
+   are). The newest older than two weeks: ask `brand-monitor` to collect
+   first. `python3 scripts/aeo_diff.py --json` gives the share of voice
+   per run on non-branded prompts.
 3. **Pull the aggregate view** when the vendor offers one: mention
    counts per brand for the category keywords over the period, saved as
    `data/seo/snapshots/YYYY-MM-DD-<vendor>-llm-mentions-agg.csv` with
    columns `brand,model,period,mentions,share,checked`. One or two calls.
 4. **Compute** per `references/sov-method.md`: share per model (rows
-   brands, columns models), share per prompt category, the per-prompt
-   leader, and the delta against the previous run. Validate brand
-   matches; a name inside another word or a person's name is a false
-   match, flagged in the caveats.
+   brands, columns engines), share per track and tier, the per-prompt
+   leader, and the delta against the previous run, with the denominator.
+   Validate brand matches in the answers file; a false match is fixed in
+   `brands.csv` aliases and re-scored with `aeo_diff.py --redetect`.
 5. **Write the report** from `reports/_templates/report.md` to
    `reports/recurring/mentions/YYYY-MM-DD-sov.md`: the answer (our share,
    the leader, our rank, the delta), the heatmap table, "who owns what"
-   per brand (strong in, absent from), the category table (leader, share,
-   our position, gap), the three to five categories where we lose despite
+   per brand (strong in, absent from), the track table (leader, share,
+   our position, gap), the three to five tracks where we lose despite
    having content (with the `content/` piece to fix through
    `aeo-page-optimize`), caveats, Data used listing every snapshot.
 6. **Dashboard** through `make-dashboard` when asked or when more than
@@ -67,11 +68,11 @@ from whatever snapshots exist, dated. Never estimate a citation count.
   from `brand-monitor`, 24 calls). Aggregate metrics: 2 calls, saved as
   `data/seo/snapshots/2026-09-04-dataforseo-llm-mentions-agg.csv`.
 - Share on ChatGPT: 9 percent in June, 14 percent in September; leader
-  X at 38 percent flat. On Perplexity we are at 4 percent, absent from
+  X at 38 percent flat. On Google AI Mode we are at 4 percent, absent from
   every integration prompt.
 - Report opens: "Yes on ChatGPT, from 9 to 14 percent over three runs,
-  driven by the two comparison prompts. No on Perplexity, where the
-  integration category is owned by X and we have no page that answers
+  driven by the two comparison prompts. No on Google AI Mode, where the
+  integration track is owned by X and we have no page that answers
   it." 26 calls in total this month, most of them the prompt runs.
 
 ## Rules

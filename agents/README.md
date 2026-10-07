@@ -94,11 +94,11 @@ path without it. Keys never live in this repo
 <!-- generated:skills-aeo -->
 | Skill | Kind | What it does | Needs |
 | --- | --- | --- | --- |
-| [brand-monitor](../.agents/skills/brand-monitor/SKILL.md) | role (monthly) | Track how AI answer engines mention us and competitors through the wired ai-visibility integration, against data/seo/prompts.csv | [ai-visibility](../integrations/catalog/README.md#ai-visibility) |
+| [brand-monitor](../.agents/skills/brand-monitor/SKILL.md) | role (weekly) | Who ChatGPT, Google AI Mode and Claude name and cite for our prompt set, by tier, and why not us | [ai-visibility](../integrations/catalog/README.md#ai-visibility) |
 | [aeo-page-optimize](../.agents/skills/aeo-page-optimize/SKILL.md) | workflow | Make a page citable by answer engines: direct answers, question headings, entities, passage structure, proof | nothing (optional: [ai-visibility](../integrations/catalog/README.md#ai-visibility)) |
 | [ai-share-of-voice](../.agents/skills/ai-share-of-voice/SKILL.md) | workflow | Compute share of voice in AI answers versus competitors across the prompt set and over time | [ai-visibility](../integrations/catalog/README.md#ai-visibility) |
 | [apify-ai-search-citations](../.agents/skills/apify-ai-search-citations/SKILL.md) | workflow | Prompts that surface competitors in AI answers, citation gaps and a mentions snapshot via scraping | [scraping-search](../integrations/catalog/README.md#scraping-search) (optional: [ai-visibility](../integrations/catalog/README.md#ai-visibility)) |
-| [prompt-set-builder](../.agents/skills/prompt-set-builder/SKILL.md) | workflow | Propose buyer prompts for data/seo/prompts.csv per persona and buying stage, never rewriting existing ones | nothing |
+| [prompt-set-builder](../.agents/skills/prompt-set-builder/SKILL.md) | workflow | Propose buyer prompts for data/seo/prompts.csv that pass the prompt bars, never editing existing rows | nothing |
 <!-- /generated:skills-aeo -->
 
 ## Social

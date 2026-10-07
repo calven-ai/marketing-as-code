@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- AEO tracking runs as a script. `scripts/aeo_track.py` asks every active
+  prompt in `data/seo/prompts.csv` on ChatGPT, Google AI Mode and Claude
+  through DataForSEO and saves who is named and cited; `scripts/aeo_diff.py`
+  scores it by tier with rolling Wilson intervals, findings and a forecast
+  check. `prompts.csv` gains ids, tracks, tiers and intent, `brands.csv` is
+  new, and `brand-monitor` follows a written protocol (mention audit, the
+  why-not-us ladder, a frozen prompt set reviewed quarterly).
+  `aeo-track-cron.yml` collects on Mondays once DataForSEO keys are set.
+
 - The checked-in `.claude/settings.json` carries only what this repository
   owns: the allow-list for its lifecycle scripts, the `SessionStart` doctor
   hook, and the write-tool deny rules `wire_integration.py` adds for a

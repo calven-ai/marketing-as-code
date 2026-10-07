@@ -68,7 +68,7 @@ https://github.com/apify/awesome-skills/tree/main/skills/apify-ai-search-visibil
    Never edit an old snapshot.
 5. **Report** in `reports/adhoc/YYYY-MM-DD-ai-visibility-<what>/report.md`
    from `reports/_templates/report.md`, or, for a snapshot that stands in
-   for the monthly check, `reports/recurring/mentions/YYYY-MM-DD.md` in the
+   for the weekly check, `reports/recurring/mentions/YYYY-MM-DD.md` in the
    shape `brand-monitor` writes: for how many prompts we are cited, by
    which engine, who leads, and the delta against the previous snapshot.
 6. **Hand over.** Propose the follow-ups a person decides on: rows for

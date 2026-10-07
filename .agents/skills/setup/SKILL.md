@@ -109,8 +109,9 @@ already filled in without asking.
    up for <team>", with skipped items as follow-ups, and which path the
    strategy files took: Markdown or context layer). Seed the tables from
    the answers: five terms in `data/seo/keywords.csv` (the category term,
-   two problem phrases, two alternatives) and three buyer questions in
-   `data/seo/prompts.csv`, replacing the rows marked `example row:`; leave
+   two problem phrases, two alternatives), three buyer questions in
+   `data/seo/prompts.csv` replacing the rows marked `example row:`, and
+   `data/seo/brands.csv` (us and the competitors they named); leave
    `data/accounts/target-accounts.csv` unless they named accounts. Point
    at `docs/make-it-yours.md` for what remains (the example company, the
    maintainer's community files, the changelog) and list which of its

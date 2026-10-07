@@ -22,7 +22,7 @@ Mode, whichever the vendor covers).
    query text and the exact sources so a person can validate.
 4. Topic clustering: group prompts by theme (pricing, feature comparison,
    tutorials, alternatives, reviews, integrations). In this repo the
-   `category` column of `data/seo/prompts.csv` is the cluster; use it.
+   `track` column of `data/seo/prompts.csv` is the cluster; use it.
 5. Gaps: three to five clusters where we underperform despite relevant
    content; for each, a specific action (a new angle, structured data, a
    comparison page, a real FAQ, presence on a frequently cited source).
