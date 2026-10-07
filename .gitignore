@@ -25,3 +25,6 @@ __pycache__/
 
 # Left on the Actions runner by transcripts-process.yml; never committed
 .transcripts-run/
+
+# Rendered images (scripts/brand_render.py); the spec reproduces them
+brand/renders/

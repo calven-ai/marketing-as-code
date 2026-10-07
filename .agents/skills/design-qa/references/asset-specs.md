@@ -2,7 +2,8 @@
 
 Dimensions, safe zones and the checks per channel. Platforms change their
 specs; treat these as the starting point and confirm on the platform's
-help page when a pixel matters.
+help page when a pixel matters. The renderable surfaces, with safe areas
+and verified spec sources, are in `brand/templates/sizes.json`.
 
 ## Dimensions by channel
 

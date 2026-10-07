@@ -1,6 +1,6 @@
 ---
 name: publish
-description: Move an approved draft to published: frontmatter in a PR, a CMS draft or scheduled post when wired, the distribution steps. Use when "publish this", "schedule the post".
+description: Move an approved draft to published: frontmatter PR, a staged CMS draft or post, distribution steps. Use when "publish this", "schedule the post".
 license: MIT
 metadata:
   kind: workflow
@@ -51,7 +51,9 @@ for the frontmatter contract and `data/ontology/naming.md` for UTMs.
 5. **Write the distribution checklist** at the end of the piece's
    `brief.md` (`references/distribution-checklist.md`): the channels,
    the owner per step, the internal links to add from existing pieces,
-   the email mention, the advocacy pack, the date to check the first
+   the email mention, the advocacy pack, the link preview image
+   (`brand-image`: `python3 scripts/brand_render.py og content/<piece>`),
+   the date to check the first
    analytics snapshot. File the steps with an owner as tasks per
    `integrations/tasks.md`.
 6. **Set the frontmatter** once the person confirms the piece is live:

@@ -30,6 +30,12 @@ All notable changes to this project are documented here. The format follows
   `data/analytics/snapshots/`, or prints them for the MCP, and
   `web-analyst` works by a written method: expectation before so-what, a
   cause ladder, and fixing what let a finding hide.
+- Brand images render from templates. `brand/templates/` holds banner,
+  post, icon and screenshot templates and a size registry of 26 platform
+  presets with safe areas; `scripts/brand_render.py` renders them through
+  headless Chrome from `brand/tokens.json` (`og <piece>` makes a link
+  preview). `brand/image-rules.md` sets the copy and layout rules, and the
+  new `brand-image` skill makes single images and marketplace listing kits.
 
 - The checked-in `.claude/settings.json` carries only what this repository
   owns: the allow-list for its lifecycle scripts, the `SessionStart` doctor

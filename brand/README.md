@@ -11,14 +11,17 @@ see (a draft, an email, a prototype, an image) loads this folder first.
 | --- | --- |
 | [voice.md](voice.md) | Voice and tone: how we write, with do/don't examples |
 | [visual-identity.md](visual-identity.md) | Colors, typography, imagery rules, logo usage |
-| [tokens.json](tokens.json) | The machine-readable subset (colors, fonts) that scripts and the prototype builder read |
+| [tokens.json](tokens.json) | The machine-readable subset (colors, fonts, logo paths) that scripts and the prototype builder read |
+| [image-rules.md](image-rules.md) | What goes into a rendered banner, post or icon: copy, sizing, safe areas |
 | `logos/` | Logo files (SVG preferred) |
-| `templates/` | Reusable design templates: OG-image background, social templates |
+| `templates/` | Image templates and the size registry that `scripts/brand_render.py` renders |
+| `screenshots/` | Product screenshots the templates may use |
 
 ## Rules
 
-- This is the **one sanctioned binary zone** in the repo (logos, image
-  templates). Everywhere else, plain text first.
+- This is the **one sanctioned binary zone** in the repo (logos, fonts,
+  screenshots). Everywhere else, plain text first. Rendered images go to
+  the gitignored `renders/`.
 - `tokens.json` and `visual-identity.md` must agree. When the identity
   changes, update both in the same commit.
 - Voice questions are settled by `voice.md`, not by taste. If it doesn't

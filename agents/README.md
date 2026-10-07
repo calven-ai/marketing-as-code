@@ -33,7 +33,7 @@ path without it. Keys never live in this repo
 | [new-content](../.agents/skills/new-content/SKILL.md) | workflow | Scaffold a piece of content in content/: folder, brief and draft skeleton with wired frontmatter | nothing |
 | [new-project](../.agents/skills/new-project/SKILL.md) | workflow | Scaffold a project or campaign folder in projects/ from the template and wire its tasks per the task adapter | nothing (optional: [tasks](../integrations/catalog/README.md#tasks)) |
 | [propose](../.agents/skills/propose/SKILL.md) | workflow | Turn what changed into a proposal (a pull request) and hand back the link | nothing |
-| [prototype-builder](../.agents/skills/prototype-builder/SKILL.md) | workflow | Build a disposable prototype in playgrounds/ from one sentence: a landing page mock, concept page, email sequence preview, ad board or storyboard | nothing |
+| [prototype-builder](../.agents/skills/prototype-builder/SKILL.md) | workflow | Build a disposable prototype in playgrounds/: a landing page mock, concept page, email preview, ad board | nothing |
 | [setup](../.agents/skills/setup/SKILL.md) | workflow | Onboard a team: interview them, fill the strategy, brand and ontology templates, connect integrations, write the task adapter | nothing (optional: [context-layer](../integrations/catalog/README.md#context-layer), [tasks](../integrations/catalog/README.md#tasks)) |
 | [sync](../.agents/skills/sync/SKILL.md) | workflow | Bring in the latest approved copy and say what is waiting on you | nothing |
 <!-- /generated:skills-core -->
@@ -108,7 +108,7 @@ path without it. Keys never live in this repo
 | --- | --- | --- | --- |
 | [social-listening](../.agents/skills/social-listening/SKILL.md) | role (weekly) | Track brand, competitor and category mentions on LinkedIn, X, Reddit and forums and surface buyer questions and red flags | nothing (optional: [scraping-search](../integrations/catalog/README.md#scraping-search), [social](../integrations/catalog/README.md#social), [chat](../integrations/catalog/README.md#chat)) |
 | [social-performance](../.agents/skills/social-performance/SKILL.md) | role (monthly) | Report what worked on social this month by post type, hook and topic, and update what-resonates knowledge | [social](../integrations/catalog/README.md#social) |
-| [social-post](../.agents/skills/social-post/SKILL.md) | workflow | Write a LinkedIn or X post in the company or an exec voice with hook, body and CTA | nothing |
+| [social-post](../.agents/skills/social-post/SKILL.md) | workflow | Write a LinkedIn or X post in the company or an exec voice | nothing |
 <!-- /generated:skills-social -->
 
 ## Demand generation and paid
@@ -229,7 +229,7 @@ path without it. Keys never live in this repo
 | Skill | Kind | What it does | Needs |
 | --- | --- | --- | --- |
 | [web-analyst](../.agents/skills/web-analyst/SKILL.md) | role (weekly) | Weekly web report: sessions by channel and source, engine fetches, landing pages, CTA and conversions, the cause and the one thing to do | [web-analytics](../integrations/catalog/README.md#web-analytics) (optional: [chat](../integrations/catalog/README.md#chat)) |
-| [publish](../.agents/skills/publish/SKILL.md) | workflow | Move an approved draft to published: frontmatter in a PR, a CMS draft or scheduled post when wired, the distribution steps | nothing (optional: [cms](../integrations/catalog/README.md#cms), [social](../integrations/catalog/README.md#social)) |
+| [publish](../.agents/skills/publish/SKILL.md) | workflow | Move an approved draft to published: frontmatter PR, a staged CMS draft or post, distribution steps | nothing (optional: [cms](../integrations/catalog/README.md#cms), [social](../integrations/catalog/README.md#social)) |
 | [site-architecture](../.agents/skills/site-architecture/SKILL.md) | workflow | Plan page hierarchy, navigation, URL structure and redirects for a section or the whole site | nothing (optional: [seo-data](../integrations/catalog/README.md#seo-data), [cms](../integrations/catalog/README.md#cms)) |
 | [web-copy-audit](../.agents/skills/web-copy-audit/SKILL.md) | workflow | Review the homepage, pricing and key pages against positioning, messaging and voice | nothing |
 <!-- /generated:skills-web -->
@@ -239,7 +239,8 @@ path without it. Keys never live in this repo
 <!-- generated:skills-brand -->
 | Skill | Kind | What it does | Needs |
 | --- | --- | --- | --- |
-| [design-qa](../.agents/skills/design-qa/SKILL.md) | workflow | Check an asset against the visual identity and tokens, or write the design brief for a missing one | nothing (optional: [design](../integrations/catalog/README.md#design)) |
+| [brand-image](../.agents/skills/brand-image/SKILL.md) | workflow | Render on-brand banners, posts, icons and listing kits from brand/templates | nothing (optional: [scraping-search](../integrations/catalog/README.md#scraping-search)) |
+| [design-qa](../.agents/skills/design-qa/SKILL.md) | workflow | Check an asset against the visual identity and tokens, or brief a missing one | nothing (optional: [design](../integrations/catalog/README.md#design)) |
 | [voice-refresh](../.agents/skills/voice-refresh/SKILL.md) | workflow | Refresh brand/voice.md from the pieces that worked and the recurring review findings, with the cascade listed | nothing |
 <!-- /generated:skills-brand -->
 

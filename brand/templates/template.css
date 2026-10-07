@@ -1,0 +1,85 @@
+/* Image templates: the canvas is exactly --w x --h and everything sits inside #safe. Colors and
+   fonts arrive as variables from template.js (brand/tokens.json); nothing here is brand-specific. */
+html, body { margin: 0; padding: 0; background: transparent; }
+body { width: var(--w); height: var(--h); overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+.canvas { position: relative; isolation: isolate; width: var(--w); height: var(--h); overflow: hidden;
+  border-radius: var(--radius, 0); background: var(--bg); color: var(--fg); }
+#safe { position: absolute; top: var(--safe-t); right: var(--safe-r); bottom: var(--safe-b); left: var(--safe-l); display: flex; }
+body.debug .canvas::after {
+  content: ''; position: absolute; z-index: 9; pointer-events: none;
+  top: var(--safe-t); right: var(--safe-r); bottom: var(--safe-b); left: var(--safe-l);
+  outline: 2px dashed #FF3B6B;
+}
+
+/* The glow: exactly one, behind the content, primary into accent. Its centre sits outside the
+   frame below the bottom right edge, so only the faint rim enters the image. */
+.bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.glow { position: absolute; left: 78%; top: 155%; width: 95%; height: 170%; transform: translate(-50%, -50%); background: var(--glow); }
+[data-template='icon'] .glow { display: none; }
+[data-bg='glow'] .glow { display: block; }
+/* Film grain breaks up 8-bit banding in the soft gradient. */
+[data-template='banner'] .bg::after, [data-template='post'] .bg::after, [data-bg='glow'] .bg::after {
+  content: ''; position: absolute; inset: 0; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Type */
+#lockup { height: var(--lockup-h); width: auto; flex: none; display: block; }
+#text { min-width: 0; }
+#headline { font: 500 var(--headline)/1.04 var(--font-heading); letter-spacing: -.025em; margin: 0; text-wrap: balance; }
+.hl { background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
+
+/* Banner layouts by aspect ratio */
+[data-layout='wide'] #safe, [data-layout='tall'] #safe { flex-direction: column; align-items: flex-start; }
+[data-layout='wide'] #text { margin: auto 0; max-width: 60%; }
+[data-layout='tall'] #text { margin-top: auto; max-width: 82%; }
+[data-layout='ultra'] #safe { flex-direction: row; align-items: center; justify-content: space-between; gap: calc(var(--h) * .3); }
+[data-layout='ultra'] #lockup { order: 2; }
+[data-layout='ultra'] #headline { white-space: nowrap; }
+[data-layout='logo-only'] #safe { align-items: center; justify-content: center; }
+
+/* Icon */
+[data-template='icon'] .canvas { display: flex; align-items: center; justify-content: center; }
+[data-bg='transparent'] .canvas { background: transparent; }
+#mark { position: absolute; inset: var(--pad); width: calc(100% - 2 * var(--pad)); height: calc(100% - 2 * var(--pad)); object-fit: contain; }
+
+/* Posts: social feed images, read at phone size. */
+[data-template='post'] #headline { line-height: 1; letter-spacing: -.03em; }
+[data-template='post'] #safe { flex-direction: column; align-items: flex-start; }
+[data-template='post'] #lockup { margin-bottom: calc(var(--lockup-h) * .9); }
+[data-layout='post-tall'] #text { max-width: 88%; margin-top: auto; }
+[data-layout='post-wide'] #text { max-width: 86%; margin: auto 0; }
+[data-layout='post-tall'][data-shot='1'] #text { margin-top: calc(var(--lockup-h) * 1.1); }
+[data-layout='post-wide'][data-shot='1'] #text { max-width: 44%; }
+/* With a screenshot the glow grows (centre still outside the frame) so its rim shows around it. */
+[data-template='post'][data-shot='1'] .glow { top: 125%; width: 150%; height: 190%; }
+[data-layout='post-tall'][data-shot='1'] .glow { background: var(--glow-lifted); }
+/* Text-only and stat posts: nothing covers the glow, so it rises and its rim is lifted. */
+[data-template='post'][data-shot='0'] .glow { top: 140%; background: var(--glow-lifted); }
+
+#shot-wrap { position: absolute; z-index: 1; }
+#shot { display: block; border: 1px solid rgba(127, 127, 127, .25); border-radius: 14px; box-shadow: 0 30px 90px rgba(0, 0, 0, .45); }
+[data-layout='post-tall'] #shot-wrap { left: var(--safe-l); top: calc(var(--h) - var(--w) * .53); }
+[data-layout='post-tall'] #shot { width: calc(var(--w) * 1.5); }
+[data-layout='post-wide'] #shot-wrap { left: 56%; top: 17%; }
+[data-layout='post-wide'] #shot { width: calc(var(--w) * 1.1); }
+/* Zoomed screenshot (focus): the frame moves to the wrapper, which runs to the canvas edges and
+   crops the enlarged image; template.js shifts the image to the focus point. */
+[data-focus='1'] #shot-wrap { right: 0; bottom: 0; overflow: hidden; border: 1px solid rgba(127, 127, 127, .25); border-width: 1px 0 0 1px;
+  border-radius: 14px 0 0 0; box-shadow: 0 30px 90px rgba(0, 0, 0, .45); background: var(--bg); }
+[data-focus='1'] #shot { border: 0; border-radius: 0; box-shadow: none; }
+[data-layout='post-tall'][data-focus='1'] #shot { width: calc(var(--w) * 2.4); }
+[data-layout='post-wide'][data-focus='1'] #shot { width: calc(var(--w) * 1.8); }
+
+/* Stat posts: one huge number in the gradient; the headline under it is the claim, set plain. */
+#stat { width: fit-content; font: 600 calc(var(--headline) * 3)/.9 var(--font-heading); letter-spacing: -.04em; margin-bottom: calc(var(--headline) * .3);
+  background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+[data-stat='1'] .hl { background: none; color: inherit; }
+
+/* Shot: one screenshot at an exact size, no text. contain = whole screenshot on the background
+   with even padding; cover = fills the frame, cropped. */
+[data-template='shot'] .canvas { display: grid; place-items: center; padding: var(--pad); box-sizing: border-box; }
+[data-template='shot'] #shot { max-width: 100%; max-height: 100%; border-radius: 12px; }
+[data-fit='cover'] .canvas { padding: 0; }
+[data-fit='cover'] #shot { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; border: 0; border-radius: 0; box-shadow: none; }
