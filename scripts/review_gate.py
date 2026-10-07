@@ -88,10 +88,10 @@ def approvals_from(data):
 
 
 # Proposals an agent opened with nobody watching (transcripts-process.yml,
-# role-run.yml). Their files may all be bookkeeping, but the agent read
+# role-run.yml, the maintainers' scheduled agent on claude/oss-*). Their files may all be bookkeeping, but the agent read
 # untrusted text to write them, so a person reads the diff before it becomes
 # context every later agent trusts (AGENTS.md rules 1, 8 and 11).
-UNATTENDED_BRANCHES = ("transcripts-processed/", "role/")
+UNATTENDED_BRANCHES = ("transcripts-processed/", "role/", "claude/oss-")
 
 
 def kind_of(kind, head_branch, fork=False):

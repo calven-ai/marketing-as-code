@@ -827,6 +827,7 @@ class TestReviewGate(unittest.TestCase):
         self.assertEqual("bookkeeping", kind_of("bookkeeping", "housekeeping/2026-09-08"))
         self.assertEqual("needs-review", kind_of("bookkeeping", "transcripts-processed/2026-09-06-0630"))
         self.assertEqual("needs-review", kind_of("bookkeeping", "role/brand-monitor/2026-09-01-0700"))
+        self.assertEqual("needs-review", kind_of("bookkeeping", "claude/oss-2026-10-15-crm-catalog"))
         self.assertEqual("needs-review", kind_of("bookkeeping", "transcripts/2026-09-06", fork=True))
         self.assertEqual("needs-review", kind_of("needs-review", "anything"))
 
