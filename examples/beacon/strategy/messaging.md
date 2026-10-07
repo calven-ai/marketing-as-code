@@ -1,15 +1,14 @@
 ---
 document: messaging
 source: repo
-last_reviewed: 2026-08-15
+last_reviewed: 2026-09-30
 owner: Ana Ruiz
 ---
 
 # Messaging
 
 The seven sections match the Messaging document a marketing context layer
-serves. Two pillars are filled; the third waits for the next customer
-study. Words we use and words we avoid live in the voice guide.
+serves. Two pillars are filled; the third waits for the Fernhill case study. Words we use and words we avoid live in the voice guide.
 
 ## Core Narrative & One-Liner
 
@@ -33,25 +32,28 @@ study. Words we use and words we avoid live in the voice guide.
 | --- | --- | --- | --- |
 | **Speed with a voice** | The first update in under a minute, and it sounds like you | Templates written once in your voice remove the blank page at the worst possible moment | Median time to first update across workspaces: 48 seconds |
 | **The right people, only** | Tell the customers who are affected, and nobody else | Audience segments by region, plan and feature mean an update is a courtesy, not an alarm | Incident ticket volume down 31 percent at a design-tool customer after one quarter |
-| **The report they forward** | Not yet filled | Waiting for the customer study planned for October | |
+| **The report they forward** | Not yet filled | Waiting for the Fernhill case study, due in October | |
 
 ## Value Propositions by Persona
 
 | Persona | Leading value prop | Lead pillar |
 | --- | --- | --- |
 | Head of Support | Fewer tickets during incidents and no more blank-page moments for the team | The right people, only |
+| Support Team Lead | Write the update once and get back to the queue | Speed with a voice |
 
 ## Messaging Matrix (Persona × Funnel Stage)
 
 | Persona | Awareness (problem) | Consideration (evaluation) | Decision (justify) |
 | --- | --- | --- | --- |
 | Head of Support | The status page tells engineers what is down; it does not tell customers what to do | A status page is a feature; incident communication is a workflow with templates, audiences and a report | 48 seconds to first update and 31 percent fewer incident tickets, from customers like you |
+| Support Team Lead | You write the same update three times while the queue grows | Try it in a trial: one template, one update, three channels | The numbers to take to your manager: 48 seconds and 31 percent |
 
 ## Objection Handling
 
 | Objection | Reframe + proof |
 | --- | --- |
 | "We already have a status page in Northstar." | You have a page. You do not have the update, the audience or the report; Northstar customers who added Beacon kept the page and stopped writing emails by hand. |
+| "Pagewise is 29 dollars a month." | It is, and it is a good page. It sends everyone the same message and stops there; the tickets from unaffected customers cost more than the difference. |
 | "Our incidents are rare." | Rare is when it matters most: nobody has practised. Templates mean the first update is ready before anyone is calm. |
 
 ## Vertical & Campaign Variations

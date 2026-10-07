@@ -20,6 +20,7 @@ python3 scripts/brand_render.py presets
 python3 scripts/brand_render.py render post --preset portrait-4x5 --param "headline=Plans you can *diff*"
 python3 scripts/brand_render.py og content/2026-09-why-plain-text-wins
 python3 scripts/brand_render.py render banner --preset og --param headline=Hi --print-url   # open in a browser
+python3 scripts/brand_render.py book                            # refresh brand/library/ (open index.html)
 ```
 
 PNGs land in `brand/renders/` (gitignored), because the spec reproduces

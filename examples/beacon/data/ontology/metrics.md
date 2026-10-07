@@ -12,3 +12,8 @@ precise enough to compute from raw data.
 | Pipeline ($) | Sum of open deal amounts in stages Discovery, Evaluation and Proposal | HubSpot deals, `amount` where `dealstage` in those three |
 | Search location | United States | keyword and SERP pulls |
 | Search language | en | keyword and SERP pulls |
+| Session | A PostHog session on example.com, bots and answer-engine fetches excluded; never "visitors" | PostHog, `$session_id` on `$pageview` |
+| Campaign-attributed MQL | An MQL whose first-touch session carries the campaign's `utm_campaign`, or whose first pageview is a page the campaign brief lists, inside the campaign window | HubSpot `first_touch_campaign`, PostHog first pageview |
+| Cost per MQL | Platform spend for a campaign divided by its campaign-attributed MQLs | Ad platform spend, HubSpot |
+| Pieces published | `content/` pieces whose `published` date falls in the quarter | `content/` frontmatter |
+| Named in AI answers | Prompts in `data/seo/prompts.csv` where at least one tracked engine names the brand, out of the active prompts | `*-aeo-results.csv`, `mentioned = true` |

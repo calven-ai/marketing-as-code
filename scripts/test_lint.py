@@ -744,6 +744,35 @@ class TestExample(LintCase):
         rates = {r["source"]: int(r["signups"]) / int(r["sessions"]) for r in by_source}
         self.assertEqual("Social", min(rates, key=rates.get))  # the report says social converted worst
 
+    def test_beacon_q3_numbers_reconcile(self):
+        """The Q3 review, its dashboard and the launch's MQL count agree with the 2026-09-30 snapshots."""
+        import csv
+        src = ROOT / "examples" / "beacon"
+        if not src.is_dir():
+            self.skipTest("no examples/beacon in this checkout")
+        snaps = src / "data"
+        rows = lambda rel: list(csv.DictReader(open(snaps / rel)))  # noqa: E731
+        by_source = rows("analytics/snapshots/2026-09-30-posthog-traffic-by-source.csv")
+        by_month = rows("analytics/snapshots/2026-09-30-posthog-signups-by-month.csv")
+        lifecycle = {r["stage"]: int(r["count"]) for r in rows("crm/snapshots/2026-09-30-hubspot-lifecycle-by-quarter.csv")}
+        pipeline = sum(int(r["amount_usd"]) for r in rows("crm/snapshots/2026-09-30-hubspot-pipeline.csv"))
+        launch = rows("crm/snapshots/2026-09-30-repo-launch-attribution.csv")
+        signups = sum(int(r["signups"]) for r in by_source)
+        sessions = sum(int(r["sessions"]) for r in by_source)
+        self.assertEqual(signups, sum(int(r["signups"]) for r in by_month))
+        self.assertEqual(signups, lifecycle["Signup"])
+        report = (src / "reports" / "qmr" / "2026-q3" / "report.md").read_text(encoding="utf-8")
+        dashboard = (src / "reports" / "qmr" / "2026-q3" / "dashboard.html").read_text(encoding="utf-8")
+        self.assertIn(f"| Signups | 900 | {signups} |", report)
+        self.assertIn(f"| Visitors | {sessions:,} |", report)
+        self.assertIn(f"| MQLs | 110 | {lifecycle['MQL']} |", report)
+        self.assertIn(f"| Open pipeline | 450k | {pipeline // 1000}k |", report)
+        self.assertIn(f"value: {lifecycle['MQL']},", dashboard)
+        mqls = sum(int(r["mqls"]) for r in launch)
+        self.assertIn(f"| Launch-attributed MQLs | 40 | {mqls} |", report)
+        status = (src / "projects" / "q3-launch" / "status.md").read_text(encoding="utf-8")
+        self.assertIn(str(mqls), status)
+
 
 class TestClassify(unittest.TestCase):
     def test_bookkeeping_globs(self):

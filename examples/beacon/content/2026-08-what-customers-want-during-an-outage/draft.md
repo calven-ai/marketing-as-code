@@ -1,5 +1,5 @@
 ---
-project: projects/q3-launch
+project: projects/q3-launch/launch-content
 status: published
 channel: blog
 owner: Tomas Berg

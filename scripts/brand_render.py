@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the brand image templates in brand/templates/ (banner, post, icon, shot) to exact-size PNGs with headless Chrome, in the colors, fonts and logos of brand/tokens.json (a neutral default while it is empty). Subcommands: presets (the size registry), render <template> --preset ID | --size WxH --param k=v, og <content piece> (the link preview from the draft's title), batch <kit.json> (a listing kit), logos (PNG exports of the SVGs in brand/logos/), check (tokens.json against visual-identity.md, and a kit's PNGs against the registry). Output goes to the gitignored brand/renders/ unless --out says otherwise; --print-url and --dry-run render nothing. Rules for the content: brand/image-rules.md. Chrome from $CHROME or the usual install paths. Standard library only."""
+"""Render the brand image templates in brand/templates/ (banner, post, icon, shot) to exact-size PNGs with headless Chrome, in the colors, fonts and logos of brand/tokens.json (a neutral default while it is empty). Subcommands: presets (the size registry), render <template> --preset ID | --size WxH --param k=v, og <content piece> (the link preview from the draft's title), batch <kit.json> (a listing kit), logos (PNG exports of the SVGs in brand/logos/), book (the brand library: brand/library/library.js for the pages beside it; open index.html), check (tokens.json against visual-identity.md, and a kit's PNGs against the registry). Output goes to the gitignored brand/renders/ unless --out says otherwise; --brand DIR reads another brand folder (examples/beacon/brand) and renders into DIR/renders/; --print-url and --dry-run render nothing. Rules for the content: brand/image-rules.md. Chrome from $CHROME or the usual install paths. Standard library only."""
 
 import argparse
 import concurrent.futures
@@ -25,6 +25,7 @@ TOKENS = BRAND / "tokens.json"
 IDENTITY = BRAND / "visual-identity.md"
 SCREENSHOTS = BRAND / "screenshots"
 OUT_DEFAULT = BRAND / "renders"
+EXTERNAL_BRAND = False   # --brand: asset URLs are relative to brand/templates/, where the templates stay
 
 TEMPLATE_PARAMS = {
     "banner": {"headline", "theme", "debug"},
@@ -54,6 +55,24 @@ class BrandError(ValueError):
     """A job, a spec or the tokens are not usable; the message says what to change."""
 
 
+def use_brand(path):
+    """Read tokens, identity, logos and screenshots from another brand/ folder (examples/beacon/brand)."""
+    global BRAND, TOKENS, IDENTITY, SCREENSHOTS, OUT_DEFAULT, EXTERNAL_BRAND
+    BRAND = Path(path).resolve()
+    if not (BRAND / "tokens.json").is_file():
+        raise BrandError(f"{path} has no tokens.json")
+    TOKENS, IDENTITY = BRAND / "tokens.json", BRAND / "visual-identity.md"
+    SCREENSHOTS, OUT_DEFAULT = BRAND / "screenshots", BRAND / "renders"
+    EXTERNAL_BRAND = True
+
+
+def asset_url(rel):
+    """A file under the brand folder, as a URL the templates can load."""
+    if not EXTERNAL_BRAND:
+        return "../" + Path(rel).as_posix()
+    return Path(os.path.relpath(BRAND / rel, TEMPLATES)).as_posix()
+
+
 # ---------------------------------------------------------------- registry --
 
 def load_sizes(path=SIZES):
@@ -76,8 +95,8 @@ def parse_size(value):
 
 # ------------------------------------------------------------------ tokens --
 
-def load_tokens(path=TOKENS):
-    path = Path(path)
+def load_tokens(path=None):
+    path = Path(path or TOKENS)
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
 
 
@@ -88,7 +107,7 @@ def _brand_path(value, what):
         raise BrandError(f"{what} must be a path under brand/, got '{value}'")
     if not (BRAND / rel).is_file():
         raise BrandError(f"{what} points at brand/{value}, which does not exist")
-    return "../" + rel.as_posix()
+    return asset_url(rel)
 
 
 def token_query(tokens, template, params):
@@ -210,7 +229,7 @@ def build_url(template, params, tokens):
     query, notes = token_query(tokens, template, params)
     query.update(params)
     if "shot" in params:
-        query["shot"] = "../screenshots/" + params["shot"]
+        query["shot"] = asset_url("screenshots/" + params["shot"])
     path = TEMPLATES / f"{template}.html"
     url = path.as_uri() + "?" + urllib.parse.urlencode(query, quote_via=urllib.parse.quote)
     return url, notes
@@ -354,9 +373,10 @@ def say(notes):
 ROLE_ROW = re.compile(r"^\|\s*(primary|secondary|background|text|accent)\b[^|]*\|\s*`?(#[0-9a-fA-F_]{6})`?", re.I | re.M)
 
 
-def identity_check(tokens, identity_text, brand_dir=BRAND):
+def identity_check(tokens, identity_text, brand_dir=None):
     """Where tokens.json and visual-identity.md disagree, as sentences. Empty when they agree."""
     problems = []
+    brand_dir = brand_dir or BRAND
     colors, fonts, logo = tokens.get("colors", {}), tokens.get("fonts", {}), tokens.get("logo", {})
     doc = {m.group(1).lower(): m.group(2) for m in ROLE_ROW.finditer(identity_text)}
     for role in ("primary", "secondary", "background", "text", "accent"):
@@ -483,13 +503,14 @@ def cmd_batch(a):
 LOGO_WIDTHS = (512, 1024, 2048)
 
 
-def logo_jobs(logos_dir=BRAND / "logos"):
+def logo_jobs(logos_dir=None):
+    logos_dir = logos_dir or BRAND / "logos"
     jobs = []
     for svg in sorted(Path(logos_dir).glob("*.svg")):
         vw, vh = svg_size(svg)
         for px in LOGO_WIDTHS:
             h = max(1, round(px * vh / vw))
-            query = {"w": px, "h": h, "bg": "transparent", "pad": 0, "logo": "../logos/" + svg.name}
+            query = {"w": px, "h": h, "bg": "transparent", "pad": 0, "logo": asset_url("logos/" + svg.name)}
             url = (TEMPLATES / "icon.html").as_uri() + "?" + urllib.parse.urlencode(query)
             jobs.append((url, px, h, Path(logos_dir) / "png" / f"{svg.stem}-{px}.png"))
     return jobs
@@ -527,8 +548,142 @@ def cmd_check(a):
     return status or (1 if problems else 0)
 
 
+LIBRARY_PAGES = ("index.html", "logos.html", "colors.html", "banners.html", "posts.html", "screenshots.html",
+                 "library.css", "library-runtime.js")
+SAMPLES_DEFAULT = {
+    "banner": "Your headline, *in the gradient*",
+    "display": "The display line, set large", "headline": "A headline at section size",
+    "title": "A title for cards and lists", "lede": "A lede sentence introduces a page in the body face.",
+    "eyebrow": "Eyebrow",
+    "posts": [
+        {"name": "Portrait", "ratio": "4:5", "w": 1080, "h": 1350, "headline": "An opinion, *said plainly*"},
+        {"name": "Square", "ratio": "1:1", "w": 1080, "h": 1080, "headline": "A claim the number proves", "stat": "3x"},
+        {"name": "Landscape", "ratio": "1.91:1", "w": 1200, "h": 627, "headline": "A link post, *one idea*"},
+    ],
+}
+
+
+def md_html(text):
+    """A section of visual-identity.md as HTML: paragraphs and bullets, **bold** and `code`; tables dropped."""
+    def inline(t):
+        t = t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
+        return re.sub(r"`([^`]+)`", r"<code>\1</code>", t)
+    out, para, items = [], [], []
+    def flush():
+        if para:
+            out.append(f'<p class="prose">{inline(" ".join(para))}</p>')
+            para.clear()
+        if items:
+            out.append('<ul class="rules">' + "".join(f"<li>{inline(i)}</li>" for i in items) + "</ul>")
+            items.clear()
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith(("|", ">", "#")):
+            flush()
+        elif stripped.startswith("- "):
+            if para:
+                flush()
+            items.append(stripped[2:])
+        elif items and line.startswith("  "):
+            items[-1] += " " + stripped
+        else:
+            para.append(stripped)
+    flush()
+    return "".join(out)
+
+
+def identity_sections(text):
+    """{heading: html} for the sections of visual-identity.md the library shows."""
+    found = {}
+    for m in re.finditer(r"^## ([^\n]+)\n(.*?)(?=^## |\Z)", text, re.M | re.S):
+        found[m.group(1).strip().lower()] = md_html(m.group(2))
+    keys = {"logo": "logo usage", "colors": "colors", "imagery": "imagery", "typography": "typography"}
+    return {k: found[v] for k, v in keys.items() if found.get(v)}
+
+
+def _luminance(hex_color):
+    rgb = [int(hex_color.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+    rgb = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
+    return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
+
+
+def library_data(tokens, identity_text="", samples=None, regen="python3 scripts/brand_render.py book"):
+    """window.LIB for brand/library/: tokens, assets and sample copy, every path relative to the library."""
+    lib_dir = BRAND / "library"
+    rel = lambda path: Path(os.path.relpath(path, lib_dir)).as_posix()  # noqa: E731
+    colors = {k: v for k, v in tokens.get("colors", {}).items() if not k.startswith("$") and v and HEX.match(v)}
+    fonts = {k: v for k, v in tokens.get("fonts", {}).items() if not k.startswith("$") and v}
+    logo = {k: v for k, v in tokens.get("logo", {}).items() if not k.startswith("$") and v and (BRAND / v).is_file()}
+    samples = {**SAMPLES_DEFAULT, **(samples or {})}
+    faces, families = [], []
+    for role in ("heading", "body"):
+        value = fonts.get(role, "")
+        if FONT_FILE.search(value) and (BRAND / value).is_file():
+            faces.append({"family": Path(value).stem, "src": rel(BRAND / value)})
+            fonts[role] = Path(value).stem
+        elif value and value not in families:
+            families.append(value)
+    google = ("https://fonts.googleapis.com/css2?" + "&".join(
+        "family=" + urllib.parse.quote(f).replace("%20", "+") + ":wght@300;400;500;600;700" for f in families)
+        + "&display=swap") if families else ""
+    logos = []
+    for key in ("primary", "mark", "primary_inverse", "mark_inverse"):
+        if key in logo:
+            square = key.startswith("mark")
+            logos.append({"key": key, "file": logo[key], "src": rel(BRAND / logo[key]), "square": square,
+                          "inverse": key.endswith("_inverse"),
+                          "note": ("Mark" if square else "Logo") + (", for the opposite background"
+                                                                     if key.endswith("_inverse") else ", for the brand background")})
+    dark_brand = _luminance(colors["background"]) < 0.4 if "background" in colors else True
+    # The library chrome is black: the logo with light ink is primary on a dark brand, else primary_inverse.
+    header = logo.get("primary") if dark_brand else logo.get("primary_inverse")
+    pngs = sorted((BRAND / "logos" / "png").glob("*.png")) if (BRAND / "logos" / "png").is_dir() else []
+    shots = []
+    for f in sorted(SCREENSHOTS.glob("*")) if SCREENSHOTS.is_dir() else []:
+        if IMAGE_FILE.match(f.name):
+            try:
+                w, h = png_size(f)
+            except Exception:  # noqa: BLE001 (JPEG and WebP: size unknown, still listed)
+                w = h = "?"
+            shots.append({"file": f.name, "src": rel(f), "w": w, "h": h})
+    query = {}
+    for template in ("banner", "post", "icon"):
+        q, _ = token_query(tokens, template, {})
+        query[template] = urllib.parse.urlencode(q, quote_via=urllib.parse.quote)
+    posts = [p for p in samples.get("posts", []) if not p.get("shot") or (SCREENSHOTS / p["shot"]).is_file()]
+    return {
+        "name": samples.get("name", ""), "regen": regen, "colors": colors, "fonts": fonts,
+        "fontFaces": faces, "googleFonts": google, "headerLogo": rel(BRAND / header) if header else "",
+        "logos": logos, "pngs": [{"name": f.name, "src": rel(f)} for f in pngs], "screenshots": shots,
+        "templates": rel(TEMPLATES), "shotBase": asset_url("screenshots/x")[:-1], "query": query,
+        "identity": identity_sections(identity_text), "posts": posts,
+        "samples": {k: samples[k] for k in ("banner", "display", "headline", "title", "lede", "eyebrow")},
+    }
+
+
+def cmd_book(a):
+    lib_dir = BRAND / "library"
+    lib_dir.mkdir(exist_ok=True)
+    if EXTERNAL_BRAND:  # another brand folder gets a copy of the pages; only library.js differs
+        for name in LIBRARY_PAGES:
+            shutil.copyfile(ROOT / "brand" / "library" / name, lib_dir / name)
+    samples_file = lib_dir / "samples.json"
+    samples = json.loads(samples_file.read_text(encoding="utf-8")) if samples_file.is_file() else {}
+    identity = IDENTITY.read_text(encoding="utf-8") if IDENTITY.is_file() else ""
+    regen = "python3 scripts/brand_render.py " + (f"--brand {show(BRAND)} " if EXTERNAL_BRAND else "") + "book"
+    data = library_data(load_tokens(), identity, samples, regen)
+    out = lib_dir / "library.js"
+    out.write_text("// Generated by `" + regen + "` from tokens.json, logos/, screenshots/,\n"
+                   "// visual-identity.md and library/samples.json. Do not edit; re-run it.\n"
+                   "window.LIB = " + json.dumps(data, indent=1, ensure_ascii=False) + ";\n", encoding="utf-8")
+    print(show(lib_dir / "index.html"))
+    return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--brand", metavar="DIR", help="another brand/ folder, e.g. examples/beacon/brand")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("presets", help="list the size registry").set_defaults(fn=cmd_presets)
     r = sub.add_parser("render", help="render one image")
@@ -553,11 +708,15 @@ def main(argv=None):
     lg = sub.add_parser("logos", help="PNG exports of brand/logos/*.svg into brand/logos/png/")
     lg.add_argument("--dry-run", action="store_true")
     lg.set_defaults(fn=cmd_logos)
+    bk = sub.add_parser("book", help="the brand library pages in brand/library/ (open index.html in a browser)")
+    bk.set_defaults(fn=cmd_book)
     c = sub.add_parser("check", help="tokens.json against visual-identity.md; a kit's PNGs against the registry")
     c.add_argument("kit", nargs="?")
     c.set_defaults(fn=cmd_check)
     a = ap.parse_args(argv)
     try:
+        if a.brand:
+            use_brand(a.brand)
         return a.fn(a) or 0
     except BrandError as e:
         print(f"error: {e}", file=sys.stderr)

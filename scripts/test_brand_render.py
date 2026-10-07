@@ -7,6 +7,7 @@ Run from the repo root:  python3 -m unittest scripts/test_brand_render.py
 """
 
 import json
+import os
 import struct
 import sys
 import tempfile
@@ -177,6 +178,26 @@ class Tokens(BrandDir):
     def test_screenshot_resolves_under_brand(self):
         q, _ = self.query(TOKENS, "post", {"shot": "app.png"})
         self.assertEqual(q["shot"], "../screenshots/app.png")
+
+    def test_another_brand_folder_loads_assets_by_absolute_url(self):
+        (self.brand / "tokens.json").write_text(json.dumps(TOKENS))
+        saved = br.TOKENS, br.IDENTITY, br.OUT_DEFAULT, br.EXTERNAL_BRAND
+        try:
+            br.use_brand(self.brand)
+            q, _ = self.query(br.load_tokens(), "post", {"shot": "app.png"})
+            to = lambda rel: Path(os.path.relpath(self.brand.resolve() / rel, br.TEMPLATES)).as_posix()  # noqa: E731
+            self.assertEqual(q["logo"], to("logos/primary.svg"))
+            self.assertEqual(q["shot"], to("screenshots/app.png"))
+            self.assertEqual(br.OUT_DEFAULT, self.brand.resolve() / "renders")
+            lib = br.library_data(br.load_tokens(), "## Logo usage\n\n- Never **stretch** it.\n", {"name": "Acme"})
+            self.assertEqual(lib["logos"][0]["src"], "../logos/primary.svg")
+            self.assertEqual(lib["screenshots"][0]["src"], "../screenshots/app.png")
+            self.assertEqual(lib["templates"], Path(os.path.relpath(br.TEMPLATES, self.brand.resolve() / "library")).as_posix())
+            self.assertIn("c_bg=0B1020", lib["query"]["banner"])
+            self.assertIn("<strong>stretch</strong>", lib["identity"]["logo"])
+            self.assertEqual(lib["name"], "Acme")
+        finally:
+            br.TOKENS, br.IDENTITY, br.OUT_DEFAULT, br.EXTERNAL_BRAND = saved
 
     def test_bad_tokens_are_refused(self):
         for tokens in ({"colors": {"primary": "blue"}}, {"logo": {"primary": "logos/missing.svg"}},

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand library</title>
+<link rel="stylesheet" href="library.css">
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="eyebrow">Brand library</div>
+  <h1>Everything <span data-name></span> looks like, <span class="hl">in one place</span>.</h1>
+  <p class="lede">Logos, colors, type and the image templates for listings, social profiles and posts. Templates are code; every image we ship is a PNG rendered from them at the exact size the surface asks for.</p>
+
+  <div class="grid">
+    <a class="card" href="logos.html"><h3>Logos</h3><p>Every logo file on the background it is made for, with the PNG exports.</p></a>
+    <a class="card" href="colors.html"><h3>Color &amp; type</h3><p>The palette, the gradient, contrast on real surfaces, and the type pair.</p></a>
+    <a class="card" href="banners.html"><h3>Banners</h3><p>How our banners look at each common aspect ratio.</p></a>
+    <a class="card" href="posts.html"><h3>Social posts</h3><p>Feed posts for LinkedIn and X, with and without a product screenshot.</p></a>
+    <a class="card" href="screenshots.html"><h3>Screenshots</h3><p>The product UI the post and listing templates may use.</p></a>
+  </div>
+
+  <h2>How to get an image</h2>
+  <p class="muted">Ask your coding agent: the <code>brand-image</code> skill renders a single banner, post or icon, or a whole listing kit for a marketplace or profile, at the exact size each surface asks for. The rules for what goes in an image are in <code>brand/image-rules.md</code>.</p>
+  <p class="muted small">This library is generated; after a change to the tokens, logos or screenshots, run <code data-regen></code>.</p>
+</main>
+<script src="library.js"></script>
+<script src="library-runtime.js"></script>
+</body>
+</html>

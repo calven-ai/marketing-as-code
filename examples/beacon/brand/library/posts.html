@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Social posts</title>
+<link rel="stylesheet" href="library.css">
+<style>
+main { max-width: 1000px; }
+.posts { display: grid; gap: 40px 24px; grid-template-columns: 1fr 1fr; margin-top: 28px; }
+@media (max-width: 720px) { .posts { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="eyebrow">Social posts</div>
+  <h1>Built to <span class="hl">stop the scroll</span>.</h1>
+  <p class="lede">Feed posts for LinkedIn and X. Portrait 4:5 first: it takes the most room in a phone feed. Big type, one real number when there is one, and a product screenshot zoomed to the detail the post is about.</p>
+  <div class="posts" id="posts"></div>
+</main>
+<script src="library.js"></script>
+<script src="library-runtime.js"></script>
+<script>
+const POSTS = (window.LIB.posts || []);
+const $ = (id) => document.getElementById(id);
+$('posts').innerHTML = POSTS.map((e) => `<div class="ex" data-w="${e.w}" data-h="${e.h}">
+    <div class="preview"><iframe width="${e.w}" height="${e.h}" title="${esc(e.name)}" src="${templateSrc('post', { w: e.w, h: e.h, headline: e.headline, stat: e.stat, shot: e.shot, focus: e.focus })}"></iframe></div>
+    <div class="cap"><b>${esc(e.name)} · ${e.ratio}</b><span>${e.focus ? 'Zoomed screenshot' : e.shot ? 'Product screenshot' : e.stat ? 'Big number' : 'Text only'}${e.w / e.h > 1.4 ? ', link-style posts' : ''}</span></div>
+  </div>`).join('');
+fitPreviews($('posts'));
+</script>
+</body>
+</html>

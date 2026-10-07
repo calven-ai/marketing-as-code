@@ -1,6 +1,6 @@
 # Brief: What customers want during an outage
 
-- **Project:** projects/q3-launch
+- **Project:** projects/q3-launch/launch-content
 - **Owner:** Tomas Berg
 - **Channel:** blog
 - **Target date:** 2026-08-28

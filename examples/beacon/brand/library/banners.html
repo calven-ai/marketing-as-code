@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banners</title>
+<link rel="stylesheet" href="library.css">
+<style>main { max-width: 1000px; }</style>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="eyebrow">Banners</div>
+  <h1>One look, <span class="hl">every shape</span>.</h1>
+  <p class="lede">Covers, headers and link previews at the common aspect ratios. Only the words change; the look comes from the tokens. Feed posts have their own page.</p>
+
+  <div class="controls">
+    <label>Preview headline <input type="text" id="headline"></label>
+  </div>
+
+  <div class="examples" id="examples"></div>
+  <p class="muted small" style="margin-top:40px">Every surface's exact size and safe area is in <code>brand/templates/sizes.json</code>; <code>python3 scripts/brand_render.py presets</code> lists them.</p>
+</main>
+<script src="library.js"></script>
+<script src="library-runtime.js"></script>
+<script>
+const EXAMPLES = [
+  { name: 'Ultra-wide strip', ratio: '8:1', w: 1600, h: 200, use: 'Email headers, directory strips' },
+  { name: 'Cover', ratio: '3:1', w: 1500, h: 500, use: 'Social headers and profile covers' },
+  { name: 'Link preview', ratio: '1.91:1', w: 1200, h: 630, use: 'Link previews, landscape posts' },
+  { name: 'Widescreen', ratio: '16:9', w: 1920, h: 1080, use: 'Slides, video, marketplace galleries' },
+];
+const $ = (id) => document.getElementById(id);
+$('headline').value = (window.LIB.samples || {}).banner || 'Your headline, *in the gradient*';
+const src = (e) => templateSrc('banner', { w: e.w, h: e.h, headline: $('headline').value });
+$('examples').innerHTML = EXAMPLES.map((e) => `
+  <div class="ex" data-w="${e.w}" data-h="${e.h}">
+    <div class="preview"><iframe width="${e.w}" height="${e.h}" title="${e.name}" src="${src(e)}"></iframe></div>
+    <div class="cap"><b>${e.name} · ${e.ratio}</b><span>${e.w} × ${e.h} · ${e.use}</span></div>
+  </div>`).join('');
+let timer;
+$('headline').addEventListener('input', () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => document.querySelectorAll('#examples .ex').forEach((el, i) => (el.querySelector('iframe').src = src(EXAMPLES[i]))), 350);
+});
+fitPreviews($('examples'));
+</script>
+</body>
+</html>

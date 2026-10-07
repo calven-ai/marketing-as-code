@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logos</title>
+<link rel="stylesheet" href="library.css">
+<style>
+.logo-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); margin-top: 24px; align-items: start; }
+.logo { border: 1px solid var(--border-dark); border-radius: 10px; overflow: hidden; background: var(--surface-dark); }
+.stage { height: 200px; display: flex; align-items: center; justify-content: center; padding: 36px; }
+.stage img { max-height: 100%; max-width: 100%; }
+.stage.wide img { width: 70%; }
+.stage.square img { height: 100px; }
+.stage.on-ink { background: var(--ink); }
+.stage.on-paper { background: var(--paper); }
+.stage.on-check { background: repeating-conic-gradient(#d9d9d9 0 25%, #f2f2f2 0 50%) 0 0 / 20px 20px; }
+.meta { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; }
+.meta a { color: var(--text-on-dark-2); }
+.png-list { columns: 2; font-size: 14px; margin-top: 16px; padding-left: 18px; color: var(--text-on-dark-2); }
+</style>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="eyebrow">Logos</div>
+  <h1>The logo and the <span class="hl">mark</span>.</h1>
+  <p class="lede">Each file on the backgrounds it is made for. The <code>_inverse</code> files are for the opposite background.</p>
+
+  <h2>Files</h2>
+  <p class="muted">Paths come from <code>logo</code> in <code>tokens.json</code>; the masters live in <code>brand/logos/</code>.</p>
+  <div class="logo-grid" id="logos"></div>
+
+  <div id="usage"></div>
+
+  <h2>PNG exports</h2>
+  <p class="muted">Rendered from the SVGs by <code>scripts/brand_render.py logos</code>. Transparent background.</p>
+  <div id="pngs"></div>
+</main>
+<script src="library.js"></script>
+<script src="library-runtime.js"></script>
+<script>
+const L = window.LIB, c = L.colors || {};
+const card = (lg) => {
+  const stages = lg.inverse ? [['on-paper', ''], ['on-check', '']]
+    : [['', `background:${c.background || '#111111'}`], ['on-ink', '']];
+  return `<div class="logo">${stages.map(([cls, style]) =>
+    `<div class="stage ${cls} ${lg.square ? 'square' : 'wide'}" style="${style}"><img src="${lg.src}" alt="${esc(lg.key)}"></div>`).join('')}
+    <div class="meta"><span>${esc(lg.file)}<br><span class="muted">${esc(lg.note)}</span></span><a href="${lg.src}" download>SVG</a></div></div>`;
+};
+document.getElementById('logos').innerHTML = (L.logos || []).length
+  ? L.logos.map(card).join('') : '<div class="empty">No logos yet: add them to <code>brand/logos/</code> and name them in <code>tokens.json</code>.</div>';
+if (L.identity && L.identity.logo) document.getElementById('usage').innerHTML = `<h2>Usage</h2>${L.identity.logo}`;
+document.getElementById('pngs').innerHTML = (L.pngs || []).length
+  ? `<ul class="png-list">${L.pngs.map((f) => `<li><a href="${f.src}" download>${esc(f.name)}</a></li>`).join('')}</ul>`
+  : '<div class="empty">No exports yet: run <code>python3 scripts/brand_render.py logos</code>.</div>';
+</script>
+</body>
+</html>

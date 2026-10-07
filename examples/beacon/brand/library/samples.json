@@ -1,0 +1,18 @@
+{
+  "_doc": "Sample copy for the brand library pages (scripts/brand_render.py book), from strategy/messaging.md.",
+  "name": "Beacon",
+  "banner": "Your customers hear it *from you first*",
+  "display": "Bad news, well told",
+  "headline": "When something breaks, your customers hear it from you first",
+  "title": "Tell the customers who are affected, and nobody else",
+  "lede": "One update reaches the status page, the product and the inbox at once, in your voice.",
+  "eyebrow": "Incident communication",
+  "posts": [
+    {"name": "Portrait", "ratio": "4:5", "w": 1080, "h": 1350, "headline": "The outage is not the problem. *The silence is.*"},
+    {"name": "Portrait", "ratio": "4:5", "w": 1080, "h": 1350, "headline": "Median time to a *first update*", "stat": "48s"},
+    {"name": "Square", "ratio": "1:1", "w": 1080, "h": 1080, "headline": "Write the update *once*", "shot": "update-composer.png", "focus": "0.18,0.12"},
+    {"name": "Square", "ratio": "1:1", "w": 1080, "h": 1080, "headline": "Fewer incident tickets at a design-tool customer", "stat": "31%"},
+    {"name": "Landscape", "ratio": "1.91:1", "w": 1200, "h": 627, "headline": "Your customers hear it *from you first*"},
+    {"name": "Landscape", "ratio": "1.91:1", "w": 1200, "h": 627, "headline": "Tell only the customers *who are affected*", "shot": "audience-segments.png"}
+  ]
+}

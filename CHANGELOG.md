@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Beacon, the worked example, covers the whole tree: the brand library
+  (visual identity, tokens, logos, screenshots, an image kit), the product
+  brief, a second persona and battlecard, the Q3 launch as a campaign with
+  child projects, seven content pieces, transcripts, knowledge files, every
+  data domain, the Q3 review with a reconciliation test, a launch retro and
+  the recurring reports. `examples/README.md` is the tour.
+  `scripts/brand_render.py --brand DIR` renders another brand folder, and
+  `book` builds the brand library, `brand/library/`: pages for logos,
+  color and type, banners, social posts and screenshots with live template
+  previews, on a black chrome so only the brand has color.
+
 - SEO tracking by tier. `scripts/seo_rank_track.py` pulls the top 30 and
   the AI Overview for every keyword, `scripts/seo_diff.py` scores ranks by
   tier with striking distance and a crosswalk to the AEO prompts,
