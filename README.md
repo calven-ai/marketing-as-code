@@ -273,7 +273,7 @@ layer over MCP, is in [AGENTS.md](AGENTS.md) and
 | Context | `projects/` | Briefs and status; campaigns as projects that contain projects |
 | Context | `memory/` | The decision log and the knowledge base, fed from transcripts |
 | Context | `docs/` | Guides: fit check, stages, workflow, secrets, architecture |
-| Agents | `agents/` | The roster; definitions live in `.agents/skills/` |
+| Agents | `agents/` | The roster, and the prompt library in `agents/prompts/`; definitions live in `.agents/skills/` |
 | Agents | `integrations/` | How the repo talks to your stack, and the rules agents follow |
 | Code | `playgrounds/` | Disposable prototypes |
 | Code | `scripts/` | Deterministic helpers with no AI inside |

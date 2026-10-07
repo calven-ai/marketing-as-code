@@ -36,6 +36,11 @@ All notable changes to this project are documented here. The format follows
   headless Chrome from `brand/tokens.json` (`og <piece>` makes a link
   preview). `brand/image-rules.md` sets the copy and layout rules, and the
   new `brand-image` skill makes single images and marketplace listing kits.
+- A prompt library in `agents/prompts/`: workflow prompts, advanced
+  prompts and one-line questions for 35 use cases across seven marketing
+  teams, each grounded in the repo's folders and pointing at the skills
+  that already do part of the job; `prompt-patterns.md` explains how to
+  write your own.
 
 - The checked-in `.claude/settings.json` carries only what this repository
   owns: the allow-list for its lifecycle scripts, the `SessionStart` doctor
