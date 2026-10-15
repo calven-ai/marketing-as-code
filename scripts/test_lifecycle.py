@@ -377,6 +377,37 @@ class TestDoctorMachine(LifecycleCase):
         self.assertIn(doctor.NOT_LOGGED_IN, notes)
 
 
+class TestDoctorServers(unittest.TestCase):
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        (self.tmp / ".mcp.json").write_text(json.dumps({"mcpServers": {
+            "seo": {"type": "stdio", "command": "npx", "env": {"SEO_LOGIN": "${SEO_LOGIN}", "SEO_PASS": "${SEO_PASS}"}},
+            "ctx": {"type": "http", "url": "https://example.com/mcp", "headers": {"Authorization": "Bearer ${CTX_KEY}"}},
+            "oauth": {"type": "http", "url": "https://example.com/oauth"}}}))
+
+    def test_names_what_is_missing_never_values(self):
+        (self.tmp / ".env").write_text("SEO_LOGIN=v4lue-login\nSEO_PASS=\nCTX_KEY=op://Vault/Item/key\n")
+        notes = doctor.server_env(self.tmp, environ={"CTX_KEY": "v4lue-ctx"})
+        self.assertEqual(1, len(notes), notes)
+        self.assertTrue(notes[0].startswith("seo needs SEO_PASS,"), notes)
+        self.assertNotIn("v4lue", " ".join(notes))
+
+    def test_in_env_file_only_points_at_the_launcher(self):
+        (self.tmp / ".env").write_text("SEO_LOGIN=a\nSEO_PASS=b\nCTX_KEY=c\n")
+        notes = doctor.server_env(self.tmp, environ={})
+        self.assertEqual(2, len(notes), notes)
+        self.assertTrue(all("with_env.sh" in n for n in notes), notes)
+
+    def test_all_set_or_no_config_is_quiet(self):
+        environ = {"SEO_LOGIN": "a", "SEO_PASS": "b", "CTX_KEY": "c"}
+        self.assertEqual([], doctor.server_env(self.tmp, environ=environ))
+        (self.tmp / ".mcp.json").write_text("{not json")
+        self.assertEqual([], doctor.server_env(self.tmp, environ={}))
+        (self.tmp / ".mcp.json").unlink()
+        self.assertEqual([], doctor.server_env(self.tmp, environ={}))
+
+
 class TestPureParts(unittest.TestCase):
     def test_describe(self):
         gate = {"name": "review-gate", "conclusion": "ACTION_REQUIRED"}

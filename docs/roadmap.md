@@ -24,8 +24,6 @@ corrected entry contributed back is welcome
       categories to key-based servers; a dispatch run of `role-run.yml`
       against a real key to confirm `--mcp-config` alongside the action's
       own server, and `secrets: inherit` into the `automation` environment
-- [ ] `scripts/doctor.py`: warn when a wired server's variable is not set
-      in the person's environment, without printing values
 - [ ] `docs/website.md`: the sibling-repo pattern, and the content-to-website
       sync Action that opens a PR against the website repo on merge of
       `status: published`

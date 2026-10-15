@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- `scripts/doctor.py` says which servers in `.mcp.json` will start without
+  their keys: a `${VAR}` set neither in `.env` nor in the environment, or
+  set in `.env` while the agent was not started through
+  `sh scripts/with_env.sh`. Before, the server started and failed on its
+  first call. Names only, never values; skipped in CI, where no server runs.
+
 - One instruction file: `CLAUDE.md` is gone, because Claude Code 2.1.277 and
   later read `AGENTS.md` directly. Its notes (skills symlinks, the doctor
   hook, the first-session MCP prompt) moved into `AGENTS.md`, which is also
