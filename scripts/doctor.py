@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Health check for a marketing-as-code checkout: runs every check in
 scripts/lint.py against docs/schema.json, then reports unfilled templates,
-context files past their review date, whether an .env exists, and whether
+context files past their review date, whether an .env exists, which servers
+in .mcp.json are missing a key on this machine (names, never values), and whether
 this machine is ready to propose (git, your name, the pre-push hook, the
 GitHub CLI and its login). --fix applies the safe fixes first, turns the
 hook on and sets your name from your GitHub login; --strict fails on
@@ -18,6 +19,8 @@ green doctor here means a green check there.
 
 import argparse
 import json
+import os
+import re
 import shutil
 import subprocess
 import sys
@@ -25,7 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lint  # noqa: E402
-from _common import find_gh, gh_ready, origin_repo, run  # noqa: E402
+from _common import find_gh, gh_ready, origin_repo, read_env_file, run  # noqa: E402
 
 ROOT = lint.ROOT
 
@@ -190,6 +193,38 @@ def local_setup(root=ROOT, fix=False):
     return notes, fixed
 
 
+PLACEHOLDER = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
+
+
+def server_env(root=ROOT, environ=None):
+    """'Your servers' notes: each server in .mcp.json whose ${VAR} placeholders this machine does not
+    fill. A server starts anyway and fails on its first call, so say it here. Names only, never values.
+    A 1Password reference in .env counts as set: scripts/with_env.sh resolves it through `op run`."""
+    environ = os.environ if environ is None else environ
+    try:
+        servers = json.loads((Path(root) / ".mcp.json").read_text(encoding="utf-8")).get("mcpServers") or {}
+    except (OSError, json.JSONDecodeError, AttributeError):
+        return []
+    env_file = read_env_file(Path(root) / ".env")
+    notes = []
+    for name, spec in sorted(servers.items()):
+        wanted = sorted(set(PLACEHOLDER.findall(json.dumps(spec))))
+        unset = [v for v in wanted if not environ.get(v) and not env_file.get(v)]
+        file_only = [v for v in wanted if not environ.get(v) and env_file.get(v)]
+        if unset:
+            notes.append(f"{name} needs {', '.join(unset)}, set neither in .env nor in this environment; add the value to .env "
+                         "(docs/secrets.md), or remove the server from .mcp.json if you do not use it")
+        elif file_only:
+            notes.append(f"{name}: {', '.join(file_only)} in .env but not in this environment; servers read the "
+                         "environment, so start your agent with `sh scripts/with_env.sh claude` (or your agent's command)")
+    return notes
+
+
+def environ_is_ci():
+    """CI runs the check without keys on purpose (check.yml); the servers never start there."""
+    return bool(os.environ.get("CI"))
+
+
 def brief(ctx, findings=None):
     """The three lines the session-start hook and /sync print: problems, stale context, unfilled templates.
     A fourth line, only while the template's residue is still here (docs/make-it-yours.md)."""
@@ -268,6 +303,12 @@ def main(argv=None):
             print(f"  - {n}")
     else:
         print("info: your machine is ready to propose")
+
+    servers = [] if environ_is_ci() else server_env(ROOT)
+    if servers:
+        print("\nYour servers (.mcp.json):")
+        for n in servers:
+            print(f"  - {n}")
 
     if unfilled:
         print(f"\nunfilled templates ({len(unfilled)}), run /setup to fill them:")
