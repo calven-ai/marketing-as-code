@@ -44,41 +44,6 @@
       }
     },
     {
-      "id": "jsonify",
-      "name": "Jsonify",
-      "source": "jsonify",
-      "verified": "vendor",
-      "checked": "2026-10-21",
-      "source_url": "https://www.jsonify.com/connect",
-      "capabilities": ["maintained datasets from the web (scheduled, self-repairing pipelines)", "competitor page and pricing monitoring", "read dataset rows with filters and paging", "build a new dataset from a brief"],
-      "writes": true,
-      "write_tools": ["request_work", "run_pipeline"],
-      "read_only_switch": null,
-      "caveats": [
-        "A pipeline is built once from a brief, then runs on a schedule and repairs itself when the source changes; the agent reads rows, it does not re-scrape per call.",
-        "`request_work` and `run_pipeline` create or run pipelines that spend the workspace's row budget (100 rows a month free, then per row); keep them behind a permission rule.",
-        "OAuth in the browser on first use, so the MCP route cannot run unattended; the headless route is a dataset's serve URL (Integrations > REST API on the dataset), a plain GET that returns rows as JSON with `limit`, `offset`, `columns` and `filter[column]` parameters. Treat the serve URL as a secret.",
-        "A competitor-watch dataset in the shape the `competitor-watch` skill writes, readable without an account: https://www.jsonify.com/datasets/calven-competitor-watch-dfd2d8d7f7fc"
-      ],
-      "routes": {
-        "mcp": [
-          {
-            "id": "oauth",
-            "default": true,
-            "server": "jsonify",
-            "transport": "http",
-            "url": "https://factory.jsonify.com/mcp",
-            "headers": {},
-            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
-            "headless": false,
-            "oauth_scopes": []
-          }
-        ],
-        "cli": null,
-        "script": {"path": null, "env": ["JSONIFY_SERVE_URL"], "notes": "copy scripts/seo_snapshot.py; GET the dataset's serve URL (Integrations > REST API) with limit/offset paging and write the rows to data/accounts/snapshots/ for the weekly refresh"}
-      }
-    },
-    {
       "id": "firecrawl",
       "name": "Firecrawl",
       "source": "firecrawl",
@@ -378,6 +343,39 @@
         "Prefer Apify or Bright Data for the same jobs; both have maintained servers."
       ],
       "routes": {"mcp": [], "cli": null, "script": null}
+    },
+    {
+      "id": "jsonify",
+      "name": "Jsonify",
+      "source": "jsonify",
+      "verified": "vendor",
+      "checked": "2026-10-21",
+      "source_url": "https://www.jsonify.com/connect",
+      "capabilities": ["maintained datasets from the web (scheduled, self-repairing pipelines)", "competitor page and pricing monitoring", "read dataset rows with filters and paging", "build a new dataset from a brief"],
+      "writes": true,
+      "write_tools": ["request_work", "run_pipeline"],
+      "read_only_switch": null,
+      "caveats": [
+        "`request_work` and `run_pipeline` create or run pipelines that spend the workspace's row budget (100 rows a month free, then per row); keep them behind a permission rule.",
+        "OAuth in the browser on first use, so the MCP route cannot run unattended; the headless route is a dataset's serve URL (Integrations > REST API on the dataset), a plain GET that returns rows as JSON with `limit`, `offset`, `columns` and `filter[column]` parameters. Treat the serve URL as a secret."
+      ],
+      "routes": {
+        "mcp": [
+          {
+            "id": "oauth",
+            "default": true,
+            "server": "jsonify",
+            "transport": "http",
+            "url": "https://factory.jsonify.com/mcp",
+            "headers": {},
+            "auth": {"model": "oauth", "env": [], "where": "browser grant on first use"},
+            "headless": false,
+            "oauth_scopes": []
+          }
+        ],
+        "cli": null,
+        "script": {"path": null, "env": ["JSONIFY_SERVE_URL"], "notes": "copy scripts/seo_snapshot.py; GET the dataset's serve URL (Integrations > REST API) with limit/offset paging and write the rows to data/accounts/snapshots/ for the weekly refresh"}
+      }
     }
   ]
 }

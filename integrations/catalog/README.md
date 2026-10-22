@@ -342,7 +342,6 @@ Falls back to: generic.
 | Vendor | Mechanism | Auth | Writes | Headless | Verified | Checked |
 | --- | --- | --- | --- | --- | --- | --- |
 | Apify | http `apify`: https://mcp.apify.com; CLI `apify` | oauth | yes, 1 tools recorded | no | vendor | 2026-09-04 |
-| Jsonify | http `jsonify`: https://factory.jsonify.com/mcp | oauth | yes, 2 tools recorded | no | vendor | 2026-10-21 |
 | Firecrawl | stdio `firecrawl`: npx -y firecrawl-mcp@3.24.0 (+1 variant) | env: `FIRECRAWL_API_KEY` | no | yes | vendor | 2026-09-04 |
 | Exa | http `exa`: https://mcp.exa.ai/mcp (+1 variant) | none | no | yes | vendor | 2026-09-04 |
 | Tavily | stdio `tavily`: npx -y tavily-mcp@0.2.22 (+1 variant) | env: `TAVILY_API_KEY` | no | yes | vendor | 2026-09-04 |
@@ -351,6 +350,7 @@ Falls back to: generic.
 | Jina Reader | none | manual export | no | no | unverified | 2026-09-04 |
 | Bright Data | http `brightdata`: https://mcp.brightdata.com/mcp?token=${BRIGHTDATA_API_TOKEN} (+1 variant) | env: `BRIGHTDATA_API_TOKEN` | no | yes | vendor | 2026-09-04 |
 | Browserbase | none | manual export | no | no | vendor | 2026-09-04 |
+| Jsonify | http `jsonify`: https://factory.jsonify.com/mcp | oauth | yes, 2 tools recorded | no | vendor | 2026-10-21 |
 
 ### warehouse-bi
 
