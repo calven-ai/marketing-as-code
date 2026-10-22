@@ -350,6 +350,7 @@ Falls back to: generic.
 | Jina Reader | none | manual export | no | no | unverified | 2026-09-04 |
 | Bright Data | http `brightdata`: https://mcp.brightdata.com/mcp?token=${BRIGHTDATA_API_TOKEN} (+1 variant) | env: `BRIGHTDATA_API_TOKEN` | no | yes | vendor | 2026-09-04 |
 | Browserbase | none | manual export | no | no | vendor | 2026-09-04 |
+| Jsonify | http `jsonify`: https://factory.jsonify.com/mcp | oauth | yes, 2 tools recorded | no | vendor | 2026-10-21 |
 
 ### warehouse-bi
 
