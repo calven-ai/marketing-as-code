@@ -408,6 +408,21 @@ class TestDoctorServers(unittest.TestCase):
         self.assertEqual([], doctor.server_env(self.tmp, environ={}))
 
 
+class TestDoctorNode(unittest.TestCase):
+    def test_patched_or_newer_line_is_quiet(self):
+        for v in ("v24.22.1", "v24.23.0", "v22.23.4", "v26.12.1", "v28.0.0", "not a version"):
+            self.assertIsNone(doctor.node_note(v), v)
+
+    def test_unpatched_names_the_target(self):
+        note = doctor.node_note("v24.22.0\n")
+        self.assertIn("v24.22.0", note)
+        self.assertIn("nvm install 24.22.1", note)
+
+    def test_end_of_life_line_says_move(self):
+        for v in ("v20.19.0", "v25.9.0", "v18.0.0"):
+            self.assertIn("no longer gets security fixes", doctor.node_note(v), v)
+
+
 class TestPureParts(unittest.TestCase):
     def test_describe(self):
         gate = {"name": "review-gate", "conclusion": "ACTION_REQUIRED"}
