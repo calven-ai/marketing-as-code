@@ -220,6 +220,37 @@ def server_env(root=ROOT, environ=None):
     return notes
 
 
+# The oldest patched release per supported Node line, from the latest security release that
+# touches what runs here (2026-10-21: Brotli RCE in fetch(), TLS hostname bypasses;
+# nodejs.org/en/blog/vulnerability). Raise these after the next one. A line older than the
+# newest here that is not listed gets no fixes at all.
+NODE_PATCHED = {22: (22, 23, 4), 24: (24, 22, 1), 26: (26, 12, 1)}
+
+
+def node_note(version=None):
+    """One line when this machine's Node.js has a known security hole, else None. The DataForSEO
+    server in .mcp.json runs through npx on it. `version` is `node --version` output, for tests."""
+    if version is None:
+        if shutil.which("node") is None:
+            return None
+        version = run(["node", "--version"], check=False).stdout
+    m = re.match(r"v?(\d+)\.(\d+)\.(\d+)", version.strip())
+    if not m:
+        return None
+    have = tuple(int(p) for p in m.groups())
+    fixed = NODE_PATCHED.get(have[0])
+    if fixed and have >= fixed:
+        return None
+    if not fixed and have[0] > max(NODE_PATCHED):
+        return None
+    shown = "v" + ".".join(map(str, have))
+    if fixed:
+        target = "v" + ".".join(map(str, fixed))
+        return f"Node.js {shown} has known security holes; upgrade to {target} or newer (nvm: nvm install {target[1:]})"
+    lines = ", ".join(str(n) for n in sorted(NODE_PATCHED))
+    return f"Node.js {shown} no longer gets security fixes; move to a supported line ({lines})"
+
+
 def environ_is_ci():
     """CI runs the check without keys on purpose (check.yml); the servers never start there."""
     return bool(os.environ.get("CI"))
@@ -227,7 +258,8 @@ def environ_is_ci():
 
 def brief(ctx, findings=None):
     """The three lines the session-start hook and /sync print: problems, stale context, unfilled templates.
-    A fourth line, only while the template's residue is still here (docs/make-it-yours.md)."""
+    A fourth line, only while the template's residue is still here (docs/make-it-yours.md), and one
+    more when this machine's Node.js has a known security hole."""
     findings = lint.run_checks(ctx) if findings is None else findings
     errors = [f for f in findings if f.level == lint.ERROR]
     warnings = [f for f in findings if f.level == lint.WARNING]
@@ -240,6 +272,9 @@ def brief(ctx, findings=None):
              f"unfilled templates: {len(unfilled)}" + (" (run /setup)" if unfilled else "")]
     if adoption:
         lines.append(f"make it yours: {len(adoption)} items left (docs/make-it-yours.md)")
+    node = None if environ_is_ci() else node_note()
+    if node:
+        lines.append(f"your machine: {node}")
     return lines
 
 
@@ -294,6 +329,9 @@ def main(argv=None):
         print("info: no .env; fine unless you use key-based integrations (copy .env.example)")
     if shutil.which("npx") is None:
         print("info: Node.js is not installed; only the DataForSEO server in .mcp.json needs it (integrations/README.md)")
+    node = None if environ_is_ci() else node_note()
+    if node:
+        print(f"warning: {node}")
     notes, done = local_setup(ROOT, fix=args.fix)
     for line in done:
         print(f"fixed: {line}")
