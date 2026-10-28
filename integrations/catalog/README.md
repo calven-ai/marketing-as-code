@@ -406,7 +406,7 @@ Falls back to: generic.
 
 | Vendor | Mechanism | Auth | Writes | Headless | Verified | Checked |
 | --- | --- | --- | --- | --- | --- | --- |
-| Calven | http `calven`: https://app.calven.ai/api/mcp | bearer: `CALVEN_MCP_KEY` | no | yes | vendor | 2026-09-04 |
+| Calven | http `calven`: https://api.calven.ai/mcp | bearer: `CALVEN_MCP_KEY` | no | yes | vendor | 2026-10-28 |
 
 ### generic
 

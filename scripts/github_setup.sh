@@ -53,10 +53,12 @@ $dry gh api -X PUT "repos/$repo/actions/permissions/workflow" \
   -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true >/dev/null
 
 echo "4. environment 'automation': the bot keys live here, and only main may use it"
-$dry gh api -X PUT "repos/$repo/environments/automation" --input - <<EOF >/dev/null
+if ! $dry gh api -X PUT "repos/$repo/environments/automation" --input - <<EOF >/dev/null 2>&1
 {"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}
 EOF
-if ! $dry gh api -X POST "repos/$repo/environments/automation/deployment-branch-policies" \
+then
+  echo "   skipped: environments on a private repository need GitHub Team or Pro; docs/github-settings.md"
+elif ! $dry gh api -X POST "repos/$repo/environments/automation/deployment-branch-policies" \
      -f name=main -f type=branch >/dev/null 2>&1; then
   echo "   (branch policy already present, or not available on this plan; docs/github-settings.md)"
 fi
@@ -90,10 +92,14 @@ $body
 EOF
   echo "   updated ruleset $existing"
 else
-  $dry gh api -X POST "repos/$repo/rulesets" --input - <<EOF >/dev/null
+  if $dry gh api -X POST "repos/$repo/rulesets" --input - <<EOF >/dev/null 2>&1
 $body
 EOF
-  echo "   created"
+  then
+    echo "   created"
+  else
+    echo "   skipped: GitHub refused the ruleset (on Free a private repository may not have one); docs/github-settings.md"
+  fi
 fi
 
 echo
@@ -101,8 +107,9 @@ echo "Could not verify from here (check Settings -> Rules -> Rulesets in the bro
 private="$(gh repo view "$repo" --json isPrivate -q .isPrivate)"
 if [ "$private" = "true" ]; then
   echo "  - This repository is private. The ruleset is enforced on GitHub Pro (personal) or Team (organization);"
-  echo "    on GitHub Free it shows 'not enforced' and nothing stops a direct push. Free is not supported;"
-  echo "    python3 scripts/doctor.py --github says which plan this is. docs/github-settings.md."
+  echo "    on GitHub Free it shows 'not enforced' and nothing stops a direct push. Free is for trying the"
+  echo "    template; move to Team or Pro before real data goes in. python3 scripts/doctor.py --github says"
+  echo "    which plan this is. docs/github-settings.md."
 else
   echo "  - This repository is PUBLIC. It must be private (AGENTS.md, rule 8): Settings -> General ->"
   echo "    Danger zone -> Change visibility. Add no transcripts or account lists until it is."

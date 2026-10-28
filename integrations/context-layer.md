@@ -46,8 +46,9 @@ layer described here. The templates in `strategy/` mirror its documents
 heading for heading. The pattern works with any service that serves the
 same documents over MCP; nothing in the repo depends on Calven.
 
-Calven serves its MCP at `https://app.calven.ai/api/mcp`. Details:
-[calven.ai/mcp](https://calven.ai/mcp).
+Calven serves its MCP at `https://api.calven.ai/mcp`. Details:
+[calven.ai/mcp](https://calven.ai/mcp); the full tool catalog is in
+[calven-ai/calven-mcp](https://github.com/calven-ai/calven-mcp/blob/main/docs/tool-catalog.md).
 
 What each repo file maps to:
 
@@ -59,18 +60,24 @@ What each repo file maps to:
 | `strategy/product-brief.md` | `get_strategy_document({document: "product_brief"})` |
 | `strategy/personas.md` | `list_records({kind: "personas"})`, then `get_persona({name})` for the canvas |
 | `strategy/competitive/<name>.md` | `get_competitor({name, include: ["battlecard"]})` |
-| (no file) customer voice, trends, win/loss drivers | `list_records({kind: "quotes"})`, `"themes"`, `"trends"`, `"deal_drivers"` |
+| (no file) customer voice, trends, win/loss drivers | `list_records({kind: "quotes"})`, `"themes"`, `"trends"`, `"deal_drivers"`, then `get_record` for one |
+| (no file) published documents | `list_documents`, then `read_document` |
+| (no file) win/loss, competitive and voice-of-customer numbers | `get_insights_overview`, `get_insights`, `get_insight_detail` for the rows behind a number |
+| (no file) a persona check on a draft | `review_against_personas` starts a review; poll `get_task` for the result |
 
 `get_workspace_overview` needs no arguments; use it to confirm the
-connection. Two behaviours to know: a document that has not been written is
-reported as not written, never invented. And a `sections` argument on
-`get_strategy_document` returns only the H2 sections you name, which is why
-the repo templates keep the same headings.
+connection. `list_products` scopes any of these calls to one product. Three
+behaviours to know: a document that has not been written is reported as not
+written, never invented. A `sections` argument on `get_strategy_document`
+returns only the H2 sections you name, which is why the repo templates keep
+the same headings. And dashboard numbers come from the Insights tools with
+their sample size and window, never from adding up rows.
 
 ## Connect (Claude Code)
 
-1. In Calven, open Settings, then Integrations, then the MCP card, and
-   generate a key. It is shown once. Each person has one active key.
+1. In Calven, open [Settings, then API & MCP](https://app.calven.ai/settings/api),
+   and generate a key. It is shown once. Each person has one active key; a
+   new one replaces the old.
 2. Put it in `.env` as `CALVEN_MCP_KEY=cmcp_...`. Never in the repo; `.env`
    is gitignored and agents are told never to read it.
 3. The `calven` server is already listed in `.mcp.json`. Claude Code asks
@@ -83,10 +90,15 @@ The entry in `.mcp.json`:
 ```json
 "calven": {
   "type": "http",
-  "url": "https://app.calven.ai/api/mcp",
+  "url": "https://api.calven.ai/mcp",
   "headers": { "Authorization": "Bearer ${CALVEN_MCP_KEY}" }
 }
 ```
+
+The key is what lets the server run headless (`claude -p`, the GitHub
+action). For interactive use only, OAuth works without a key: drop the
+`headers` line from your local copy of the entry and Claude Code asks you to
+sign in to Calven on first use.
 
 `.cursor/mcp.json` carries the same entry in Cursor's syntax
 (`${env:CALVEN_MCP_KEY}`). Codex users paste the TOML from

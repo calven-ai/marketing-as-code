@@ -69,8 +69,8 @@ def review_policy(name, repo):
     plan = github_plan(repo)
     if repo.get("private") and plan == "free":
         out.append("the owner is on GitHub Free, which does not enforce the ruleset or the environment branch "
-                   "rule on a private repository; upgrade to Team (organization) or Pro (personal account), "
-                   "docs/github-settings.md")
+                   "rule on a private repository; fine for trying the template, move to Team (organization) or "
+                   "Pro (personal account) before real data goes in, docs/github-settings.md")
     variable = _api(f"repos/{name}/actions/variables/REVIEW_SELF_MERGE") or {}
     self_merge = bool((schema.get("review") or {}).get("self_merge")) or \
         str(variable.get("value", "")).strip().lower() == "true"
@@ -116,7 +116,8 @@ def environment_settings(repo):
     out = []
     env = _api(f"repos/{repo}/environments/automation")
     if env is None:
-        out.append("no environment named 'automation' (the bot keys for unattended runs have nowhere safe to live)")
+        out.append("no environment named 'automation' (the bot keys for unattended runs have nowhere safe to live; "
+                   "GitHub Free has no environments on a private repository)")
     else:
         policy = env.get("deployment_branch_policy") or {}
         branches = _api(f"repos/{repo}/environments/automation/deployment-branch-policies") or {}

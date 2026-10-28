@@ -59,7 +59,8 @@ accounts). That is the plan this template assumes: priced per seat, the
 cheapest line item in the setup, and the plan your website repository is
 most likely on already. Put the copy in that organization and the seats are
 paid for. On GitHub Free the ruleset shows "not enforced", and the doctor
-says so. Free is not supported: on it
+says so. Free is for trying the template on the example company, not for
+running the team on it, because on it
 
 - a red check does not block the merge button,
 - a direct push to the approved copy is refused only by the local pre-push

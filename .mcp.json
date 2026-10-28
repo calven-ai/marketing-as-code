@@ -19,7 +19,7 @@
     },
     "calven": {
       "type": "http",
-      "url": "https://app.calven.ai/api/mcp",
+      "url": "https://api.calven.ai/mcp",
       "headers": {
         "Authorization": "Bearer ${CALVEN_MCP_KEY}"
       }

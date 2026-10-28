@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- GitHub Team or Pro stays the recommended plan; Free is now named as the
+  way to try the template on the example company. `scripts/github_setup.sh`
+  finishes on Free instead of stopping at the environment or the ruleset,
+  and the doctor's Free note says what is lost rather than "not supported".
+
+- The `calven` server points at `https://api.calven.ai/mcp`; keys come from
+  Settings > API & MCP. `integrations/context-layer.md` maps the current 14
+  tools (Insights, documents, persona review) and the OAuth option.
+
+- `.claude-plugin/plugin.json`: the repo validates as a Claude Code plugin
+  (`claude plugin validate ./`) and loads its skills from `.agents/skills/`.
+
 - `scripts/doctor.py` says which servers in `.mcp.json` will start without
   their keys: a `${VAR}` set neither in `.env` nor in the environment, or
   set in `.env` while the agent was not started through

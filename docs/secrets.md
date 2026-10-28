@@ -10,7 +10,7 @@ holds a key, and agents never read one.
 | Credential | Kind | Who owns it | Where it lives | Rotate it at | When someone leaves |
 | --- | --- | --- | --- | --- | --- |
 | Apify | per person, OAuth | each person | nowhere; the browser grant on first use | Apify: revoke the grant | remove them from the Apify organization |
-| `CALVEN_MCP_KEY` | per person | each person | their own `.env` (or the desktop app's Local environment), their own 1Password item | Calven: Settings → Integrations → MCP | revoke their key in Calven |
+| `CALVEN_MCP_KEY` | per person | each person | their own `.env` (or the desktop app's Local environment), their own 1Password item | Calven: Settings → API & MCP | revoke their key in Calven |
 | `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD` | per person where DataForSEO gives teammates their own login; otherwise the owner's, treated as a bot key | the integrations owner | each person's `.env`; the owner's copy in the shared vault; an environment secret in `automation` once the weekly answer-engine collection (`aeo-track-cron.yml`) is turned on | DataForSEO dashboard | rotate if it was ever shared with them |
 | `GRANOLA_API_KEY` | bot (the daily pull) | the integrations owner | the GitHub environment `automation`; the owner's vault item | Granola: Settings → Connectors → API keys | rotate if they were the owner |
 | `SLACK_BOT_TOKEN` | bot (the team's Slack app) | the Slack workspace admin | the GitHub environment `automation`; the shared vault, visible to the owner only | Slack app page: Reinstall to Workspace | rotate if they had it |

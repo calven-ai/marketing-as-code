@@ -73,8 +73,11 @@ It is not:
   GitHub Pro (a personal account), so the rules the workflow relies on are
   enforced. The repo holds transcripts and strategy, so private is not
   optional. Your website's repo is almost certainly on that plan already.
-  GitHub Free does not enforce rulesets on a private repository and is not
-  supported ([docs/github-settings.md](docs/github-settings.md)).
+  On GitHub Free a private repository runs everything, but the rulesets are
+  not enforced: a red check does not block a merge and nothing stops a
+  direct push. Free is fine for trying the template on the example company;
+  move to Team or Pro before real transcripts and customer data go in
+  ([docs/github-settings.md](docs/github-settings.md)).
 - A coding agent per person. [Claude Code](https://claude.com/claude-code)
   is what this repo is tuned for; Cursor and Codex read the same files
   ([the table below](#which-coding-agent)).
@@ -209,6 +212,12 @@ Whichever you use, keys are per person and never shared
 Codex, say the word. The table was checked against the three vendors'
 documentation on 2026-09-06; the skill format is the Agent Skills open
 standard, so a newer version reads the same files.
+
+The repo is also a Claude Code plugin (`.claude-plugin/plugin.json`), so
+`claude --plugin-dir <path-to-your-copy>` loads its skills in another
+folder. The skills expect this repository's folder structure (`strategy/`,
+`memory/`, `content/` and the rest); outside a copy of it they have nothing
+to read or write.
 
 ## A blueprint, not a product
 
