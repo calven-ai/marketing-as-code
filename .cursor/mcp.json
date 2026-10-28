@@ -16,7 +16,7 @@
       "url": "https://mcp.apify.com"
     },
     "calven": {
-      "url": "https://app.calven.ai/api/mcp",
+      "url": "https://api.calven.ai/mcp",
       "headers": {
         "Authorization": "Bearer ${env:CALVEN_MCP_KEY}"
       }

@@ -1,0 +1,16 @@
+{
+  "name": "marketing-as-code",
+  "version": "0.2.0",
+  "description": "Skills for a B2B marketing team that runs from a Git repository: strategy, content, SEO and AEO, campaigns, meeting memory and review. The skills expect this repository's folder structure.",
+  "author": {
+    "name": "Calven",
+    "email": "oss@calven.ai",
+    "url": "https://calven.ai"
+  },
+  "homepage": "https://github.com/calven-ai/marketing-as-code",
+  "repository": "https://github.com/calven-ai/marketing-as-code",
+  "license": "MIT",
+  "privacyPolicyUrl": "https://calven.ai/privacy",
+  "keywords": ["marketing", "agents-md", "skills", "seo", "aeo", "content-marketing", "b2b"],
+  "skills": "./.agents/skills/"
+}

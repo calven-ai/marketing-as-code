@@ -14,9 +14,9 @@
       "name": "Calven",
       "source": "calven",
       "verified": "vendor",
-      "checked": "2026-09-04",
+      "checked": "2026-10-28",
       "source_url": "https://calven.ai/mcp",
-      "capabilities": ["get_workspace_overview", "get_strategy_document", "list_records", "get_persona", "get_competitor"],
+      "capabilities": ["get_workspace_overview", "list_products", "get_strategy_document", "list_documents", "read_document", "list_records", "get_record", "get_competitor", "get_persona", "get_insights", "get_insights_overview", "get_insight_detail", "review_against_personas", "get_task"],
       "writes": false,
       "write_tools": [],
       "read_only_switch": null,
@@ -24,6 +24,8 @@
         "Calven maintains this repository (disclosed in integrations/context-layer.md)",
         "Already wired in .mcp.json and .cursor/mcp.json as the `calven` server; the repo works without it.",
         "Each person has one active key, shown once; it goes in .env as CALVEN_MCP_KEY and never in a committed file.",
+        "OAuth sign-in also works for interactive use (drop the headers locally); the key is what runs headless.",
+        "review_against_personas starts an asynchronous review inside Calven and changes nothing in the repo.",
         "A document that has not been written is reported as not written, never invented; fall back to strategy/*.md and state its last_reviewed date when the MCP is unreachable."
       ],
       "routes": {
@@ -33,9 +35,9 @@
             "default": true,
             "server": "calven",
             "transport": "http",
-            "url": "https://app.calven.ai/api/mcp",
+            "url": "https://api.calven.ai/mcp",
             "headers": {"Authorization": "Bearer ${CALVEN_MCP_KEY}"},
-            "auth": {"model": "bearer", "env": ["CALVEN_MCP_KEY"], "where": "Calven: Settings > Integrations > MCP"},
+            "auth": {"model": "bearer", "env": ["CALVEN_MCP_KEY"], "where": "Calven: Settings > API & MCP"},
             "headless": true,
             "oauth_scopes": []
           }

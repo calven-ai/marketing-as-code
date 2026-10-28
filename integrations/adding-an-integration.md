@@ -126,21 +126,21 @@ The remote entry with a key, in the three forms:
 ```json
 "calven": {
   "type": "http",
-  "url": "https://app.calven.ai/api/mcp",
+  "url": "https://api.calven.ai/mcp",
   "headers": { "Authorization": "Bearer ${CALVEN_MCP_KEY}" }
 }
 ```
 
 ```json
 "calven": {
-  "url": "https://app.calven.ai/api/mcp",
+  "url": "https://api.calven.ai/mcp",
   "headers": { "Authorization": "Bearer ${env:CALVEN_MCP_KEY}" }
 }
 ```
 
 ```toml
 [mcp_servers.calven]
-url = "https://app.calven.ai/api/mcp"
+url = "https://api.calven.ai/mcp"
 bearer_token_env_var = "CALVEN_MCP_KEY"
 ```
 

@@ -56,7 +56,9 @@ decides.
 8. **The repository is private.** It holds transcripts, strategy and
    customer data, so it lives as a private repository on a GitHub plan
    that enforces its rules: Team for an organization, Pro for a personal
-   account ([docs/github-settings.md](docs/github-settings.md)). An agent
+   account ([docs/github-settings.md](docs/github-settings.md)). GitHub
+   Free runs everything but enforces none of those rules on a private
+   repository; it is for trying the template without real data. An agent
    that finds the repository public reports it as the first problem and
    adds no personal data until it is fixed.
 9. **Log decisions.** When a meeting or discussion resolves something, record

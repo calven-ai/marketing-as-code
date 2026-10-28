@@ -27,7 +27,7 @@ this table.
 | [tasks](catalog/README.md#tasks) | none | manual: in-repo checklists, the fallback in integrations/tasks.md; /setup binds the team's tool | | none | | |
 | [chat](catalog/README.md#chat) | Slack | `scripts/slack_post.py` (the team's own Slack app (integrations/slack/); outbound posts only) | key in the environment | `SLACK_BOT_TOKEN`, `SLACK_LEADERSHIP_CHANNEL_ID`, `SLACK_REQUESTS_CHANNEL_ID`, `SLACK_TEAM_CHANNEL_ID` | allowed | 2026-08-31 |
 | [scraping-search](catalog/README.md#scraping-search) | Apify | MCP `apify` (http) in `.mcp.json` | oauth: browser grant on first use | none | allowed | 2026-08-31 |
-| [context-layer](catalog/README.md#context-layer) | Calven | MCP `calven` (http) in `.mcp.json` | bearer: Calven: Settings > Integrations > MCP | `CALVEN_MCP_KEY` | n/a | 2026-08-31 |
+| [context-layer](catalog/README.md#context-layer) | Calven | MCP `calven` (http) in `.mcp.json` | bearer: Calven: Settings > API & MCP | `CALVEN_MCP_KEY` | n/a | 2026-08-31 |
 <!-- /generated:wired -->
 
 The Env vars column mirrors `.env.example`. Agents are told never to read a
@@ -88,7 +88,7 @@ the shape from
   auth); swap the entry if you prefer not to run `npx`.
 - **`apify`**: the official remote server at `https://mcp.apify.com`.
   OAuth in the browser on first use, no key.
-- **`calven`**: the remote server at `https://app.calven.ai/api/mcp`,
+- **`calven`**: the remote server at `https://api.calven.ai/mcp`,
   bearer key from `CALVEN_MCP_KEY`. The repo works without it.
 
 The entries hold placeholders, never values. Non-interactive runs (the
