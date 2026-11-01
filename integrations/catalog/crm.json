@@ -61,8 +61,8 @@
         "write tool names not verified; deny the whole server (`mcp__salesforce`) until checked",
         "Hosted MCP Servers are GA (Apr 2026) for Enterprise Edition and above plus Developer Edition; the hosted URL pattern comes from third-party write-ups because the vendor page returned 403; a person confirms it in Setup before wiring",
         "Sandbox orgs use https://api.salesforce.com/platform/mcp/v1/sandbox/",
-        "The DX server (@salesforce/mcp) authenticates through the sf CLI's org login, so `sf org login web` must have run on the machine; its data toolset can run DML, so scope --toolsets to what the workflow needs",
-        "Field-level security and sharing rules apply to every call in both variants",
+        "The local DX server (@salesforce/mcp) reaches end of life on 2026-11-02 (forcedotcom/mcp#46): no releases or support after that date, so it is no longer a route here; Salesforce now ships that tooling as agent skills (forcedotcom/sf-skills), and the sf CLI route below covers scheduled exports",
+        "Field-level security and sharing rules apply to every call",
         "Community alternative tsmztech/mcp-server-salesforce exists; judge it as a script, not a vendor tool"
       ],
       "routes": {
@@ -76,18 +76,6 @@
             "headers": {},
             "auth": {"model": "oauth", "env": [], "where": "browser grant as the Salesforce user; an admin enables Hosted MCP Servers in Setup first"},
             "headless": false,
-            "oauth_scopes": []
-          },
-          {
-            "id": "local",
-            "default": false,
-            "server": "salesforce-dx",
-            "transport": "stdio",
-            "command": "npx",
-            "args": ["-y", "@salesforce/mcp@0.30.15", "--orgs", "DEFAULT_TARGET_ORG", "--toolsets", "orgs,data"],
-            "env": {},
-            "auth": {"model": "none", "env": [], "where": "reuses the sf CLI's stored org auth (sf org login web); nothing goes in .env"},
-            "headless": true,
             "oauth_scopes": []
           }
         ],
