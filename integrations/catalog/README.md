@@ -37,7 +37,7 @@ Falls back to: generic.
 | Vendor | Mechanism | Auth | Writes | Headless | Verified | Checked |
 | --- | --- | --- | --- | --- | --- | --- |
 | HubSpot | http `hubspot`: https://mcp.hubspot.com; CLI `hs` | oauth | yes, 5 tools recorded | no | vendor | 2026-09-04 |
-| Salesforce | http `salesforce`: https://api.salesforce.com/platform/mcp/v1/platform/ (+1 variant); CLI `sf` | oauth | yes, tools unrecorded | no | listing | 2026-09-04 |
+| Salesforce | http `salesforce`: https://api.salesforce.com/platform/mcp/v1/platform/; CLI `sf` | oauth | yes, tools unrecorded | no | listing | 2026-09-04 |
 | Pipedrive | http `pipedrive`: https://mcp.pipedrive.ai/mcp | oauth | yes, tools unrecorded | no | listing | 2026-09-04 |
 | Close | http `close`: https://mcp.close.com/mcp (+1 variant) | header: `CLOSE_API_KEY` | yes, tools unrecorded; read-only switch | yes | vendor | 2026-09-04 |
 | Attio | http `attio`: https://mcp.attio.com/mcp | oauth | yes, tools unrecorded | no | vendor | 2026-09-04 |

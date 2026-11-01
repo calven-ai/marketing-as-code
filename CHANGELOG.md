@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Salesforce in `integrations/catalog/crm.json` loses its `local` route, the
+  DX MCP server (`@salesforce/mcp`), which reaches end of life on
+  2026-11-02 with no further releases or support (forcedotcom/mcp#46).
+  `python3 scripts/wire_integration.py salesforce` keeps the hosted server
+  as the default; the caveat points at Salesforce's agent skills
+  (forcedotcom/sf-skills) and the `sf` CLI route for scheduled exports.
+
 - GitHub Team or Pro stays the recommended plan; Free is now named as the
   way to try the template on the example company. `scripts/github_setup.sh`
   finishes on Free instead of stopping at the environment or the ruleset,
