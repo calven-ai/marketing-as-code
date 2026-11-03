@@ -153,6 +153,16 @@ fit check, with profiles for one or two people, teams of about 5, 20 and
 the AI tools you already pay for, then hand one activity to one agent, then
 this repo.
 
+## Product marketing skills, no repo needed
+
+[plugins/product-marketing/](plugins/product-marketing/README.md) holds
+standalone skills for product marketers: competitive intelligence, market
+research, ICP and personas, positioning and messaging, product intelligence,
+customer voice and win/loss. They come from the prompts behind Calven's
+product agents and run in the Claude app with nothing else installed:
+download a skill's ZIP, upload it under Customize > Skills. It is the first
+stage in [docs/stages.md](docs/stages.md) done well, before any repository.
+
 ## Never used GitHub?
 
 You are who this repo was built for. You don't need to be a developer or
@@ -213,9 +223,13 @@ Codex, say the word. The table was checked against the three vendors'
 documentation on 2026-09-06; the skill format is the Agent Skills open
 standard, so a newer version reads the same files.
 
-The repo is also a Claude Code plugin (`.claude-plugin/plugin.json`), so
-`claude --plugin-dir <path-to-your-copy>` loads its skills in another
-folder. The skills expect this repository's folder structure (`strategy/`,
+The repo is also a Claude Code plugin marketplace
+(`.claude-plugin/marketplace.json`) with two plugins:
+`/plugin install marketing-as-code --marketplace calven-ai/marketing-as-code`
+for this repo's skills, and
+`/plugin install product-marketing --marketplace calven-ai/marketing-as-code`
+for the standalone product marketing skills. `claude --plugin-dir
+<path-to-your-copy>` loads this repo's skills in another folder. The skills expect this repository's folder structure (`strategy/`,
 `memory/`, `content/` and the rest); outside a copy of it they have nothing
 to read or write.
 

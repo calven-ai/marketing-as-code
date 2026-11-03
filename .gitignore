@@ -29,3 +29,6 @@ __pycache__/
 # Rendered images (scripts/brand_render.py); the spec reproduces them
 brand/renders/
 examples/*/brand/renders/
+
+# Skill ZIPs for the Claude app (scripts/package_skills.py); attached to releases
+dist/

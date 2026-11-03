@@ -1,0 +1,37 @@
+name: skills-release
+
+# Attaches one ZIP per product marketing skill to every published release, so
+# a marketer can download a skill and upload it in the Claude app
+# (Customize > Skills) without cloning anything. Runs only on a release a
+# maintainer publishes; holds no secrets beyond the job's own token.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to attach the ZIPs to
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  zips:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+
+      - name: Zip the skills
+        run: python3 scripts/package_skills.py --out dist/claude-app
+
+      - name: Attach them to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: gh release upload "$TAG" dist/claude-app/*.zip --clobber

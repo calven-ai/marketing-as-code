@@ -1,0 +1,16 @@
+{
+  "name": "product-marketing",
+  "version": "1.0.0",
+  "description": "Standalone product marketing skills for Claude: competitive intelligence, market research, ICP and personas, positioning and messaging, product intelligence, customer voice and win/loss. No repository needed.",
+  "author": {
+    "name": "Calven",
+    "email": "oss@calven.ai",
+    "url": "https://calven.ai"
+  },
+  "homepage": "https://github.com/calven-ai/marketing-as-code/tree/main/plugins/product-marketing",
+  "repository": "https://github.com/calven-ai/marketing-as-code",
+  "license": "MIT",
+  "privacyPolicyUrl": "https://calven.ai/privacy",
+  "keywords": ["product-marketing", "pmm", "competitive-intelligence", "battlecard", "win-loss", "positioning", "messaging", "icp", "personas", "skills"],
+  "skills": "./skills/"
+}

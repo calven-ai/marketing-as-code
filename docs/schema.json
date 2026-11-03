@@ -414,6 +414,15 @@
       "manual"
     ]
   },
+  "plugin_skills": {
+    "_doc": "Standalone skills in plugins/<plugin>/skills/ run in the Claude app with nothing else installed (plugins/product-marketing/README.md). The app takes a name and a description of at most 200 characters, so the check holds both, allows only these frontmatter keys, and refuses a backticked path that leaves the skill folder.",
+    "glob": "plugins/*/skills/*/SKILL.md",
+    "description_max": 200,
+    "frontmatter_keys": ["name", "description", "license", "metadata"],
+    "metadata_keys": ["job", "version"],
+    "jobs": ["foundations", "competitive-intelligence", "market-research", "icp-and-personas", "positioning-and-messaging", "product-intelligence", "customer-voice-and-win-loss"],
+    "job_titles": {"foundations": "Foundations", "competitive-intelligence": "Competitive intelligence", "market-research": "Market research", "icp-and-personas": "ICP and personas", "positioning-and-messaging": "Positioning and messaging", "product-intelligence": "Product intelligence", "customer-voice-and-win-loss": "Customer voice and win/loss"}
+  },
   "skills": {
     "_doc": "What a skill's metadata may say (docs/skill-authoring.md). areas group the roster in agents/README.md, in this order; needs and optional hold category ids from catalog.categories; roles carry a cadence; writes: external means the skill stages things in outside tools and never runs unattended.",
     "areas": [
@@ -644,6 +653,9 @@
     ],
     "scripts/README.md": [
       "scripts"
+    ],
+    "plugins/product-marketing/README.md": [
+      "plugin-product-marketing"
     ],
     "integrations/README.md": [
       "wired",

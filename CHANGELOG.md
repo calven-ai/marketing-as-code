@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- `plugins/product-marketing/`: 34 standalone product marketing skills
+  (competitive intelligence, market research, ICP and personas, positioning
+  and messaging, product intelligence, customer voice and win/loss), from
+  the prompts behind Calven's product agents. They run in the Claude app
+  with no repository: `scripts/package_skills.py` zips each one and
+  `skills-release.yml` attaches the ZIPs to every release. The repo is now a
+  plugin marketplace (`.claude-plugin/marketplace.json`) with two plugins,
+  and the check holds plugin skills to what the Claude app accepts.
+
 - Salesforce in `integrations/catalog/crm.json` loses its `local` route, the
   DX MCP server (`@salesforce/mcp`), which reaches end of life on
   2026-11-02 with no further releases or support (forcedotcom/mcp#46).
