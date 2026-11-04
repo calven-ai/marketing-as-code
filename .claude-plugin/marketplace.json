@@ -1,0 +1,22 @@
+{
+  "name": "marketing-as-code",
+  "owner": {
+    "name": "Calven",
+    "email": "oss@calven.ai"
+  },
+  "metadata": {
+    "description": "Calven's open-source marketing plugins."
+  },
+  "plugins": [
+    {
+      "name": "product-marketing",
+      "source": "./plugins/product-marketing",
+      "description": "Standalone product marketing skills: competitive intelligence, market research, ICP and personas, positioning and messaging, product intelligence, customer voice and win/loss."
+    },
+    {
+      "name": "marketing-as-code",
+      "source": "./",
+      "description": "The skills for a marketing team that runs from this repository. They expect its folder structure."
+    }
+  ]
+}

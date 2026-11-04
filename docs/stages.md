@@ -18,7 +18,7 @@ still replaced a subscription with an agent it owns. Read
 ## Stage 1: use what you already pay for, fully
 
 The AI assistant the team already has a plan for, used deliberately instead
-of one chat at a time. Three moves:
+of one chat at a time. Four moves:
 
 1. **Shared projects whose instructions are your context.** Positioning,
    voice, personas, and the words you never use go into the shared
@@ -30,6 +30,11 @@ of one chat at a time. Three moves:
    product's own documentation.
 3. **Desktop agents that work on files.** A folder of transcripts in, a
    summary out. A person watching.
+4. **Skills for the work you repeat.** A skill is a page of instructions
+   the assistant loads when a request matches it, shared across the team
+   and runnable on a schedule. The product marketing skills in
+   [plugins/product-marketing/](../plugins/product-marketing/README.md) run
+   this way: upload the ZIP, no repository.
 
 No repository, no Git, no coding agent, no keys beyond the ones the product
 manages. Nobody opens a terminal. You need a paid team plan, one person who

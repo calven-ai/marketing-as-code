@@ -1185,6 +1185,59 @@ def check_third_party(ctx):
     return out
 
 
+def check_plugin_skills(ctx):
+    """Standalone plugin skills fit the Claude app: name equals folder, a description of at most 200 characters, only the allowed keys, nothing outside the skill folder."""
+    out = []
+    spec = ctx.schema.get("plugin_skills")
+    if not spec:
+        return out
+    name_re = re.compile(ctx.schema["naming"]["skill_name"])
+    tops = tuple(ctx.schema["paths"]["top_dirs"])
+    path_re = re.compile(r"`((?:\.?[A-Za-z0-9_-]+/)+[A-Za-z0-9_.-]*)`")
+    for rel in ctx.glob(spec["glob"]):
+        folder = rel.split("/")[-2]
+        base = rel.rsplit("/", 1)[0]
+        fm = ctx.fm(rel) or {}
+        text = ctx.text(rel)
+
+        def bad(msg, line=1, level=ERROR, rel=rel):
+            out.append(Finding(level, rel, msg, "plugin-skill", line=line))
+
+        if fm.get("name") != folder or not name_re.match(folder):
+            bad(f"`name:` must equal the folder name `{folder}` (lowercase, hyphens)", line_of(text, "name:") or 1)
+        desc = str(fm.get("description") or "")
+        raw = next((l[len("description:"):].strip() for l in text.splitlines() if l.startswith("description:")), "")
+        if ": " in raw and raw[:1] not in "'\"":
+            bad("`description:` holds a colon and a space; YAML reads that as a new key and the Claude app "
+                "rejects the skill, so reword it or quote the value", line_of(text, "description:") or 1)
+        if not desc:
+            bad("`description:` is empty; Claude routes on it")
+        elif len(desc) > spec["description_max"]:
+            bad(f"`description:` is {len(desc)} characters; the Claude app takes at most {spec['description_max']}",
+                line_of(text, "description:") or 1)
+        if not fm.get("license"):
+            bad("add `license: MIT`; the skill travels on its own as a ZIP")
+        for key in fm:
+            if key not in spec["frontmatter_keys"]:
+                bad(f"frontmatter key `{key}` is not one the Claude app reads; allowed: "
+                    f"{', '.join(spec['frontmatter_keys'])}", line_of(text, f"{key}:") or 1)
+        meta = fm.get("metadata") if isinstance(fm.get("metadata"), dict) else {}
+        for key in meta:
+            if key not in spec["metadata_keys"]:
+                bad(f"unknown metadata key `{key}` (typo?)", line_of(text, f"{key}:") or 1, WARNING)
+        if meta.get("job") not in spec["jobs"]:
+            bad(f"`metadata.job` must be one of {', '.join(spec['jobs'])}", line_of(text, "job:") or 1)
+        for i, line in enumerate(text.splitlines(), 1):
+            if "{{" in line or "{%" in line:
+                bad("template syntax left in a standalone skill", i)
+            for path in path_re.findall(line):
+                if path.split("/")[0] in tops:
+                    bad(f"`{path}` is a repository path; a standalone skill runs without this repository", i)
+                elif path.startswith("references/") and not ctx.exists(f"{base}/{path}"):
+                    bad(f"`{path}` does not exist in this skill's folder", i)
+    return out
+
+
 def check_paths(ctx):
     """Backticked repo paths in skills and docs point at things that exist."""
     out = []
@@ -1278,6 +1331,8 @@ def render_block(ctx, block):
             name = rel[len("scripts/"):]
             rows.append(f"| [{name}]({name}) | {cell(script_summary(ctx.text(rel)))} |")
         return "\n".join(rows)
+    if block.startswith("plugin-"):
+        return _render_plugin(ctx, block[len("plugin-"):])
     if block == "wired":
         return _render_wired(ctx)
     if block == "categories":
@@ -1285,6 +1340,28 @@ def render_block(ctx, block):
     if block == "catalog":
         return _render_catalog(ctx)
     raise ValueError(block)
+
+
+def _render_plugin(ctx, plugin):
+    """One table per job, in schema order: the skill, what it does, its ZIP on the latest release."""
+    spec = ctx.schema["plugin_skills"]
+    releases = "https://github.com/calven-ai/marketing-as-code/releases/latest/download"
+    by_job = {}
+    for rel in ctx.glob(f"plugins/{plugin}/skills/*/SKILL.md"):
+        fm = ctx.fm(rel) or {}
+        meta = fm.get("metadata") if isinstance(fm.get("metadata"), dict) else {}
+        by_job.setdefault(meta.get("job"), []).append((rel.split("/")[-2], str(fm.get("description") or "")))
+    parts = []
+    for job in spec["jobs"]:
+        if job not in by_job:
+            continue
+        rows = [f"### {spec['job_titles'][job]}", "",
+                "| Skill | What it does | Claude app |", "| --- | --- | --- |"]
+        for name, desc in sorted(by_job[job]):
+            rows.append(f"| [{name}](skills/{name}/SKILL.md) | {cell(desc.split('. Use')[0])} | "
+                        f"[{name}.zip]({releases}/{name}.zip) |")
+        parts.append("\n".join(rows))
+    return "\n\n".join(parts)
 
 
 def _needs_cell(needs, optional, base):
@@ -1614,6 +1691,7 @@ CHECKS = [
     (check_paths, "file"),
     (check_links, "file"),
     (check_skills, "file"),
+    (check_plugin_skills, "file"),
     (check_required, "repo"),
     (check_mcp_configs, "repo"),
     (check_catalog, "repo"),

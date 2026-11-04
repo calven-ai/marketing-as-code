@@ -115,6 +115,7 @@ Whatever the mode, these need a person every time (AGENTS.md rule 3,
 | Health check | `/doctor`, `python3 scripts/doctor.py` | `check.yml` on every proposal and on `main`: tests the lint, annotates, keeps the sticky comment current; read-only, no secrets (shipped) |
 | Review gate | `python3 scripts/review_gate.py --pr N --dry-run` | `gate.yml` after every check run, from `main`: classifies, pushes the safe fixes as a Tidy commit, labels, publishes `review-gate`, merges green bookkeeping proposals (shipped) |
 | Tidy the approved copy | `python3 scripts/doctor.py --fix` | `housekeeping.yml`, Mondays: the safe fixes as one bookkeeping proposal; stale proposals closed after three weeks (shipped) |
+| Zip the product marketing skills for the Claude app | `python3 scripts/package_skills.py` | `skills-release.yml`, on every published release: attaches one ZIP per skill (shipped) |
 | Repository settings | `sh scripts/github_setup.sh`, then `python3 scripts/doctor.py --github` | Never; settings are applied once by an admin ([github-settings.md](github-settings.md)) |
 
 When you add an integration or a workflow, add its row here. The checklist

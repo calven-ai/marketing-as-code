@@ -876,5 +876,32 @@ class TestSkillLinks(LintCase):
         self.assertEqual([], self.findings("skill-links", lint.ERROR))
 
 
+class TestPluginSkills(LintCase):
+    GOOD = ("---\nname: battlecard\ndescription: A sales battlecard. Use when \"battlecard for X\".\nlicense: MIT\n"
+            "metadata:\n  job: competitive-intelligence\n  version: 1.0.0\n---\n\n# Battlecard\n\n"
+            "Open `references/card.md`.\n")
+
+    def test_standalone_skill_is_clean(self):
+        write(self.root, "plugins/pmm/skills/battlecard/SKILL.md", self.GOOD)
+        write(self.root, "plugins/pmm/skills/battlecard/references/card.md", "# Card\n")
+        self.assertEqual([], self.findings("plugin-skill"))
+
+    def test_app_limits_and_repo_paths(self):
+        text = (self.GOOD.replace("A sales battlecard.", "x" * 201 + ".")
+                .replace("license: MIT\n", "license: MIT\nallowed-tools: Read\n")
+                .replace("competitive-intelligence", "sales")
+                + "Read `strategy/positioning.md` and {{ company }}.\n")
+        write(self.root, "plugins/pmm/skills/card/SKILL.md", text)
+        messages = " ".join(f.message for f in self.findings("plugin-skill", lint.ERROR))
+        for part in ("folder name", "at most 200", "allowed-tools", "metadata.job", "repository path",
+                     "template syntax", "does not exist"):
+            self.assertIn(part, messages)
+
+    def test_unquoted_colon_in_description(self):
+        write(self.root, "plugins/pmm/skills/battlecard/SKILL.md", self.GOOD.replace("A sales battlecard.", "Card: one."))
+        write(self.root, "plugins/pmm/skills/battlecard/references/card.md", "# Card\n")
+        self.assertIn("colon and a space", " ".join(f.message for f in self.findings("plugin-skill")))
+
+
 if __name__ == "__main__":
     unittest.main()
