@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-13
+
+- The README names the lineage: infrastructure as code, docs as code,
+  marketing as code.
+
 - `plugins/product-marketing/`: 34 standalone product marketing skills
   (competitive intelligence, market research, ICP and personas, positioning
   and messaging, product intelligence, customer voice and win/loss), from

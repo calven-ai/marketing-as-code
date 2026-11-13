@@ -40,6 +40,12 @@ code: strategy, messaging, briefs, decisions and knowledge as plain text, in
 one place, where agents read all of it and write into it. The repo is the
 floor. The agents are the point.
 
+The idea has a lineage. Infrastructure as code took server setup out of the
+wiki and put it into text files that are reviewed and versioned like any
+other change. Docs as code did the same for documentation. Marketing as
+code does it for a marketing team's context: the strategy, messaging,
+briefs and decisions an agent has to read before it can do the work.
+
 This repository is that floor, pre-built. A roster of agents and skills
 for every marketing function ([agents/README.md](agents/README.md)). Five
 tools wired across six integration categories, and a catalog of the rest,

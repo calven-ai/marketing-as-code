@@ -76,7 +76,7 @@ git fetch template
 git checkout template/main -- scripts .github/workflows docs/schema.json .agents/skills scripts/hooks
 ```
 
-Prefer a released version over the moving branch: `template/v0.2.0` in
+Prefer a released version over the moving branch: `template/v0.3.0` in
 place of `template/main`, from the template's Releases page, so you can
 see exactly which version your copy carries.
 
