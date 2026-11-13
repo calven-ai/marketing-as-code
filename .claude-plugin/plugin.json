@@ -1,6 +1,6 @@
 {
   "name": "marketing-as-code",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Skills for a B2B marketing team that runs from a Git repository: strategy, content, SEO and AEO, campaigns, meeting memory and review. The skills expect this repository's folder structure.",
   "author": {
     "name": "Calven",
