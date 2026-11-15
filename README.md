@@ -331,6 +331,15 @@ marketing context layer described in
 [integrations/context-layer.md](integrations/context-layer.md). The repo
 works without it.
 
+## More from Calven
+
+- [calven-mcp](https://github.com/calven-ai/calven-mcp): your approved GTM context in Claude, ChatGPT, Codex, Cursor and Copilot, through a remote MCP server.
+- [demoverse](https://github.com/calven-ai/demoverse): synthetic B2B sales data: a fictional company's history in Salesforce, HubSpot, Google Drive and Slack.
+- [calven-migrate-from-klue](https://github.com/calven-ai/calven-migrate-from-klue): export your Klue cards and battlecards to Markdown and JSON on your machine.
+- [calven-migrate-from-crayon](https://github.com/calven-ai/calven-migrate-from-crayon): export your Crayon battlecards and win/loss stories to Markdown and JSON on your machine.
+
+All projects: [github.com/calven-ai](https://github.com/calven-ai)
+
 ## License
 
 [MIT](LICENSE).
