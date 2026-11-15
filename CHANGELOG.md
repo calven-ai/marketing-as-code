@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- Marketo in `integrations/catalog/marketing-automation.json` is re-checked
+  against Adobe's MCP operations page (updated 2026-11-10). The caveats now
+  say the server has 182 operations, some that change or delete data, and
+  the discovery tools (`list_tool_categories`, `search_tools`) that show
+  what your API user can reach. They also say `schedule_smart_campaign`
+  fails on the client-credential route this entry wires, so agents use
+  `schedule_campaign`. The stale "slated for September 2026" note is gone.
+
 ## [0.3.0] - 2026-11-13
 
 - The README names the lineage: infrastructure as code, docs as code,
