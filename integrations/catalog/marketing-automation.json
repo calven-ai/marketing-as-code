@@ -49,7 +49,7 @@
       "name": "Marketo (Adobe)",
       "source": "marketo",
       "verified": "vendor",
-      "checked": "2026-09-04",
+      "checked": "2026-11-15",
       "source_url": "https://experienceleague.adobe.com/en/docs/marketo-developer/marketo/mcp-server",
       "capabilities": ["programs", "smart-campaigns", "leads", "lists", "emails", "forms", "bulk-export"],
       "writes": true,
@@ -57,9 +57,11 @@
       "read_only_switch": null,
       "caveats": [
         "write tool names not verified; deny the whole server (`mcp__marketo`) until checked",
-        "100+ operations, most of them writes (create programs, campaigns, emails, forms); no read-only mode is documented",
+        "182 operations as of 2026-11-10 (Adobe's Marketo Engage MCP operations page), across asset management, lead data and campaign automation; most are writes (create and clone programs, forms and smart campaigns, configure smart list filters, activate campaigns, change static list membership)",
+        "Adobe says some operations that change or delete data require confirmation and additional access; no read-only mode is documented, so give the API user only the permissions the team needs and try it in a sandbox first",
+        "The server has discovery tools (`list_tool_categories`, `search_tools`); ask the agent to run them to see which operations your API user and instance can reach",
         "Credentials travel as per-request headers, so the entry uses ${MARKETO_CLIENT_ID}, ${MARKETO_CLIENT_SECRET} and ${MARKETO_MUNCHKIN_ID} placeholders; an IMS bearer token is the alternative",
-        "Smart List and Smart Campaign create/update were slated for September 2026; check the changelog"
+        "`schedule_smart_campaign` does not work with client-credential connections (the header route here); use `schedule_campaign`"
       ],
       "routes": {
         "mcp": [

@@ -53,7 +53,7 @@ Falls back to: generic.
 | Vendor | Mechanism | Auth | Writes | Headless | Verified | Checked |
 | --- | --- | --- | --- | --- | --- | --- |
 | HubSpot Marketing Hub | http `hubspot`: https://mcp.hubspot.com; CLI `hs` | oauth | yes, 5 tools recorded | no | vendor | 2026-09-04 |
-| Marketo (Adobe) | http `marketo`: https://marketo-mcp.adobe.io/mcp | header: `MARKETO_CLIENT_ID`, `MARKETO_CLIENT_SECRET`, `MARKETO_MUNCHKIN_ID` | yes, tools unrecorded | yes | vendor | 2026-09-04 |
+| Marketo (Adobe) | http `marketo`: https://marketo-mcp.adobe.io/mcp | header: `MARKETO_CLIENT_ID`, `MARKETO_CLIENT_SECRET`, `MARKETO_MUNCHKIN_ID` | yes, tools unrecorded | yes | vendor | 2026-11-15 |
 | Customer.io | http `customerio`: https://mcp.customer.io/mcp (+1 variant) | oauth | yes, tools unrecorded | no | listing | 2026-09-04 |
 | Braze | http `braze`: https://mcp.braze.com/mcp (+1 variant) | oauth | yes, tools unrecorded | no | vendor | 2026-09-04 |
 | Klaviyo | http `klaviyo`: https://mcp.klaviyo.com/mcp (+1 variant) | oauth | yes, tools unrecorded; read-only switch | no | vendor | 2026-09-04 |
