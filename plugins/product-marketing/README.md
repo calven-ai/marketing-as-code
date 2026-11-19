@@ -79,6 +79,7 @@ and an agent product, and it is what [Calven](https://calven.ai) is for.
 | [competitor-mentions-in-calls](skills/competitor-mentions-in-calls/SKILL.md) | Pulls each competitor mention from call transcripts, verbatim, with speaker role, context and sentiment, rolled up by competitor | [competitor-mentions-in-calls.zip](https://github.com/calven-ai/marketing-as-code/releases/latest/download/competitor-mentions-in-calls.zip) |
 | [find-competitors](skills/find-competitors/SKILL.md) | Finds and tiers a company's direct, indirect and emerging competitors from its site and web search, each with why it competes and evidence | [find-competitors.zip](https://github.com/calven-ai/marketing-as-code/releases/latest/download/find-competitors.zip) |
 | [new-entrant-scan](skills/new-entrant-scan/SKILL.md) | Scans a category for new entrants (funding, launches, hiring, reviews), drop the noise, and name the few to watch and why | [new-entrant-scan.zip](https://github.com/calven-ai/marketing-as-code/releases/latest/download/new-entrant-scan.zip) |
+| [report-refresh](skills/report-refresh/SKILL.md) | Updates last quarter's report instead of rewriting it. Returns a redline of what changed, each change sourced and dated, and writes the new version once you approve | [report-refresh.zip](https://github.com/calven-ai/marketing-as-code/releases/latest/download/report-refresh.zip) |
 
 ### Market research
 

@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- `report-refresh`, the 35th product marketing skill: updates a previous
+  report (competitive landscape, deep dive, market or win/loss report)
+  instead of rewriting it. It returns a redline of kept, changed, added and
+  removed claims, each with its source and date, and writes the new version
+  only after a person approves the redline.
+
 - Marketo in `integrations/catalog/marketing-automation.json` is re-checked
   against Adobe's MCP operations page (updated 2026-11-10). The caveats now
   say the server has 182 operations, some that change or delete data, and
