@@ -40,4 +40,4 @@ body:
     attributes:
       label: Template version
       description: The tag your copy was made from, or the first line of `CHANGELOG.md` that names a version.
-      placeholder: v0.2.0
+      placeholder: v0.3.0
