@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+- `report-refresh`, the 35th product marketing skill: updates a previous
+  report (competitive landscape, deep dive, market or win/loss report)
+  instead of rewriting it. It returns a redline of kept, changed, added and
+  removed claims, each with its source and date, and writes the new version
+  only after a person approves the redline.
+
 ## [0.3.0] - 2026-11-13
 
 - The README names the lineage: infrastructure as code, docs as code,
